@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "211685825322",
+    "firebase_url": "https://bodtchat.firebaseio.com",
+    "project_id": "bodtchat",
+    "storage_bucket": "bodtchat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:211685825322:android:4607a3a61e0b7600",
+        "android_client_info": {
+          "package_name": "com.root.bodtchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "211685825322-rj5faeu7t9va7q2ob3dd2jiukd10540i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.root.bodtchat",
+            "certificate_hash": "95eac1690e99ba065e06373de195e051fd1a3a78"
+          }
+        },
+        {
+          "client_id": "211685825322-uskifhcpc80h3176p515eu3e1fms7m9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZGvRx5KLLOqGzAPbk_PBbrKZLdlRdgOY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "211685825322-uskifhcpc80h3176p515eu3e1fms7m9h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "211685825322-g0i9nesck10qefkddjefo6s0p6mghfpu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.root.bodtChat"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
