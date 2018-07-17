@@ -1,8 +1,7 @@
-# bodt_chat
-
-A new Flutter application.
+# Bodt Chat
+The online version is now live!  Multiple message threads are now supported, but messages are currently stored unencrypted.  Next step is E2EE.
 
 ## Getting Started
 
-For help getting started with Flutter, view our online
+Check out the flutter 
 [documentation](https://flutter.io/).
