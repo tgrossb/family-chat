@@ -49,8 +49,14 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
         // Remove any earlier copies
         setState(() {
-          _groups.removeWhere((GroupsListItem item) => item.name == groupName);
+          for (GroupsListItem group in _groups)
+            if (group.name == groupName){
+              _groups.remove(group);
+              break;
+            }
         });
+
+        print("Raw time: " + ev.snapshot.key);
 
         GroupsListItem group = new GroupsListItem(
           rawTime: ev.snapshot.key,
@@ -82,7 +88,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
         ),
         body: new Container(
           child: _groups.length > 0 ? new ListView.builder(
-            padding: new EdgeInsets.all(8.0),
+            padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
             reverse: false,
             itemBuilder: (_, int index) => buildGroup(context, index),
             itemCount: _groups.length,
@@ -150,7 +156,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     mainRef.child(group.name).remove();
 
     group.animationController.addStatusListener((AnimationStatus status){
-      if (status == AnimationStatus.completed)
+      if (status == AnimationStatus.dismissed)
         setState(() {
           _groups.remove(group);
         });

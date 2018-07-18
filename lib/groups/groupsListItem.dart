@@ -4,21 +4,24 @@ import '../chatScreen.dart';
 import 'dart:math' as math;
 
 class EaseIn extends Tween<Offset> {
-/*
-  final double period = 2.0;
-
-  @override
-  double transform(double t) {
-    assert(t >= 0.0 && t <= 1.0);
-    final double s = period / 4.0;
-    return math.pow(2.0, -10 * t) * math.sin((t - s) * (math.pi * 2.0) / period) + 1.0;
-  }
-*/
-  static const Curve copy = Curves.elasticOut;
   EaseIn(): super(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0));
 
+  double map(double x, double a, double b, double c, double d){
+    return (x-a)*(d-c)/(b-a)+c;
+  }
+
+  double transform(double t){
+    // My one
+//    t = map(t, 0.0, 1.0, 0.0, 3.5);
+//    double x = 1 - math.pow(math.e, -.5*t*t) * math.cos(t*t);
+
+    double x = 1 - math.pow(math.e, -5*t*t) * math.cos(10*t*t);
+
+    return x;
+  }
+
   Offset lerp(double t){
-    return Offset(1.0-copy.transform(t), 0.0);
+    return Offset(1.0 - transform(t), 0.0);
   }
 }
 
@@ -48,22 +51,17 @@ class GroupsListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return animationController == null ? normalMessage(context) : new SlideTransition(
         position: new EaseIn().animate(animationController),
-//        position: new CurvedAnimation(parent: animationController, curve: new EaseIn()),
-//        axisAlignment: 0.0,
-//        axis: Axis.horizontal,
-        textDirection: TextDirection.ltr,
-
         child: normalMessage(context)
     );
   }
 
   Widget normalMessage(BuildContext context){
-    return  GestureDetector(
+    return GestureDetector(
       onTap: () => startGroup(context, name),
       child: new Container(
         color: Colors.transparent,
         alignment: Alignment(1.0, 0.0),
-        margin: const EdgeInsets.symmetric(vertical: 10.0),
+        margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
         child: new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
