@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
-import 'groupsListScreen.dart';
+import 'package:bodt_chat/groups/groupsListScreen.dart';
 
 class SplashPage extends StatefulWidget {
   @override
