@@ -20,7 +20,7 @@ class GroupsListScreen extends StatefulWidget {
 class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderStateMixin {
   FirebaseUser user;
   DatabaseReference mainRef;
-  StreamSubscription<Event> mainRefSubscription;
+  StreamSubscription<Event> addSub, deleteSub;
   bool canSub = false;
 
   final int growAnimationDuration = 700;
@@ -33,10 +33,23 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
     mainRef = db.reference();
     mainRef.keepSynced(true);
-    mainRefSubscription = mainRef.onChildAdded.listen((Event event) => _onChatAdded(event.snapshot.key));
+    addSub = mainRef.onChildAdded.listen((Event event) => _onGroupAdded(event.snapshot.key));
+    deleteSub = mainRef.onChildRemoved.listen((Event event) => _onGroupDeleted(event.snapshot.key));
   }
 
-  void _onChatAdded(String groupName){
+  void _onGroupDeleted(String groupName){
+    GroupsListItem group = _groups.firstWhere((GroupsListItem item) => item.name == groupName);
+
+    group.animationController.addStatusListener((AnimationStatus status){
+      if (status == AnimationStatus.dismissed)
+        setState(() {
+          _groups.remove(group);
+        });
+    });
+    group.animationController.reverse();
+  }
+
+  void _onGroupAdded(String groupName){
     print("Chat added");
     StreamSubscription las;
     las = mainRef.child(groupName)
@@ -82,7 +95,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text("Chats"),
+          title: new Text("Groups"),
           // No elevation if its on ios
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
@@ -131,7 +144,21 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
         builder: (context) => new ChatScreen(user: user, chatName: name)));
 
     // Force it to recalculate the clicked on chat when it returns here
-    _onChatAdded(name);
+/*
+    setState(() {
+      for(int c=0; c<_groups.length; c++)
+        if (_groups[c].name == name){
+          _groups.removeAt(c);
+          break;
+        }
+    });
+*/
+    setState(() {
+      for (GroupsListItem item in _groups){
+        print("Item: " + item.name + " (" + item.time + ")");
+      }
+    });
+    _onGroupAdded(name);
   }
 
   void _addNewGroup(String groupName){
@@ -154,19 +181,12 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
   void _finishDeleteGroup(GroupsListItem group) {
     mainRef.child(group.name).remove();
-
-    group.animationController.addStatusListener((AnimationStatus status){
-      if (status == AnimationStatus.dismissed)
-        setState(() {
-          _groups.remove(group);
-        });
-    });
-    group.animationController.reverse();
   }
 
   @override
   void dispose() {
-    mainRefSubscription.cancel();
+    addSub.cancel();
+    deleteSub.cancel();
     for (GroupsListItem message in _groups)
       message.animationController.dispose();
     super.dispose();
