@@ -12,6 +12,7 @@ final ThemeData iosTheme = new ThemeData(
 final ThemeData defaultTheme = new ThemeData(
   primarySwatch: Colors.cyan,
   accentColor: Colors.orangeAccent[400],
+  splashColor: Colors.redAccent,
   primaryTextTheme: TextTheme(display1: new TextStyle(color: Colors.black54))
 );
 

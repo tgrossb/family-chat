@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:bodt_chat/groups/groupsListScreen.dart';
 
 class SplashPage extends StatefulWidget {
@@ -9,16 +10,46 @@ class SplashPage extends StatefulWidget {
   State createState() => new _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class SineAnimation extends Tween<Offset> {
+  SineAnimation({Offset begin, Offset end}): super(begin: begin, end: end);
+
+  Offset lerp(double t){
+    return new Offset(0.0, math.sin(t * math.pi));
+  }
+}
+
+class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
+  final double ballDiameter = 10.0;
+  final Offset maxHeight = new Offset(0.0, 10.0);
+  final Duration period = new Duration(milliseconds: 700);
+
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn gSignIn = new GoogleSignIn();
   bool signingIn = true;
+  AnimationController controller;
+  Animation<Offset> firstHeight;
 
   @override
   void initState(){
     super.initState();
 
-    signingIn = true;
+    controller = new AnimationController(
+        duration: period,
+        vsync: this);
+    firstHeight = new SineAnimation(begin: Offset.zero, end: maxHeight).animate(controller);
+    firstHeight..addListener(() => setState((){}))
+                ..addStatusListener((status){
+                  if (status == AnimationStatus.completed){
+                    if (signingIn)
+                      controller.reverse();
+                  } else if (status == AnimationStatus.dismissed){
+                    if (signingIn)
+                      controller.forward();
+                  }
+                });
+    controller.forward();
+    
+//    signingIn = false;
     attemptSilentSignIn(context).then((FirebaseUser user) => handleUser(user));
   }
 
@@ -69,17 +100,48 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Sign In"),
-      ),
-      body: new Center(
-          child: signingIn ? new CircularProgressIndicator() :
+      body: new Container(
+        color: Theme.of(context).primaryColor,
+        child: new Center(
+          child: signingIn ? new CircularProgressIndicator(
+            valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(context).splashColor),
+          ) :
             new RaisedButton(
               onPressed: () => signInFlow(context),
-              child: new Text("Sign In With Google"),
-              color: Theme.of(context).accentColor,
+              child: new Text("Sign In With Google", style: TextStyle(color: Colors.white),),
+              color: Theme.of(context).splashColor,
             ),
+        )
       ),
     );
+  }
+
+  Widget buildProgressIndicator(){
+    return new Row(
+      children: <Widget>[
+        buildCircle(ballDiameter, Colors.green),
+        buildCircle(ballDiameter, Colors.blue),
+        buildCircle(ballDiameter, Colors.red),
+        buildCircle(ballDiameter, Colors.yellow)
+      ],
+    )
+  }
+
+  Widget buildCircle(double d, Color color){
+    return new Container(
+      width: d,
+      height: d,
+      decoration: new BoxDecoration(
+        color: color,
+        shape: BoxShape.circle
+      ),
+    );
+  }
+
+  @override
+  void @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }

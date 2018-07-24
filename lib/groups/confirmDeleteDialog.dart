@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'groupsListItem.dart';
 
 class ConfirmDeleteDialog extends StatefulWidget {
-  final GroupsListItem group;
+  final GroupsListItemState group;
   final Function deleteGroup;
 
   const ConfirmDeleteDialog({this.group, this.deleteGroup});
@@ -12,7 +12,7 @@ class ConfirmDeleteDialog extends StatefulWidget {
 }
 
 class ConfirmDeleteDialogState extends State<ConfirmDeleteDialog> {
-  final GroupsListItem group;
+  final GroupsListItemState group;
   final Function deleteGroup;
 
   ConfirmDeleteDialogState({this.group, this.deleteGroup});

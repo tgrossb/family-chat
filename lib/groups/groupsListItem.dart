@@ -25,7 +25,17 @@ class EaseIn extends Tween<Offset> {
   }
 }
 
-class GroupsListItem extends StatelessWidget {
+class GroupData {
+  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.start, this.delete, this.animationController});
+  Function start, delete;
+  String rawTime, name, time;
+  AnimationController animationController;
+  DateTime utcTime;
+}
+
+class GroupsListItem extends StatefulWidget {
+  static GroupsListItemState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<GroupsListItemState>());
+
   static DateTime parseTime(String rawTime){
     if (rawTime == "0")
       return new DateTime(0);
@@ -40,12 +50,33 @@ class GroupsListItem extends StatelessWidget {
     return format.format(dt.toLocal());
   }
 
-  GroupsListItem({this.rawTime, this.name, this.startGroup, this.deleteGroup, this.animationController}):
-        utcTime = GroupsListItem.parseTime(rawTime), time = GroupsListItem.formatTime(rawTime);
-  final Function startGroup, deleteGroup;
-  final String time, name, rawTime;
+  GroupsListItem({this.key, this.rawTime, this.name, this.start, this.delete, this.animationController}): super(key: key);
+  final GlobalKey<GroupsListItemState> key;
+  final String rawTime, name;
+  final Function start, delete;
   final AnimationController animationController;
-  final DateTime utcTime;
+
+  @override
+  State createState(){
+    GroupsListItemState itemState = new GroupsListItemState(
+        utcTime: parseTime(rawTime),
+        time: formatTime(rawTime),
+        name: name,
+        start: start,
+        delete: delete,
+        animationController: animationController
+    );
+//    key.currentState = itemState;
+    return itemState;
+  }
+}
+
+class GroupsListItemState extends State<GroupsListItem> {
+  GroupsListItemState({this.utcTime, this.time, this.name, this.start, this.delete, this.animationController});
+  Function start, delete;
+  String time, name;
+  AnimationController animationController;
+  DateTime utcTime;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +88,7 @@ class GroupsListItem extends StatelessWidget {
 
   Widget normalMessage(BuildContext context){
     return GestureDetector(
-      onTap: () => startGroup(context, name),
+      onTap: () => start(context, name),
       child: new Container(
         color: Colors.transparent,
         alignment: Alignment(1.0, 0.0),
@@ -70,7 +101,7 @@ class GroupsListItem extends StatelessWidget {
 
             new IconButton(
               icon: new Icon(Icons.delete),
-              onPressed: () => deleteGroup(context, this),
+              onPressed: () => delete(context, this),
             ),
           ]
         ),
@@ -110,11 +141,47 @@ class GroupsListItem extends StatelessWidget {
     );
   }
 
-  bool isAfter(GroupsListItem other){
+  void update({String newRawTime, String newName, bool reanimate = true}){
+    if (newRawTime != null || newName != null) {
+      setState(() {
+        if (newRawTime != null){
+          utcTime = GroupsListItem.parseTime(newRawTime);
+          time = GroupsListItem.formatTime(newRawTime);
+        }
+
+        if (newName != null)
+          name = newName;
+
+        if (reanimate)
+          animationController.forward(from: 0.0);
+      });
+    }
+  }
+
+  void updateFromData({@required GroupData data}){
+    if (data.start == null && data.delete == null && data.time == null && data.rawTime == null &&
+        data.name == null && data.animationController == null && data.rawTime == null)
+      return;
+    setState(() {
+      if (data.start != null) start = data.start;
+      if (data.delete != null) delete = data.delete;
+      if (data.name != null) name = data.name;
+      if (data.animationController != null) animationController = data.animationController;
+      if (data.utcTime != null && data.time != null){
+        utcTime = data.utcTime;
+        time = data.time;
+      } else if (data.rawTime != null){
+        utcTime = GroupsListItem.parseTime(data.rawTime);
+        time = GroupsListItem.formatTime(data.rawTime);
+      }
+    });
+  }
+
+  bool isAfter(GroupsListItemState other){
     return utcTime.isAfter(other.utcTime);
   }
 
-  int compareTo(GroupsListItem other){
+  int compareTo(GroupsListItemState other){
     return utcTime.difference(other.utcTime).inMicroseconds;
   }
 

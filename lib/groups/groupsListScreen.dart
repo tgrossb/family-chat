@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bodt_chat/groups/groupsListItem.dart';
-import 'newGroupDialog.dart';
-import 'confirmDeleteDialog.dart';
+import './groupsListItem.dart';
+import './newGroupDialog.dart';
+import './confirmDeleteDialog.dart';
+import './slideRoute.dart';
 import '../chatScreen.dart';
 import '../main.dart';
 
@@ -20,80 +22,134 @@ class GroupsListScreen extends StatefulWidget {
 class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderStateMixin {
   FirebaseUser user;
   DatabaseReference mainRef;
-  StreamSubscription<Event> addSub, deleteSub;
+  StreamSubscription<Event> addSub, deleteSub, changeSub;
   bool canSub = false;
 
   final int growAnimationDuration = 700;
-  final List<GroupsListItem> _groups = [];
+  Map<String, GlobalKey<GroupsListItemState>> _groupStateKeys = {};
+  List<GroupsListItem> _groups = [];
+  Map<GlobalKey<GroupsListItemState>, GroupData> _toUpdate = {};
 
-  GroupsListScreenState(FirebaseUser user){
+  GroupsListScreenState(FirebaseUser user) {
     this.user = user;
+  }
+
+  @override
+  void initState(){
+    super.initState();
+
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
     mainRef = db.reference();
     mainRef.keepSynced(true);
-    addSub = mainRef.onChildAdded.listen((Event event) => _onGroupAdded(event.snapshot.key));
+    addSub = mainRef.onChildAdded.listen((Event event) => _onGroupAdded(event.snapshot));
     deleteSub = mainRef.onChildRemoved.listen((Event event) => _onGroupDeleted(event.snapshot.key));
+    changeSub = mainRef.onChildChanged.listen((Event event) => _onGroupChanged(event.snapshot.key));
   }
 
-  void _onGroupDeleted(String groupName){
-    GroupsListItem group = _groups.firstWhere((GroupsListItem item) => item.name == groupName);
+  void _onGroupChanged(String groupName) {
+    print("Group change");
+    var stateKey = _groupStateKeys[groupName];
+    stateKey.currentState.setState(() {
+      // Set displayed things to empty and make clicks do nothing
+      // This will be changed once the new data is loaded
+      stateKey.currentState
+          ..time = ""
+          ..name = ""
+          ..start = (){};
+    });
+    handleGroupChange(stateKey, groupName);
+  }
+
+  void handleGroupChange(GlobalKey<GroupsListItemState> stateKey, String groupName) async {
+    // On change, just recalculate the group info and redo the animation
+    GroupData data = await getGroupData(groupName);
+    setState(() {
+      stateKey.currentState
+          ..utcTime = GroupsListItem.parseTime(data.rawTime)
+          ..time = GroupsListItem.formatTime(data.rawTime)
+          ..name = data.name
+          ..animationController.forward(from: 0.0);
+    });
+    print("Group change finished");
+  }
+
+  void _onGroupDeleted(String groupName) {
+    var group = _groupStateKeys[groupName].currentState;
 
     group.animationController.addStatusListener((AnimationStatus status){
       if (status == AnimationStatus.dismissed)
         setState(() {
-          _groups.remove(group);
+          group.animationController.dispose();
+          group.dispose();
+          _groups.removeWhere((GroupsListItem item) => item.key.currentState.name == groupName);
+          _groupStateKeys.remove(groupName);
         });
     });
     group.animationController.reverse();
   }
 
-  void _onGroupAdded(String groupName){
+  void _onGroupAdded(DataSnapshot snapshot){
+    String groupName = snapshot.key;
+    Map v = snapshot.value;
+    print("Length: " + v.length.toString());
     print("Chat added");
-    StreamSubscription las;
-    las = mainRef.child(groupName)
-      .child(BodtChatApp.messagesChild)
-      .limitToLast(1)
-      .onChildAdded
-      .listen((Event ev) {
+    var stateKey = new GlobalKey<GroupsListItemState>();
+    GroupsListItem item = new GroupsListItem(
+      key: stateKey,
+      rawTime: "0",
+      name: groupName,
+      start: (){},
+      delete: (){},
+      animationController: new AnimationController(
+          duration: new Duration(milliseconds: growAnimationDuration),
+          vsync: this
+      ),
+    );
 
-        las.cancel();
+    // Force it to create a state in case handleAdd happens before a rebuilt
+//    item.createState();
 
-        // Remove any earlier copies
-        setState(() {
-          for (GroupsListItem group in _groups)
-            if (group.name == groupName){
-              _groups.remove(group);
-              break;
-            }
-        });
+    setState(() {
+      _groupStateKeys.putIfAbsent(groupName, () => stateKey);
+      _groups.insert(0, item);
+    });
 
-        print("Raw time: " + ev.snapshot.key);
+    item.animationController.forward();
+    _handleGroupAdd(stateKey, groupName, item);
+  }
 
-        GroupsListItem group = new GroupsListItem(
-          rawTime: ev.snapshot.key,
-          name: groupName,
-          startGroup: startGroup,
-          deleteGroup: deleteGroup,
-          animationController: new AnimationController(
-            duration: new Duration(milliseconds: growAnimationDuration),
-            vsync: this
-          ),
-        );
-        group.animationController.forward();
+  void _handleGroupAdd(GlobalKey<GroupsListItemState> stateKey, String groupName, GroupsListItem item) async {
+    GroupData data = await getGroupData(groupName, false);
+    if (stateKey.currentState != null)
+      stateKey.currentState.updateFromData(data: data);
+    else
+      // Mark this group as one that needs updating
+      _toUpdate[stateKey] = data;
 
-        // Add the group and sort
-        setState(() {
-          _groups.add(group);
-          _groups.sort((GroupsListItem i1, GroupsListItem i2) => i2.compareTo(i1));
-        });
-      });
+    print("Add finished");
+  }
+
+  Future<GroupData> getGroupData([String groupName, bool includeName = true]) async {
+    Event event = await mainRef.child(groupName).child(BodtChatApp.messagesChild).limitToLast(1).onChildAdded.first;
+
+    print("Raw time: " + event.snapshot.key);
+    return new GroupData(rawTime: event.snapshot.key, name: groupName, start: startGroup, delete: deleteGroup);
+  }
+
+  void updateStates(){
+    print("Updating states (length: " + _toUpdate.length.toString() + ")");
+    _toUpdate.forEach((var stateKey, var data){
+      stateKey.currentState.updateFromData(data: data);
+      print("Finishing " + stateKey.currentState.name);
+    });
+    _toUpdate.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    Widget res = new Scaffold(
         appBar: new AppBar(
           title: new Text("Groups"),
           // No elevation if its on ios
@@ -125,40 +181,39 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
           child: new Icon(Icons.add),
           onPressed: () => showDialog(
               context: context,
-              builder: (BuildContext context) => new NewGroupDialog(groups: _groups, addNewGroup: _addNewGroup)
+              builder: (BuildContext context) => new NewGroupDialog(groups: _groupStateKeys, addNewGroup: _addNewGroup)
           ),
         ),
     );
+    // Update anything that needs to be updated now that all have been added to the tree
+    updateStates();
+    return res;
   }
 
   Widget buildGroup(BuildContext context, int index){
+    print("Constructing " + index.toString() + " from length " + _groupStateKeys.length.toString() + ", " + _groups.length.toString());
     return new Column(
-      children: index == _groups.length-1 ?
+      children: index == _groupStateKeys.length-1 ?
         <Widget>[_groups[index]] :
         <Widget>[_groups[index], new Divider(height: 1.0)]
     );
   }
 
   void startGroup(BuildContext context, String name) async {
-    await Navigator.of(context).push(new MaterialPageRoute(
-        builder: (context) => new ChatScreen(user: user, chatName: name)));
+    addSub.pause();
+    deleteSub.pause();
+    changeSub.pause();
+//    await Navigator.of(context).push(new ListToGroupRoute(
+//        builder: (context) => new ChatScreen(user: user, chatName: name)));
 
-    // Force it to recalculate the clicked on chat when it returns here
-/*
-    setState(() {
-      for(int c=0; c<_groups.length; c++)
-        if (_groups[c].name == name){
-          _groups.removeAt(c);
-          break;
-        }
-    });
-*/
-    setState(() {
-      for (GroupsListItem item in _groups){
-        print("Item: " + item.name + " (" + item.time + ")");
-      }
-    });
-    _onGroupAdded(name);
+    await Navigator.of(context).push(new SlideLeftRoute(widget: new ChatScreen(user: user, chatName: name)));
+
+    addSub.resume();
+    deleteSub.resume();
+    changeSub.resume();
+
+    // _onGroupChanged should be triggered, so we don't need this
+//    _onGroupAdded(name);
   }
 
   void _addNewGroup(String groupName){
@@ -172,14 +227,15 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     });
   }
 
-  void deleteGroup(BuildContext context, GroupsListItem group) {
+  void deleteGroup(BuildContext context, GroupsListItemState group) {
     showDialog(
       context: context,
       builder: (BuildContext context) => new ConfirmDeleteDialog(group: group, deleteGroup: _finishDeleteGroup),
     );
   }
 
-  void _finishDeleteGroup(GroupsListItem group) {
+  void _finishDeleteGroup(GroupsListItemState group) {
+    // This will trigger the onChildDelete listener which will handle the rest
     mainRef.child(group.name).remove();
   }
 
@@ -187,8 +243,11 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   void dispose() {
     addSub.cancel();
     deleteSub.cancel();
-    for (GroupsListItem message in _groups)
-      message.animationController.dispose();
+    changeSub.cancel();
+    for (GlobalKey<GroupsListItemState> stateKey in _groupStateKeys.values) {
+      stateKey.currentState.animationController.dispose();
+      stateKey.currentState.dispose();
+    }
     super.dispose();
   }
 }

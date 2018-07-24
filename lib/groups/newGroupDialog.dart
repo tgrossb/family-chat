@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'groupsListItem.dart';
 
 class NewGroupDialog extends StatefulWidget {
-  final List<GroupsListItem> groups;
+  final Map<String, GlobalKey<GroupsListItemState>> groups;
   final Function addNewGroup;
 
   const NewGroupDialog({this.groups, this.addNewGroup});
@@ -14,7 +14,7 @@ class NewGroupDialog extends StatefulWidget {
 class NewGroupDialogState extends State<NewGroupDialog> {
   bool canSub = false;
   String groupName;
-  final List<GroupsListItem> groups;
+  final Map<String, GlobalKey<GroupsListItemState>> groups;
   final Function addNewGroup;
 
   NewGroupDialogState({this.groups, this.addNewGroup});
@@ -30,7 +30,7 @@ class NewGroupDialogState extends State<NewGroupDialog> {
         onChanged: (String text){
           groupName = text;
           setState(() {
-            canSub = groupName.length > 0 && !groups.contains(groupName);
+            canSub = groupName.length > 0 && !groups.containsKey(groupName);
           });
         }
       ),
