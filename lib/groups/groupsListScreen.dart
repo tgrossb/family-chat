@@ -7,7 +7,7 @@ import 'package:bodt_chat/groups/groupsListItem.dart';
 import 'package:bodt_chat/groups/newGroupDialog.dart';
 import 'package:bodt_chat/groups/confirmDeleteDialog.dart';
 import 'package:bodt_chat/routes.dart';
-import 'package:bodt_chat/chatScreen.dart';
+import 'package:bodt_chat/groupScreen.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
 
@@ -74,7 +74,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
         delete: deleteGroup,
         animationController: new AnimationController(
             vsync: this,
-            duration: new Duration(milliseconds: growAnimationDuration),
+            duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
         )
       ),
     );
@@ -143,7 +143,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
       start: (){},
       delete: (){},
       animationController: new AnimationController(
-          duration: new Duration(milliseconds: growAnimationDuration),
+          duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
           vsync: this
       ),
     );
@@ -268,7 +268,10 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 //    await Navigator.of(context).push(new ListToGroupRoute(
 //        builder: (context) => new ChatScreen(user: user, chatName: name)));
 
-    await Navigator.of(context).push(new SlideLeftRoute(widget: new ChatScreen(user: user, chatName: name)));
+    // TODO: I don't know how i did this
+    await Navigator.of(context).push(new SlideLeftRoute(widget: new GroupScreen(user: user, groupName: name,
+      firstMessages: groupsData.firstWhere((data) => data.name == name).firstMessages)
+/*        new ChatScreen(user: user, chatName: name)*/));
 
     addSub.resume();
     deleteSub.resume();

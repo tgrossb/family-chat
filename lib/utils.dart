@@ -27,4 +27,8 @@ class Utils {
     // This is pretty close
     return -10.0 * (radians - math.pi) * (radians - 3.0*math.pi);
   }
+
+  static bool textNotEmpty(String s){
+    return s!= null && s.trim().length != 0;
+  }
 }

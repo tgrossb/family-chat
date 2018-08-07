@@ -8,8 +8,6 @@ const String kMESSAGES_CHILD = "messages";
 const String kTEXT_CHILD = "text";
 const String kNAME_CHILD = "name";
 
-const int growAnimationDuration = 700;
-
 const int kLOADING_FINISH = -1;
 const double kLOADING_DIAMETER = 10.0;
 const double kLOADING_PADDING = 10.0;
@@ -23,3 +21,7 @@ const double kSIGN_IN_SWITCH_POINT = 0.25;
 const String kDOT_REPLACEMENT = ",";
 
 const Color kGROUPS_LIST_BACKGROUND = Colors.white;
+
+const int kMESSAGE_GROW_ANIMATION_DURATION = 700;
+
+const int kGROUPS_PRELOAD = 15;
