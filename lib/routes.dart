@@ -40,3 +40,29 @@ class SlideLeftRoute extends PageRouteBuilder {
     )
   );
  */
+
+class FadeInRoute extends PageRouteBuilder {
+  final Widget widget;
+  FadeInRoute({this.widget}):
+        super(
+        pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) => widget,
+        transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) =>
+        new FadeTransition(
+            opacity: new Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(animation),
+
+            child: child
+        ),
+      );
+}
+
+class InstantRoute extends PageRouteBuilder {
+  final Widget widget;
+  InstantRoute({this.widget}):
+        super(
+        pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) => widget,
+        transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) => child
+      );
+}

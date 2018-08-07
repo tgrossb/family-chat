@@ -4,19 +4,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bodt_chat/groups/groupsListItem.dart';
-import './groupsListItem.dart';
-import './newGroupDialog.dart';
-import './confirmDeleteDialog.dart';
-import './slideRoute.dart';
-import '../chatScreen.dart';
-import '../main.dart';
+import 'package:bodt_chat/groups/newGroupDialog.dart';
+import 'package:bodt_chat/groups/confirmDeleteDialog.dart';
+import 'package:bodt_chat/routes.dart';
+import 'package:bodt_chat/chatScreen.dart';
+import 'package:bodt_chat/constants.dart';
+import 'package:bodt_chat/utils.dart';
+
+class GroupsListData {
+  FirebaseUser user;
+  List<GroupData> groupsData;
+  GroupsListData({@required this.user, @required this.groupsData});
+}
 
 class GroupsListScreen extends StatefulWidget {
-  GroupsListScreen({this.user});
-  final FirebaseUser user;
+  GroupsListScreen({@required this.data});
+  final GroupsListData data;
 
   @override
-  State createState() => new GroupsListScreenState(user);
+  State createState() => new GroupsListScreenState(data: data);
 }
 
 class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderStateMixin {
@@ -25,18 +31,25 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   StreamSubscription<Event> addSub, deleteSub, changeSub;
   bool canSub = false;
 
-  final int growAnimationDuration = 700;
+  List<GroupData> groupsData;
   Map<String, GlobalKey<GroupsListItemState>> _groupStateKeys = {};
   List<GroupsListItem> _groups = [];
   Map<GlobalKey<GroupsListItemState>, GroupData> _toUpdate = {};
+  AnimationController fadeController;
+  Animation fadeInAnimation;
 
-  GroupsListScreenState(FirebaseUser user) {
-    this.user = user;
+  GroupsListScreenState({@required GroupsListData data}) {
+    this.user = data.user;
+    this.groupsData = data.groupsData;
   }
 
   @override
   void initState(){
     super.initState();
+
+    // Go through received data and add each group
+    for (GroupData groupData in groupsData)
+      addGroupFromData(groupData);
 
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
@@ -46,6 +59,29 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     addSub = mainRef.onChildAdded.listen((Event event) => _onGroupAdded(event.snapshot));
     deleteSub = mainRef.onChildRemoved.listen((Event event) => _onGroupDeleted(event.snapshot.key));
     changeSub = mainRef.onChildChanged.listen((Event event) => _onGroupChanged(event.snapshot.key));
+
+    fadeController = new AnimationController(vsync: this, duration: new Duration(milliseconds: 800));
+    fadeInAnimation = new ColorTween(begin: kSPLASH_SCREEN_LOADING_COLOR, end: Color.fromARGB(0, 0, 0, 0)).animate(fadeController);
+  }
+
+  void addGroupFromData(GroupData data){
+    var stateKey = new GlobalKey<GroupsListItemState>();
+    GroupsListItem item = new GroupsListItem.fromData(
+      key: stateKey,
+      data: data,
+      impData: new GroupImplementationData(
+        start: startGroup,
+        delete: deleteGroup,
+        animationController: new AnimationController(
+            vsync: this,
+            duration: new Duration(milliseconds: growAnimationDuration),
+        )
+      ),
+    );
+
+    _groupStateKeys.putIfAbsent(data.name, () => stateKey);
+    _groups.insert(0, item);
+    item.animationController.forward();
   }
 
   void _onGroupChanged(String groupName) {
@@ -67,8 +103,8 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     GroupData data = await getGroupData(groupName);
     setState(() {
       stateKey.currentState
-          ..utcTime = GroupsListItem.parseTime(data.rawTime)
-          ..time = GroupsListItem.formatTime(data.rawTime)
+          ..utcTime = Utils.parseTime(data.rawTime)
+          ..time = Utils.formatTime(data.rawTime)
           ..name = data.name
           ..animationController.forward(from: 0.0);
     });
@@ -92,6 +128,10 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
   void _onGroupAdded(DataSnapshot snapshot){
     String groupName = snapshot.key;
+    if (_groupStateKeys.containsKey(groupName)){
+      print("Rediscovered group: " + groupName + ", skipping");
+      return;
+    }
     Map v = snapshot.value;
     print("Length: " + v.length.toString());
     print("Chat added");
@@ -123,7 +163,10 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   void _handleGroupAdd(GlobalKey<GroupsListItemState> stateKey, String groupName, GroupsListItem item) async {
     GroupData data = await getGroupData(groupName, false);
     if (stateKey.currentState != null)
-      stateKey.currentState.updateFromData(data: data);
+      stateKey.currentState.updateFromData(data: data, impData: new GroupImplementationData(
+        start: startGroup,
+        delete: deleteGroup
+      ));
     else
       // Mark this group as one that needs updating
       _toUpdate[stateKey] = data;
@@ -132,17 +175,24 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   }
 
   Future<GroupData> getGroupData([String groupName, bool includeName = true]) async {
-    Event event = await mainRef.child(groupName).child(BodtChatApp.messagesChild).limitToLast(1).onChildAdded.first;
+    Event event = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(1).onChildAdded.first;
 
     print("Raw time: " + event.snapshot.key);
-    return new GroupData(rawTime: event.snapshot.key, name: groupName, start: startGroup, delete: deleteGroup);
+    return new GroupData(rawTime: event.snapshot.key, name: groupName);
   }
 
   void updateStates(){
     print("Updating states (length: " + _toUpdate.length.toString() + ")");
     _toUpdate.forEach((var stateKey, var data){
-      stateKey.currentState.updateFromData(data: data);
-      print("Finishing " + stateKey.currentState.name);
+      if (stateKey.currentState != null) {
+        stateKey.currentState.updateFromData(data: data, impData: new GroupImplementationData(
+          start: startGroup,
+          delete: deleteGroup
+        ));
+        print("Finishing " + stateKey.currentState.name);
+      } else {
+        print("Skipping 1 from null check");
+      }
     });
     _toUpdate.clear();
   }
@@ -156,24 +206,36 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
         body: new Container(
-          child: _groups.length > 0 ? new ListView.builder(
-            padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-            reverse: false,
-            itemBuilder: (_, int index) => buildGroup(context, index),
-            itemCount: _groups.length,
-          ) : new Container(
-            alignment: Alignment.center,
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: new Stack(
               children: <Widget>[
-                new Text("No groups :(", style: Theme.of(context).primaryTextTheme.title),
-                new Text("Lets get it started by creating one!", style: Theme.of(context).primaryTextTheme.title)
-              ],
-            )
-          ),
+                _groups.length > 0 ? new ListView.builder(
+                padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
+                reverse: false,
+                itemBuilder: (_, int index) => buildGroup(context, index),
+                itemCount: _groups.length,
+              ) : new Container(
+                alignment: Alignment.center,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Text("No groups :(", style: Theme.of(context).primaryTextTheme.title),
+                    new Text("Lets get it started by creating one!", style: Theme.of(context).primaryTextTheme.title)
+                  ],
+                 ),
+                decoration: Theme.of(context).platform == TargetPlatform.iOS ?
+                  new BoxDecoration(border: new Border(top: new BorderSide(color: Colors.grey[200]))) : null,
+                ),
 
-          decoration: Theme.of(context).platform == TargetPlatform.iOS ?
-          new BoxDecoration(border: new Border(top: new BorderSide(color: Colors.grey[200]))) : null
+                new Hero(
+                  tag: "circleOut",
+                  child: new Expanded(
+                    child: new Container(
+                      color: fadeInAnimation.value,
+                    )
+                  )
+                )
+              ],
+          )
         ),
 
         floatingActionButton: new FloatingActionButton(
@@ -218,10 +280,11 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
   void _addNewGroup(String groupName){
     mainRef.child(groupName).set({
-      BodtChatApp.messagesChild: {
+      kMESSAGES_CHILD: {
+        // TODO: Store this message as the creation time instead of 0
         "0": {
-          BodtChatApp.name: "System",
-          BodtChatApp.text: "This is the beginning of your conversation in " + groupName
+          kNAME_CHILD: "System",
+          kTEXT_CHILD: "This is the beginning of your conversation in " + groupName
         }
       }
     });

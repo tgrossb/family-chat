@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'chatMessage.dart';
-import 'main.dart';
+import 'package:bodt_chat/chatMessage.dart';
+import 'package:bodt_chat/constants.dart';
 
 class ChatScreen extends StatefulWidget {
   ChatScreen({this.user, this.chatName});
@@ -16,14 +16,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  static String dotReplace = ",";
-
   FirebaseUser user;
   String chatName;
   DatabaseReference mainRef;
   StreamSubscription<Event> mainRefSubscription;
 
-  final int growAnimationDuration = 700;
   final List<ChatMessage> _messageSaves = [];
   final TextEditingController _textController = new TextEditingController();
   bool _isWriting = false;
@@ -34,7 +31,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(chatName).child(BodtChatApp.messagesChild);
+    mainRef = db.reference().child(chatName).child(kMESSAGES_CHILD);
     mainRef.keepSynced(true);
     mainRefSubscription = mainRef.onChildAdded.listen(_onMessageAdded);
   }
@@ -151,7 +148,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
 
     // Stamp it with absolute time so it sorts properly
-    mainRef.child(new DateTime.now().toUtc().toIso8601String().replaceAll(".", dotReplace)).set({"text": text, "name": name});
+    mainRef.child(new DateTime.now().toUtc().toIso8601String().replaceAll(".", kDOT_REPLACEMENT)).set({"text": text, "name": name});
 
 
     // DO NOT ADD TO MESSAGESAVES

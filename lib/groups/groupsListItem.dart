@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import "package:intl/intl.dart" as intl;
-import '../chatScreen.dart';
 import 'dart:math' as math;
+import 'package:bodt_chat/utils.dart';
+import 'package:bodt_chat/chatMessage.dart';
 
 class EaseIn extends Tween<Offset> {
   EaseIn(): super(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0));
@@ -26,57 +26,83 @@ class EaseIn extends Tween<Offset> {
 }
 
 class GroupData {
-  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.start, this.delete, this.animationController});
-  Function start, delete;
+  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.firstMessages});
   String rawTime, name, time;
-  AnimationController animationController;
   DateTime utcTime;
+  List<MessageData> firstMessages;
+}
+
+class GroupImplementationData {
+  GroupImplementationData({this.start, this.delete, this.animationController});
+  Function start, delete;
+  AnimationController animationController;
 }
 
 class GroupsListItem extends StatefulWidget {
   static GroupsListItemState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<GroupsListItemState>());
 
-  static DateTime parseTime(String rawTime){
-    if (rawTime == "0")
-      return new DateTime(0);
-    return DateTime.parse(rawTime.replaceAll(ChatScreenState.dotReplace, "."));
-  }
+  GroupsListItem({this.key, this.rawTime, this.name, this.start, this.delete, this.animationController}):
+        data = null,
+        impData = null,
+        initFromData = false,
+        firstMessages = [],
+        super(key: key);
 
-  static String formatTime(String rawTime){
-    if (rawTime == "0")
-      return "";
-    DateTime dt = parseTime(rawTime);
-    var format = new intl.DateFormat("hh:mm a, EEE, MMM d, yyyy");
-    return format.format(dt.toLocal());
-  }
+  GroupsListItem.fromData({this.key, this.data, this.impData}):
+        rawTime = data.rawTime,
+        name = data.name,
+        start = impData.start,
+        delete = impData.delete,
+        animationController = impData.animationController,
+        firstMessages = data.firstMessages,
+        initFromData = true,
+        super(key: key);
 
-  GroupsListItem({this.key, this.rawTime, this.name, this.start, this.delete, this.animationController}): super(key: key);
   final GlobalKey<GroupsListItemState> key;
   final String rawTime, name;
   final Function start, delete;
   final AnimationController animationController;
+  final GroupData data;
+  final GroupImplementationData impData;
+  final List<MessageData> firstMessages;
+  final bool initFromData;
 
   @override
-  State createState(){
-    GroupsListItemState itemState = new GroupsListItemState(
-        utcTime: parseTime(rawTime),
-        time: formatTime(rawTime),
+  State createState() =>
+    initFromData ? new GroupsListItemState.fromData(data: data, impData: impData) :
+    new GroupsListItemState(
+        utcTime: Utils.parseTime(rawTime),
+        time: Utils.formatTime(rawTime),
         name: name,
         start: start,
         delete: delete,
         animationController: animationController
     );
-//    key.currentState = itemState;
-    return itemState;
-  }
 }
 
 class GroupsListItemState extends State<GroupsListItem> {
   GroupsListItemState({this.utcTime, this.time, this.name, this.start, this.delete, this.animationController});
+
+  GroupsListItemState.fromData({GroupData data, GroupImplementationData impData}){
+    start = impData.start;
+    delete = impData.delete;
+    name = data.name;
+    animationController = impData.animationController;
+    firstMessages = data.firstMessages;
+    if (data.utcTime != null && data.time != null){
+      utcTime = data.utcTime;
+      time = data.time;
+    } else if (data.rawTime != null){
+      utcTime = Utils.parseTime(data.rawTime);
+      time = Utils.formatTime(data.rawTime);
+    }
+  }
+
   Function start, delete;
   String time, name;
   AnimationController animationController;
   DateTime utcTime;
+  List<MessageData> firstMessages;
 
   @override
   Widget build(BuildContext context) {
@@ -145,8 +171,8 @@ class GroupsListItemState extends State<GroupsListItem> {
     if (newRawTime != null || newName != null) {
       setState(() {
         if (newRawTime != null){
-          utcTime = GroupsListItem.parseTime(newRawTime);
-          time = GroupsListItem.formatTime(newRawTime);
+          utcTime = Utils.parseTime(newRawTime);
+          time = Utils.formatTime(newRawTime);
         }
 
         if (newName != null)
@@ -158,21 +184,21 @@ class GroupsListItemState extends State<GroupsListItem> {
     }
   }
 
-  void updateFromData({@required GroupData data}){
-    if (data.start == null && data.delete == null && data.time == null && data.rawTime == null &&
-        data.name == null && data.animationController == null && data.rawTime == null)
+  void updateFromData({@required GroupData data, @required GroupImplementationData impData}){
+    if (impData.start == null && impData.delete == null && data.time == null && data.rawTime == null &&
+        data.name == null && impData.animationController == null && data.rawTime == null)
       return;
     setState(() {
-      if (data.start != null) start = data.start;
-      if (data.delete != null) delete = data.delete;
+      if (impData.start != null) start = impData.start;
+      if (impData.delete != null) delete = impData.delete;
       if (data.name != null) name = data.name;
-      if (data.animationController != null) animationController = data.animationController;
+      if (impData.animationController != null) animationController = impData.animationController;
       if (data.utcTime != null && data.time != null){
         utcTime = data.utcTime;
         time = data.time;
       } else if (data.rawTime != null){
-        utcTime = GroupsListItem.parseTime(data.rawTime);
-        time = GroupsListItem.formatTime(data.rawTime);
+        utcTime = Utils.parseTime(data.rawTime);
+        time = Utils.formatTime(data.rawTime);
       }
     });
   }

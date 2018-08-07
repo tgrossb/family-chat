@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+class MessageData {
+  MessageData({this.text, this.name, this.time});
+  String text, name;
+  DateTime time;
+}
+
 class ChatMessage extends StatelessWidget {
   ChatMessage({this.text, this.name, this.myName, this.animationController});
   final String text, name, myName;
