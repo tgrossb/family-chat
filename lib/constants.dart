@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 const Color kSPLASH_SCREEN_BUTTON_COLOR = Colors.green;
 const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
 
+const String kGROUPS_CHILD = "groups";
 const String kMESSAGES_CHILD = "messages";
 const String kTEXT_CHILD = "text";
 const String kNAME_CHILD = "name";

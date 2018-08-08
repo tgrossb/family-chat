@@ -86,7 +86,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
         else if (finishingStarted){
           finishingStarted = false;
           finished = true;
-          navigateToGroups(groupsListData);
+          navigateToGroups();
         }
       }
 
@@ -144,6 +144,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     }
 
     List<GroupData> groupsData = await loadGroupsData();
+    print("Rec len: " + groupsData.length.toString());
 
     // This should be at the very bottom of this method
     // It signifies loading is finished, start the finish process with received data
@@ -163,11 +164,12 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     db.setPersistenceEnabled(true);
 
     DatabaseReference mainRef = db.reference();
-    StreamSubscription addSub = mainRef.onChildAdded.listen((Event event) async {
-      String groupName = event.snapshot.key;
-
+    DataSnapshot groups = await mainRef.child(kGROUPS_CHILD).once();
+    List<String> groupNames = [];
+    print(groups.value);
+    for (String groupName in groups.value){
       // Get a list of the first few messages for this group
-      List<Event> childEvents = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(kGROUPS_PRELOAD).onChildAdded.toList();
+      List<Event> childEvents = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(kGROUPS_PRELOAD).onValue.toList();
 
       // Turn the events into full MessageData objects
       List<MessageData> childFirstMessages = [];
@@ -187,18 +189,20 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
       // Add the data for this group to the list of data
       groupsData.add(data);
-    });
+    }
 
-    addSub.cancel();
     return groupsData;
   }
 
-  void navigateToGroups(GroupsListData data){
+  void navigateToGroups(){
     if (groupsListData == null) {
       scaffoldKey.currentState.showSnackBar(
           SnackBar(content: Text("This is problematic")));
       return;
     }
+
+    print("Final data length: " + groupsListData.groupsData.length.toString());
+
     Navigator.of(context).pushReplacement(new InstantRoute(widget: new GroupsListScreen(data: groupsListData)));
   }
 
@@ -219,7 +223,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     else {
       GoogleSignInAccount account = await gSignIn.signInSilently();
       if (account != null)
-            return await signInFromGAccount(account);
+        return await signInFromGAccount(account);
     }
 
     return null;
@@ -256,21 +260,21 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
         color: Theme.of(context).primaryColor,
         child: new Center(
           child: loading || startFinishFlag || finishingStarted || finished ?
-            new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                new LoadingAnimationWidget(animation: loadingAnimation, count: animationCount),
+          new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              new LoadingAnimationWidget(animation: loadingAnimation, count: animationCount),
 //                new Padding(
 //                    padding: EdgeInsets.all(LoadingAnimationWidget.padding),
 //                    child: new Text("Signing you in", style: TextStyle(color: Colors.white)),
 //                )
-              ],
-            ) :
+            ],
+          ) :
 
-            new SignInButton(
+          new SignInButton(
               controller: signInButtonToLoadingController,
               startAnimation: () => signInButtonToLoadingController.forward()
-            ),
+          ),
         ),
       ),
     );
