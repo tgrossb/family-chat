@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/groupMessage.dart" afterPath="$PROJECT_DIR$/lib/groupMessage.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groupScreen.dart" afterPath="$PROJECT_DIR$/lib/groupScreen.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groups/groupsListItem.dart" afterPath="$PROJECT_DIR$/lib/groups/groupsListItem.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groups/groupsListScreen.dart" afterPath="$PROJECT_DIR$/lib/groups/groupsListScreen.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/splash_page.dart" afterPath="$PROJECT_DIR$/lib/splash/splash_page.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/utils.dart" afterPath="$PROJECT_DIR$/lib/utils.dart" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
