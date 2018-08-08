@@ -30,6 +30,11 @@ class GroupData {
   String rawTime, name, time;
   DateTime utcTime;
   List<MessageData> firstMessages;
+
+  @override
+  String toString() {
+    return "[" + name + " @ " + (time != null ? time : utcTime.toString()) + " with " + firstMessages.length.toString() + " init msgs]";
+  }
 }
 
 class GroupImplementationData {
@@ -49,7 +54,7 @@ class GroupsListItem extends StatefulWidget {
         super(key: key);
 
   GroupsListItem.fromData({this.key, this.data, this.impData}):
-        rawTime = data.rawTime,
+        rawTime = data.rawTime == null || data.rawTime.trim().length == 0 ? data.utcTime.toIso8601String() : data.rawTime,
         name = data.name,
         start = impData.start,
         delete = impData.delete,

@@ -43,7 +43,9 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
 
   // Requires the current firebase user to get the name, the group
   // name, and any already loaded messages if there are any.
-  GroupScreenState({@required this.user, @required this.groupName, this.loadedMessages});
+  GroupScreenState({@required this.user, @required this.groupName, this.loadedMessages}){
+    print("Recieved loaded messages: " + loadedMessages.length.toString());
+  }
 
   // Get the reference to the database for this group
   // Also, put preloaded messages into _messageSaves and start their
@@ -54,19 +56,23 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(groupName).child(kMESSAGES_CHILD);
+    mainRef = db.reference().child(kGROUPS_CHILD).child(groupName).child(kMESSAGES_CHILD);
     mainRef.keepSynced(true);
     mainRefSubscription = mainRef.onChildAdded.listen(_onMessageAdded);
 
-    for (MessageData data in loadedMessages)
-      _messageSaves.insert(0, new GroupMessage.fromData(
-        data: data,
-        myName: user.displayName,
-        animationController: new AnimationController(
-          vsync: this,
-          duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION)
-        )
-      ));
+    for (MessageData data in loadedMessages) {
+      GroupMessage message = new GroupMessage.fromData(
+          data: data,
+          myName: user.displayName,
+          animationController: new AnimationController(
+              vsync: this,
+              duration: new Duration(
+                  milliseconds: kMESSAGE_GROW_ANIMATION_DURATION)
+          )
+      );
+      _messageSaves.insert(0, message);
+      message.animationController.forward();
+    }
   }
 
   // Handles the gui side of a new message being added to the database.
@@ -198,7 +204,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
 
     // Keys cannot have dots in them, so replace the dots from the iso8601 string
     // with a control character
-    childKey.replaceAll(".", kDOT_REPLACEMENT);
+    childKey = childKey.replaceAll(".", kDOT_REPLACEMENT);
 
     // Stamp it with absolute time so it sorts properly
     mainRef.child(childKey).set({"text": text, "name": name});

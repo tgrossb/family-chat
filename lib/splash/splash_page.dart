@@ -164,32 +164,45 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     db.setPersistenceEnabled(true);
 
     DatabaseReference mainRef = db.reference();
-    DataSnapshot groups = await mainRef.child(kGROUPS_CHILD).once();
-    List<String> groupNames = [];
-    print(groups.value);
-    for (String groupName in groups.value){
+    DataSnapshot groupsSnap = await mainRef.child(kGROUPS_CHILD).once();
+
+    // Now, just traverse this map to get stuff
+    Map groups = groupsSnap.value;
+    print(groups);
+
+    groups.forEach((groupName, messages){
       // Get a list of the first few messages for this group
-      List<Event> childEvents = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(kGROUPS_PRELOAD).onValue.toList();
+//      List<Event> childEvents = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(kGROUPS_PRELOAD).onValue.toList();
 
       // Turn the events into full MessageData objects
       List<MessageData> childFirstMessages = [];
-      for (Event childEvent in childEvents)
+//      for (Event childEvent in childEvents)
+//        childFirstMessages.add(new MessageData(
+//          text: childEvent.snapshot.value['text'],
+//          name: childEvent.snapshot.value['name'],
+//          time: Utils.parseTime(childEvent.snapshot.key),
+//        ));
+      String lastTime;
+      messages[kMESSAGES_CHILD].forEach((time, messageData) {
+        print("Iter recieved: " + time.toString() + ", " + messageData.toString());
+        lastTime = time;
         childFirstMessages.add(new MessageData(
-          text: childEvent.snapshot.value['text'],
-          name: childEvent.snapshot.value['name'],
-          time: Utils.parseTime(childEvent.snapshot.key),
+          text: messageData[kTEXT_CHILD],
+          name: messageData[kNAME_CHILD],
+          time: Utils.parseTime(time),
         ));
+      });
 
       // Construct the data object for this group
       GroupData data = new GroupData(
         name: groupName,
-        rawTime: childEvents[kGROUPS_PRELOAD-1].snapshot.key,
+        rawTime: lastTime,
         firstMessages: childFirstMessages,
       );
 
       // Add the data for this group to the list of data
       groupsData.add(data);
-    }
+    });
 
     return groupsData;
   }

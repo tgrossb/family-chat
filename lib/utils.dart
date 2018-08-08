@@ -12,8 +12,12 @@ class Utils {
   static String formatTime(String rawTime) {
     if (rawTime == "0") return "";
     DateTime dt = parseTime(rawTime);
+    return timeToFormedString(dt);
+  }
+
+  static String timeToFormedString(DateTime time){
     var format = new intl.DateFormat("hh:mm a, EEE, MMM d, yyyy");
-    return format.format(dt.toLocal());
+    return format.format(time.toLocal());
   }
 
   static flippedLongCos(double radians) {

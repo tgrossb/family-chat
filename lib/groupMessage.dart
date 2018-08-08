@@ -111,6 +111,8 @@ class GroupMessage extends StatelessWidget {
             margin: const EdgeInsets.only(top: 5.0),
             child: new Text(data.text),
           ),
+          // TODO: Add string time parameter to MessageData to prevent formatting things that had to be parsed
+          new Text(Utils.timeToFormedString(data.time), style: Theme.of(context).primaryTextTheme.caption),
           new Text(myMessage ? "You" : data.name, style: Theme.of(context).primaryTextTheme.caption),
         ],
       ),

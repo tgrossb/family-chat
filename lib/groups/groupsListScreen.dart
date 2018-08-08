@@ -50,12 +50,15 @@ class GroupsListScreenState extends State<GroupsListScreen>
     super.initState();
 
     // Go through received data and add each group
-    for (GroupData groupData in groupsData) addGroupFromData(groupData);
+    for (GroupData groupData in groupsData) {
+      print("Recieved group data: " + groupData.toString());
+      addGroupFromData(groupData);
+    }
 
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference();
+    mainRef = db.reference().child(kGROUPS_CHILD);
     mainRef.keepSynced(true);
     addSub = mainRef.onChildAdded
         .listen((Event event) => _onGroupAdded(event.snapshot));
