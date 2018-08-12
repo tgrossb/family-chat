@@ -24,6 +24,7 @@ import 'package:bodt_chat/splash/signInButton.dart';
 import 'package:bodt_chat/routes.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
+import 'package:bodt_chat/data.dart';
 
 class SplashPage extends StatefulWidget {
   @override

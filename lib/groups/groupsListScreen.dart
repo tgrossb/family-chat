@@ -11,12 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-class GroupsListData {
-  FirebaseUser user;
-  List<GroupData> groupsData;
-  GroupsListData({@required this.user, @required this.groupsData});
-}
+import 'package:bodt_chat/data.dart';
 
 class GroupsListScreen extends StatefulWidget {
   GroupsListScreen({@required this.data});
