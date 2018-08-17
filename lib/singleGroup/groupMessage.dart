@@ -15,47 +15,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/utils.dart';
-
-class MessageData {
-  MessageData({this.text, this.name, this.time}) {
-    _nulls = [];
-    if (!Utils.textNotEmpty(text))
-      _nulls.add("text");
-    if (!Utils.textNotEmpty(name))
-      _nulls.add("name");
-    if (time == null)
-      _nulls.add("time");
-  }
-  String text, name;
-  DateTime time;
-  List<String> _nulls;
-
-  bool get hasNull => _nulls.length > 0;
-  String get getNulls => _nulls.join(", ");
-
-  @override
-  bool operator ==(other) {
-    MessageData otherData = other;
-    return text == otherData.text && name == otherData.name && time.millisecondsSinceEpoch == otherData.time.millisecondsSinceEpoch;
-  }
-
-  @override
-  // TODO: Don't think this will be used, but could break
-  int get hashCode => time.millisecondsSinceEpoch;
-}
+import 'package:bodt_chat/dataBundles.dart';
 
 class GroupMessage extends StatelessWidget {
-  GroupMessage({text, name, time, myName, this.animationController}):
-      data = new MessageData(text: text, name: name, time: time),
-      myMessage = myName == name {
-    if (data.hasNull)
-      ArgumentError.notNull(data.getNulls);
+  GroupMessage({@required String text, @required String name, @required DateTime time, @required String myName, @required this.animationController}):
+      this.data = new MessageData(
+          text: text,
+          name: name,
+          utcTime: time),
+      this.myMessage = (myName == name) {
+    if (data.hasEmpty)
+      throw ArgumentError.notNull(data.stringEmpties);
   }
 
   GroupMessage.fromData({this.data, myName, this.animationController}):
-      myMessage = myName == data.name {
-    if (data.hasNull)
-      ArgumentError.notNull("data (" + data.getNulls + ")");
+      this.myMessage = (myName == data.name) {
+    if (this.data.hasEmpty)
+      throw ArgumentError.notNull(this.data.stringEmpties);
   }
 
   final bool myMessage;
@@ -107,13 +83,13 @@ class GroupMessage extends StatelessWidget {
       child: new Column(
         crossAxisAlignment: caa,
         children: <Widget>[
+          new Text(myMessage ? "You" : data.name, style: Theme.of(context).primaryTextTheme.caption),
           new Container(
             margin: const EdgeInsets.only(top: 5.0),
             child: new Text(data.text),
           ),
           // TODO: Add string time parameter to MessageData to prevent formatting things that had to be parsed
-          new Text(Utils.timeToFormedString(data.time), style: Theme.of(context).primaryTextTheme.caption),
-          new Text(myMessage ? "You" : data.name, style: Theme.of(context).primaryTextTheme.caption),
+          new Text(Utils.timeToFormedString(data.utcTime), style: Theme.of(context).primaryTextTheme.caption),
         ],
       ),
     );

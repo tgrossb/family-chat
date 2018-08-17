@@ -16,9 +16,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:bodt_chat/groupMessage.dart';
+import 'package:bodt_chat/singleGroup/groupMessage.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
+import 'package:bodt_chat/dataBundles.dart';
 
 class GroupScreen extends StatefulWidget {
   GroupScreen({this.user, this.groupName, this.firstMessages});
@@ -82,7 +83,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     MessageData data = new MessageData(
       text: event.snapshot.value['text'],
       name: event.snapshot.value['name'],
-      time: Utils.parseTime(event.snapshot.key)
+      utcTime: Utils.parseTime(event.snapshot.key)
     );
 
     // If this message has already been handled (preloaded), skip over it
@@ -199,15 +200,8 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     // The name will be the current user's display name
     String name = user.displayName;
 
-    // The key will be the absolute time so it sorts properly
-    String childKey = new DateTime.now().toUtc().toIso8601String();
-
-    // Keys cannot have dots in them, so replace the dots from the iso8601 string
-    // with a control character
-    childKey = childKey.replaceAll(".", kDOT_REPLACEMENT);
-
     // Stamp it with absolute time so it sorts properly
-    mainRef.child(childKey).set({"text": text, "name": name});
+    mainRef.child(Utils.timeToKeyString(DateTime.now())).set({"text": text, "name": name});
 
 
     // DO NOT ADD TO _messageSaves OR START THE ANIMATION

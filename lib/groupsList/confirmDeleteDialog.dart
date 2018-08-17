@@ -19,7 +19,7 @@ class ConfirmDeleteDialogState extends State<ConfirmDeleteDialog> {
 
   Widget build(BuildContext context) {
     return new AlertDialog(
-      title: new Text("You are about to delete the group '" + group.name + "'"),
+      title: new Text("You are about to delete the group '" + group.data.name + "'"),
       content: new RichText(
         text: new TextSpan(
           // Note: Styles for TextSpans must be explicitly defined.

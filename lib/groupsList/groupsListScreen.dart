@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:bodt_chat/constants.dart';
-import 'package:bodt_chat/groupScreen.dart';
-import 'package:bodt_chat/groups/confirmDeleteDialog.dart';
-import 'package:bodt_chat/groups/groupsListItem.dart';
-import 'package:bodt_chat/groups/newGroupDialog.dart';
+import 'package:bodt_chat/singleGroup/groupScreen.dart';
+import 'package:bodt_chat/groupsList/confirmDeleteDialog.dart';
+import 'package:bodt_chat/groupsList/groupsListItem.dart';
+import 'package:bodt_chat/groupsList/newGroupDialog.dart';
 import 'package:bodt_chat/routes.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bodt_chat/data.dart';
+import 'package:bodt_chat/dataBundles.dart';
 
 class GroupsListScreen extends StatefulWidget {
   GroupsListScreen({@required this.data});
@@ -21,8 +21,7 @@ class GroupsListScreen extends StatefulWidget {
   State createState() => new GroupsListScreenState(data: data);
 }
 
-class GroupsListScreenState extends State<GroupsListScreen>
-    with TickerProviderStateMixin {
+class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderStateMixin {
   FirebaseUser user;
   DatabaseReference mainRef;
   StreamSubscription<Event> addSub, deleteSub, changeSub;
@@ -31,7 +30,7 @@ class GroupsListScreenState extends State<GroupsListScreen>
   List<GroupData> groupsData;
   Map<String, GlobalKey<GroupsListItemState>> _groupStateKeys = {};
   List<GroupsListItem> _groups = [];
-  Map<GlobalKey<GroupsListItemState>, GroupData> _toUpdate = {};
+
   AnimationController fadeController;
   Animation fadeInAnimation;
 
@@ -44,10 +43,15 @@ class GroupsListScreenState extends State<GroupsListScreen>
   void initState() {
     super.initState();
 
+    // First, order the groupsData based on last message time
+    groupsData.sort((GroupData d1, GroupData d2) => d1.utcTime.difference(d2.utcTime).inMilliseconds);
+
     // Go through received data and add each group
+    int c = 0;
     for (GroupData groupData in groupsData) {
       print("Recieved group data: " + groupData.toString());
-      addGroupFromData(groupData);
+      int groupPosition = groupsData.length - ++c;
+      addGroupFromData(groupData, groupPosition * kGROUPS_LIST_ITEM_ANIMATION_OFFSET);
     }
 
     FirebaseDatabase db = FirebaseDatabase.instance;
@@ -71,7 +75,7 @@ class GroupsListScreenState extends State<GroupsListScreen>
     fadeController.forward();
   }
 
-  void addGroupFromData(GroupData data) {
+  void addGroupFromData(GroupData data, int animationOffset) {
     var stateKey = new GlobalKey<GroupsListItemState>();
     GroupsListItem item = new GroupsListItem.fromData(
       key: stateKey,
@@ -88,54 +92,52 @@ class GroupsListScreenState extends State<GroupsListScreen>
 
     _groupStateKeys.putIfAbsent(data.name, () => stateKey);
     _groups.insert(0, item);
-    item.animationController.forward();
+    item.startAnimation(msOffset: animationOffset);
   }
 
-  void _onGroupChanged(String groupName) {
-    print("Group change");
+  void _onGroupChanged(String groupName) async {
+    print("Begin changing group '$groupName'");
+
     var stateKey = _groupStateKeys[groupName];
     stateKey.currentState.setState(() {
-      // Set displayed things to empty and make clicks do nothing
+      // Make clicks do nothing while loading new data
       // This will be changed once the new data is loaded
       stateKey.currentState
-        ..time = ""
-        ..name = ""
-        ..start = () {};
+        ..impData.start = (){}
+        ..impData.delete = (){};
     });
-    handleGroupChange(stateKey, groupName);
-  }
 
-  void handleGroupChange(
-      GlobalKey<GroupsListItemState> stateKey, String groupName) async {
-    // On change, just recalculate the group info and redo the animation
     GroupData data = await getGroupData(groupName);
-    setState(() {
+    stateKey.currentState.setState((){
+      // Restore functionality, update the data, and redo the animation
       stateKey.currentState
-        ..utcTime = Utils.parseTime(data.rawTime)
-        ..time = Utils.formatTime(data.rawTime)
-        ..name = data.name
-        ..animationController.forward(from: 0.0);
+          ..data.utcTime = data.utcTime
+          ..data.name = data.name
+          ..impData.start = startGroup
+          ..impData.delete = deleteGroup
+          ..impData.animationController.forward(from: 0.0);
     });
-    print("Group change finished");
+
+    print("Finished changing group '$groupName'");
   }
 
-  void _onGroupDeleted(String groupName) {
+  void _onGroupDeleted(String groupName) async {
     var group = _groupStateKeys[groupName].currentState;
 
-    group.animationController.addStatusListener((AnimationStatus status) {
+    group.impData.animationController.addStatusListener((AnimationStatus status) {
       if (status == AnimationStatus.dismissed)
         setState(() {
-          group.animationController.dispose();
+          group.impData.animationController.dispose();
           group.dispose();
           _groups.removeWhere(
-              (GroupsListItem item) => item.key.currentState.name == groupName);
+              (GroupsListItem item) => item.key.currentState.data.name == groupName);
           _groupStateKeys.remove(groupName);
         });
     });
-    group.animationController.reverse();
+    group.impData.animationController.reverse();
   }
 
-  void _onGroupAdded(DataSnapshot snapshot) {
+  void _onGroupAdded(DataSnapshot snapshot) async {
     String groupName = snapshot.key;
     if (_groupStateKeys.containsKey(groupName)) {
       print("Rediscovered group: " + groupName + ", skipping");
@@ -145,30 +147,29 @@ class GroupsListScreenState extends State<GroupsListScreen>
     print("Length: " + v.length.toString());
     print("Chat added");
     var stateKey = new GlobalKey<GroupsListItemState>();
-    GroupsListItem item = new GroupsListItem(
+    GroupData data = await getGroupData(groupName);
+    GroupsListItem item = new GroupsListItem.fromData(
       key: stateKey,
-      rawTime: "0",
-      name: groupName,
-      start: () {},
-      delete: () {},
-      animationController: new AnimationController(
-          duration:
-              new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
-          vsync: this),
+      data: data,
+      impData: new GroupImplementationData(
+        start: startGroup,
+        delete: deleteGroup,
+        animationController: new AnimationController(
+            duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
+            vsync: this
+        ),
+      ),
     );
-
-    // Force it to create a state in case handleAdd happens before a rebuilt
-//    item.createState();
 
     setState(() {
       _groupStateKeys.putIfAbsent(groupName, () => stateKey);
       _groups.insert(0, item);
+      groupsData.insert(0, data);
     });
 
-    item.animationController.forward();
-    _handleGroupAdd(stateKey, groupName, item);
+    item.impData.animationController.forward();
   }
-
+/*
   void _handleGroupAdd(GlobalKey<GroupsListItemState> stateKey,
       String groupName, GroupsListItem item) async {
     GroupData data = await getGroupData(groupName, false);
@@ -183,9 +184,8 @@ class GroupsListScreenState extends State<GroupsListScreen>
 
     print("Add finished");
   }
-
-  Future<GroupData> getGroupData(
-      [String groupName, bool includeName = true]) async {
+*/
+  Future<GroupData> getGroupData(String groupName) async {
     Event event = await mainRef
         .child(groupName)
         .child(kMESSAGES_CHILD)
@@ -194,9 +194,11 @@ class GroupsListScreenState extends State<GroupsListScreen>
         .first;
 
     print("Raw time: " + event.snapshot.key);
-    return new GroupData(rawTime: event.snapshot.key, name: groupName);
+    // TODO: Start loading the messages of the group
+    return new GroupData.fromRawTime(rawTime: event.snapshot.key, name: groupName, firstMessages: null);
   }
 
+/*
   void updateStates() {
     print("Updating states (length: " + _toUpdate.length.toString() + ")");
     _toUpdate.forEach((var stateKey, var data) {
@@ -212,10 +214,11 @@ class GroupsListScreenState extends State<GroupsListScreen>
     });
     _toUpdate.clear();
   }
+*/
 
   @override
   Widget build(BuildContext context) {
-    Widget res = new Scaffold(
+    return new Scaffold(
       appBar: new AppBar(
         title: new Text("Groups"),
         // No elevation if its on ios
@@ -272,9 +275,6 @@ class GroupsListScreenState extends State<GroupsListScreen>
                 groups: _groupStateKeys, addNewGroup: _addNewGroup)),
       ),
     );
-    // Update anything that needs to be updated now that all have been added to the tree
-    updateStates();
-    return res;
   }
 
   Widget buildGroup(BuildContext context, int index) {
@@ -318,11 +318,9 @@ class GroupsListScreenState extends State<GroupsListScreen>
   void _addNewGroup(String groupName) {
     mainRef.child(groupName).set({
       kMESSAGES_CHILD: {
-        // TODO: Store this message as the creation time instead of 0
-        "0": {
+        Utils.timeToKeyString(DateTime.now()): {
           kNAME_CHILD: "System",
-          kTEXT_CHILD:
-              "This is the beginning of your conversation in " + groupName
+          kTEXT_CHILD: Utils.getNewGroupText(groupName)
         }
       }
     });
@@ -338,7 +336,7 @@ class GroupsListScreenState extends State<GroupsListScreen>
 
   void _finishDeleteGroup(GroupsListItemState group) {
     // This will trigger the onChildDelete listener which will handle the rest
-    mainRef.child(group.name).remove();
+    mainRef.child(group.data.name).remove();
   }
 
   @override
@@ -347,7 +345,7 @@ class GroupsListScreenState extends State<GroupsListScreen>
     deleteSub.cancel();
     changeSub.cancel();
     for (GlobalKey<GroupsListItemState> stateKey in _groupStateKeys.values) {
-      stateKey.currentState.animationController.dispose();
+      stateKey.currentState.impData.animationController.dispose();
       stateKey.currentState.dispose();
     }
     super.dispose();

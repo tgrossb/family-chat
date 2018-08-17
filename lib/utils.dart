@@ -4,6 +4,11 @@ import 'package:bodt_chat/constants.dart';
 import 'package:intl/intl.dart' as intl;
 
 class Utils {
+  static String getNewGroupText(String groupName){
+    // TODO: Use the proper user when global users exist
+    return "Theo created the group $groupName";
+  }
+
   static DateTime parseTime(String rawTime) {
     if (rawTime == "0") return new DateTime(0);
     return DateTime.parse(rawTime.replaceAll(kDOT_REPLACEMENT, "."));
@@ -18,6 +23,19 @@ class Utils {
   static String timeToFormedString(DateTime time){
     var format = new intl.DateFormat("hh:mm a, EEE, MMM d, yyyy");
     return format.format(time.toLocal());
+  }
+
+  static String timeToReadableString(DateTime time){
+    var format = new intl.DateFormat("h:mm a, EEE, MMM d, yyyy");
+    return format.format(time.toLocal());
+  }
+
+  static String timeToAbsoluteString(DateTime time){
+    return time.toUtc().toIso8601String();
+  }
+
+  static String timeToKeyString(DateTime time){
+    return timeToAbsoluteString(time).replaceAll(".", kDOT_REPLACEMENT);
   }
 
   static flippedLongCos(double radians) {

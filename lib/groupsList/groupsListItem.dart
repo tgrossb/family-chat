@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/groupMessage.dart';
+import 'package:bodt_chat/dataBundles.dart';
 
 class EaseIn extends Tween<Offset> {
   EaseIn(): super(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0));
@@ -25,101 +26,52 @@ class EaseIn extends Tween<Offset> {
   }
 }
 
-class GroupData {
-  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.firstMessages});
-  String rawTime, name, time;
-  DateTime utcTime;
-  List<MessageData> firstMessages;
-
-  @override
-  String toString() {
-    return "[" + name + " @ " + (time != null ? time : utcTime.toString()) + " with " + firstMessages.length.toString() + " init msgs]";
-  }
-}
-
-class GroupImplementationData {
-  GroupImplementationData({this.start, this.delete, this.animationController});
-  Function start, delete;
-  AnimationController animationController;
-}
-
 class GroupsListItem extends StatefulWidget {
   static GroupsListItemState of(BuildContext context) => context.ancestorStateOfType(const TypeMatcher<GroupsListItemState>());
 
-  GroupsListItem({this.key, this.rawTime, this.name, this.start, this.delete, this.animationController}):
-        data = null,
-        impData = null,
-        initFromData = false,
-        firstMessages = [],
+  GroupsListItem({this.key, @required DateTime utcTime, @required String name,
+                    @required Function start, @required Function delete, @required AnimationController animationController,
+                    List<MessageData> firstMessages = const []}):
+        data = new GroupData(utcTime: utcTime, name: name, firstMessages: firstMessages),
+        impData = new GroupImplementationData(start: start, delete: delete, animationController: animationController),
         super(key: key);
 
-  GroupsListItem.fromData({this.key, this.data, this.impData}):
-        rawTime = data.rawTime == null || data.rawTime.trim().length == 0 ? data.utcTime.toIso8601String() : data.rawTime,
-        name = data.name,
-        start = impData.start,
-        delete = impData.delete,
-        animationController = impData.animationController,
-        firstMessages = data.firstMessages,
-        initFromData = true,
+  GroupsListItem.fromData({this.key, @required this.data, @required this.impData}):
         super(key: key);
 
   final GlobalKey<GroupsListItemState> key;
-  final String rawTime, name;
-  final Function start, delete;
-  final AnimationController animationController;
   final GroupData data;
   final GroupImplementationData impData;
-  final List<MessageData> firstMessages;
-  final bool initFromData;
 
   @override
-  State createState() =>
-    initFromData ? new GroupsListItemState.fromData(data: data, impData: impData) :
-    new GroupsListItemState(
-        utcTime: Utils.parseTime(rawTime),
-        time: Utils.formatTime(rawTime),
-        name: name,
-        start: start,
-        delete: delete,
-        animationController: animationController
-    );
+  State createState() => new GroupsListItemState.fromData(data: data, impData: impData);
+
+  void startAnimation({double from = 0.0, int msOffset = 0}) async {
+    impData.animationController.reset();
+    impData.animationController.stop(canceled: false);
+    Future.delayed(Duration(milliseconds: msOffset), () => impData.animationController.forward(from: from));
+  }
 }
 
 class GroupsListItemState extends State<GroupsListItem> {
-  GroupsListItemState({this.utcTime, this.time, this.name, this.start, this.delete, this.animationController});
-
-  GroupsListItemState.fromData({GroupData data, GroupImplementationData impData}){
-    start = impData.start;
-    delete = impData.delete;
-    name = data.name;
-    animationController = impData.animationController;
-    firstMessages = data.firstMessages;
-    if (data.utcTime != null && data.time != null){
-      utcTime = data.utcTime;
-      time = data.time;
-    } else if (data.rawTime != null){
-      utcTime = Utils.parseTime(data.rawTime);
-      time = Utils.formatTime(data.rawTime);
-    }
+  GroupsListItemState.fromData({@required this.data, @required this.impData}){
+    // TODO: Check for completely not null data
   }
 
-  Function start, delete;
-  String time, name;
-  AnimationController animationController;
-  DateTime utcTime;
-  List<MessageData> firstMessages;
+  GroupData data;
+  GroupImplementationData impData;
 
   @override
   Widget build(BuildContext context) {
-    return animationController == null ? normalMessage(context) : new SlideTransition(
-        position: new EaseIn().animate(animationController),
+    return impData.animationController == null ? normalMessage(context) : new SlideTransition(
+        position: new EaseIn().animate(impData.animationController),
         child: normalMessage(context)
     );
   }
 
   Widget normalMessage(BuildContext context){
     return GestureDetector(
-      onTap: () => start(context, name),
+      onTap: () => impData.start(context, data.name),
       child: new Container(
         color: Colors.transparent,
         alignment: Alignment(1.0, 0.0),
@@ -132,7 +84,7 @@ class GroupsListItemState extends State<GroupsListItem> {
 
             new IconButton(
               icon: new Icon(Icons.delete),
-              onPressed: () => delete(context, this),
+              onPressed: () => impData.delete(context, this),
             ),
           ]
         ),
@@ -151,7 +103,7 @@ class GroupsListItemState extends State<GroupsListItem> {
     return new Container(
       margin: rightIn ? right : left,
       child: new CircleAvatar(
-        child: new Text(name[0], style: theme.primaryTextTheme.headline),
+        child: new Text(data.name[0], style: theme.primaryTextTheme.headline),
         backgroundColor: rightIn ? pcl : ac,
       ),
     );
@@ -164,14 +116,19 @@ class GroupsListItemState extends State<GroupsListItem> {
         children: <Widget>[
           new Container(
             margin: const EdgeInsets.only(top: 5.0),
-            child: new Text(name, style: Theme.of(context).primaryTextTheme.title.copyWith(fontWeight: FontWeight.normal)),
+            child: new Text(data.name, style: Theme.of(context).primaryTextTheme.title.copyWith(fontWeight: FontWeight.normal)),
           ),
-          new Text(time, style: Theme.of(context).primaryTextTheme.body2.copyWith(fontWeight: FontWeight.normal)),
+          new Text(Utils.timeToReadableString(data.utcTime), style: Theme.of(context).primaryTextTheme.body2.copyWith(fontWeight: FontWeight.normal)),
         ],
       ),
     );
   }
 
+  void startAnimation({double from = 0.0}){
+    impData.animationController.forward(from: from);
+  }
+
+  /*
   void update({String newRawTime, String newName, bool reanimate = true}){
     if (newRawTime != null || newName != null) {
       setState(() {
@@ -207,13 +164,14 @@ class GroupsListItemState extends State<GroupsListItem> {
       }
     });
   }
+  */
 
   bool isAfter(GroupsListItemState other){
-    return utcTime.isAfter(other.utcTime);
+    return data.utcTime.isAfter(other.data.utcTime);
   }
 
   int compareTo(GroupsListItemState other){
-    return utcTime.difference(other.utcTime).inMicroseconds;
+    return data.utcTime.difference(other.data.utcTime).inMicroseconds;
   }
 
   @override
@@ -224,14 +182,14 @@ class GroupsListItemState extends State<GroupsListItem> {
       return false;
 
     if (other.runtimeType == String)
-      return name == other;
+      return data.name == other;
 
     final GroupsListItem otherItem = other;
-    return name == otherItem.name;
+    return data.name == otherItem.data.name;
   }
 
   @override
   int get hashCode {
-    return name.hashCode;
+    return data.name.hashCode;
   }
 }

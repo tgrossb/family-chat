@@ -16,15 +16,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
 import 'dart:math' as math;
-import 'package:bodt_chat/groups/groupsListScreen.dart';
-import 'package:bodt_chat/groups/groupsListItem.dart';
-import 'package:bodt_chat/groupMessage.dart';
+import 'package:bodt_chat/groupsList/groupsListScreen.dart';
 import 'package:bodt_chat/splash/loadingAnimationWidget.dart';
 import 'package:bodt_chat/splash/signInButton.dart';
 import 'package:bodt_chat/routes.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/data.dart';
+import 'package:bodt_chat/dataBundles.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -171,39 +169,46 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     Map groups = groupsSnap.value;
     print(groups);
 
-    groups.forEach((groupName, messages){
+    for (var groupName in groups.keys){
+      var groupInfo = groups[groupName];
       // Get a list of the first few messages for this group
 //      List<Event> childEvents = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(kGROUPS_PRELOAD).onValue.toList();
 
       // Turn the events into full MessageData objects
       List<MessageData> childFirstMessages = [];
-//      for (Event childEvent in childEvents)
-//        childFirstMessages.add(new MessageData(
-//          text: childEvent.snapshot.value['text'],
-//          name: childEvent.snapshot.value['name'],
-//          time: Utils.parseTime(childEvent.snapshot.key),
-//        ));
-      String lastTime;
-      messages[kMESSAGES_CHILD].forEach((time, messageData) {
-        print("Iter recieved: " + time.toString() + ", " + messageData.toString());
-        lastTime = time;
-        childFirstMessages.add(new MessageData(
-          text: messageData[kTEXT_CHILD],
-          name: messageData[kNAME_CHILD],
-          time: Utils.parseTime(time),
-        ));
-      });
+      DateTime lastTime;
+
+      print("Rec: " + groupInfo.toString());
+
+      for (var messageTime in groupInfo[kMESSAGES_CHILD].keys){
+        var messageData = groupInfo[kMESSAGES_CHILD][messageTime];
+        print("Iter recieved: " + messageTime.toString() + ", " + messageData.toString());
+        lastTime = Utils.parseTime(messageTime);
+
+        MessageData thisMessage = new MessageData(
+            text: messageData[kTEXT_CHILD],
+            name: messageData[kNAME_CHILD],
+            utcTime: lastTime);
+
+        // Insert this message at the right place
+        for (int c=0; c<childFirstMessages.length; c++) {
+          if (childFirstMessages[c].utcTime.isAfter(lastTime))
+            childFirstMessages.insert(c, thisMessage);
+          else if (c == childFirstMessages.length - 1)
+            childFirstMessages.add(thisMessage);
+        }
+      }
 
       // Construct the data object for this group
       GroupData data = new GroupData(
         name: groupName,
-        rawTime: lastTime,
+        utcTime: lastTime,
         firstMessages: childFirstMessages,
       );
 
       // Add the data for this group to the list of data
       groupsData.add(data);
-    });
+    }
 
     return groupsData;
   }
