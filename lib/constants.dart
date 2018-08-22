@@ -5,8 +5,25 @@ import 'package:flutter/material.dart';
 const Color kSPLASH_SCREEN_BUTTON_COLOR = Colors.green;
 const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
 
+const String kSUDOERS_CHILD = "sudoers";
+
+const String kUSERS_CHILD = "users";
+const String kUSERS_LIST_CHILD = "usersList";
+
+const String kUSER_PUBLIC_VARS = "public";
+const String kUSER_PRIVATE_VARS = "private";
+
+const String kUSER_NAME = "name";
+const String kUSER_EMAIL = "email";
+const String kUSER_CELLPHONE = "cellphone";
+
 const String kGROUPS_CHILD = "groups";
+const String kGROUPS_LIST_CHILD = "groupsList";
+
+const String kADMINS_CHILD = "admins";
+const String kMEMBERS_CHILD = "members";
 const String kMESSAGES_CHILD = "messages";
+
 const String kTEXT_CHILD = "text";
 const String kNAME_CHILD = "name";
 

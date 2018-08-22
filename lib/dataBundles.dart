@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/utils.dart';
 
 class Data {
+
+  static final bool reportRegisters = false;
+
   List<String> _empties = [];
   List<String> _params = [];
   
@@ -25,7 +28,8 @@ class Data {
   }
 
   void _registerObjectParam<T>([T value, String paramName, bool Function(T) objIsEmpty]){
-    print("Registered parameter '$paramName' with value '" + value.toString() + "'");
+    if (reportRegisters)
+      print("Registered parameter '$paramName' with value '" + value.toString() + "'");
     _params.add(paramName);
     if (value == null || (objIsEmpty != null && objIsEmpty(value)))
       _empties.add(paramName);
@@ -147,9 +151,6 @@ class MessageData extends Data {
 
   // This is the time at which the message was sent, in the UTC timezone
   DateTime utcTime;
-
-  // This is a list of the null parameters, used for debugging
-  List<String> _nulls;
 
   @override
   bool operator ==(other) {

@@ -23,6 +23,8 @@ import 'package:bodt_chat/routes.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataBundles.dart';
+import 'package:bodt_chat/database.dart';
+
 
 class SplashPage extends StatefulWidget {
   @override
@@ -142,8 +144,21 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       return;
     }
 
-    List<GroupData> groupsData = await loadGroupsData();
-    print("Rec len: " + groupsData.length.toString());
+    print("Uid: " + user.uid);
+
+    print("=================================");
+
+    var users = DatabaseReader.loadUsers(user.uid);
+    print(users.toString());
+
+    print("----------------------------------");
+
+//    List<GroupData> groupsData = await loadGroupsData();
+//    print("Rec len: " + groupsData.length.toString());
+
+    List<GroupData> groupsData = [];
+    await Future.delayed(Duration(seconds: 10));
+
 
     // This should be at the very bottom of this method
     // It signifies loading is finished, start the finish process with received data
@@ -160,14 +175,18 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     List<GroupData> groupsData = [];
 
     FirebaseDatabase db = FirebaseDatabase.instance;
-    db.setPersistenceEnabled(true);
+    await db.goOnline();
+//    db.setPersistenceEnabled(true);
 
     DatabaseReference mainRef = db.reference();
     DataSnapshot groupsSnap = await mainRef.child(kGROUPS_CHILD).once();
 
     // Now, just traverse this map to get stuff
     Map groups = groupsSnap.value;
-    print(groups);
+    String gs = groups.toString();
+    int c = 0;
+    while (gs.length > 100*c)
+      print("($c) Snap: " + gs.substring(100*c++, 100*c < gs.length ? 100*c : gs.length));
 
     for (var groupName in groups.keys){
       var groupInfo = groups[groupName];
