@@ -20,32 +20,59 @@ import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/user.dart';
 import 'package:bodt_chat/dataBundles.dart';
 
-class DatabaseWriter {
+/*
+ * Database data lives here
+ *
+ * Data is read by methods in the DatabaseReader class and stored here
+ *
+ * Note: Please, just don't edit these unless you know what you are doing.
+ * Leave that to the DatabaseReader and DatabaseWriter classes
+ */
+class Database {
   static final FirebaseDatabase database = FirebaseDatabase.instance;
 
+  static List<String> sudoerUids;
+  static List<String> userUids;
+  static Map<String, User> userFromUid;
+  static User me;
+  static List<String> groupNames;
+  static Map<String, GroupData> groupFromName;
+
+//  get groups => groupFromName.values;
+//  get users => userFromUid.values;
+}
+
+class DatabaseWriter {
   static void registerNewUser({@required Me me}) async {
-    database.reference().child("$kUSERS_CHILD").set(me.toDatabaseChild());
-    database.reference().child("$kUSERS_LIST_CHILD").set({me.uid: "uid"});
+    Database.database.reference().child("$kUSERS_CHILD").set(me.toDatabaseChild());
+    Database.database.reference().child("$kUSERS_LIST_CHILD").set({me.uid: "uid"});
+
+    // Update the database class to reflect this change
+    Database.userUids.add(me.uid);
+    Database.userFromUid[me.uid] = me;
   }
 
   // They must be a registered user as well, verified by database rules
   static void registerNewSudoer({@required User user}) async {
-    database.reference().child(kSUDOERS_CHILD).set({user.uid: "uid"});
+    Database.database.reference().child(kSUDOERS_CHILD).set({user.uid: "uid"});
+
+    // Update the database class to reflect this change
+    Database.sudoerUids.add(user.uid);
   }
 
-  static void registerNewGroup({@required Me me, @required List<User> admins, @required List<User> members, @required String groupName}) async {
-    if (!admins.contains(me))
-      admins.add(me);
-    if (!members.contains(me))
-      members.add(me);
+  static void registerNewGroup({@required List<String> admins, @required List<String> members, @required String groupName}) async {
+    if (!admins.contains(Database.me.uid))
+      admins.add(Database.me.uid);
+    if (!members.contains(Database.me))
+      members.add(Database.me.uid);
 
     Map adminsMap = {};
-    for (User admin in admins)
-      adminsMap[admin.uid] = "uid";
+    for (String adminUid in admins)
+      adminsMap[adminUid] = "uid";
 
     Map membersMap = {};
-    for (User member in members)
-      membersMap[member.uid] = "uid";
+    for (String memberUid in members)
+      membersMap[memberUid] = "uid";
 
     Map group = {
       groupName: {
@@ -54,35 +81,66 @@ class DatabaseWriter {
         kMESSAGES_CHILD: {
           Utils.timeToKeyString(DateTime.now()): {
             kNAME_CHILD: "System",
-            kTEXT_CHILD: "${me.name} created the group $groupName"
+            kTEXT_CHILD: "${Database.me.name} created the group $groupName"
           }
         }
       }
     };
 
-    database.reference().child(kGROUPS_CHILD).set(group);
-    database.reference().child(kGROUPS_LIST_CHILD).set({groupName: "group"});
+    Database.database.reference().child(kGROUPS_CHILD).set(group);
+    Database.database.reference().child(kGROUPS_LIST_CHILD).set({groupName: "group"});
+
+    // Update the database class to reflect this change
+    DateTime utcTime = group[groupName][kMESSAGES_CHILD].keys[0];
+    GroupData groupData = GroupData(
+        utcTime: utcTime,
+        name: groupName,
+        firstMessages: [MessageData.fromSnapshotValue(message: group[groupName][kMESSAGES_CHILD][utcTime])],
+        admins: admins,
+        members: members
+    );
+
+    Database.groupNames.add(groupName);
+    Database.groupFromName[groupName] = groupData;
+  }
+
+  static void removeGroup(String groupName){
+    Database.database.reference().child("$kGROUPS_CHILD/$groupName").remove();
+
+    // Update the database class to reflect this change
+    Database.groupNames.remove(groupName);
+    Database.groupFromName.removeWhere((String name, GroupData data) => name == groupName);
   }
 
   static void addMessage({@required String groupName, @required MessageData message}) async {
-    database.reference().child("$kGROUPS_CHILD/$groupName/$kMESSAGES_CHILD").set(
+    Database.database.reference().child("$kGROUPS_CHILD/$groupName/$kMESSAGES_CHILD").set(
       {
         Utils.timeToKeyString(message.utcTime): {
           kNAME_CHILD: message.name,
           kTEXT_CHILD: message.text
         }
       });
+
+    // Update the database class to reflect this change
+    Database.groupFromName[groupName].firstMessages.insert(0, message);
   }
 }
 
 class DatabaseReader {
-  static final FirebaseDatabase database = FirebaseDatabase.instance;
-
-  static List<String> sudoerUids;
-  static List<String> userUids;
-  static List<User> users;
-  static User me;
-  static List<String> groupNames;
+  // Checks if a user exists by querying a test child
+  // This will cause an error if the user doesn't exist
+  static Future<bool> userExists() async {
+    try {
+      await loadFullChild(kUSER_EXISTS_TEST);
+    } catch (e){
+      if (e is DatabaseError) {
+        print("User doesn't exist");
+        print(e.message);
+        return false;
+      }
+    }
+    return true;
+  }
 
   // Loads a list of all sudoers' uids in the database
   // TODO: I don't **think** we need this
@@ -90,26 +148,26 @@ class DatabaseReader {
     DataSnapshot sudoersSnap = await loadFullChild(kSUDOERS_CHILD);
     print("Loading sudoers, snapped value: " + sudoersSnap.value.toString() + ", snapped key: " + sudoersSnap.key.toString());
 
-    sudoerUids = scrapeSnapshotKeys(sudoersSnap);
-    return sudoerUids;
+    Database.sudoerUids = scrapeSnapshotKeys(sudoersSnap);
+    return Database.sudoerUids;
   }
 
   // Loads a list of all users in the database without their data
   static Future<List<String>> loadUserUids() async {
     DataSnapshot usersSnap = await loadFullChild(kUSERS_LIST_CHILD);
-    userUids = scrapeSnapshotKeys(usersSnap);
-    return userUids;
+    Database.userUids = scrapeSnapshotKeys(usersSnap);
+    return Database.userUids;
   }
 
   // Loads all of the public data of all users in the database
   static Future<List<User>> loadUsers(String myUid) async {
     // We have to query specific uids because of the database rules, so make sure they have been loaded
-    if (userUids == null || userUids.length == 0)
-      loadUserUids();
+    if (Database.userUids == null || Database.userUids.length == 0)
+      await loadUserUids();
 
-    users = [];
+    Database.userFromUid = {};
 
-    for (String uid in userUids) {
+    for (String uid in Database.userUids) {
       // If the uid is me, don't add it
       // We'll handle my data later
       if (uid == myUid)
@@ -119,26 +177,78 @@ class DatabaseReader {
       // Access is denied to private data, so this is not the only defense
       DataSnapshot userSnap = await loadFullChild("$kUSERS_CHILD/$uid/$kUSER_PUBLIC_VARS");
 
-      // Convert each user to a User object and add it to the list
-      users.add(User.fromSnapshot(uid: uid, snapshot: userSnap));
+      // Convert each user to a User object and add it to the map
+      Database.userFromUid[uid] = User.fromSnapshot(uid: uid, snapshot: userSnap);
     }
 
     // Find me in the user data, and get private info as well
     DataSnapshot meSnap = await loadFullChild("$kUSERS_CHILD/$myUid");
-    me = Me.fromSnapshot(snapshot: meSnap);
+    Database.me = Me.fromSnapshot(snapshot: meSnap);
 
-    return users;
+    return Database.userFromUid.values;
   }
 
-  // Loads a list of all groups in the database
+  // Loads a list of all groups in the database (available to this user)
   static Future<List<String>> loadGroupNames() async {
     DataSnapshot groupsSnap = await loadFullChild(kGROUPS_LIST_CHILD);
 
-    groupNames = scrapeSnapshotKeys(groupsSnap);
-    return groupNames;
+    Database.groupNames = scrapeSnapshotKeys(groupsSnap);
+    return Database.groupNames;
   }
 
+  // Loads the group data from all available groups
+  // Requires the groupNames list to query specific groups
+  static Future<List<GroupData>> loadGroups() async {
+    // Must have the groupsNames list
+    if (Database.groupNames == null || Database.groupNames.length == 0)
+      await loadGroupNames();
 
+    Database.groupFromName = {};
+
+    // Now, query each group to get the data
+    for (String groupName in Database.groupNames){
+      List<String> admins = await loadAdmins(groupName);
+      List<String> members = await loadMembers(groupName);
+
+      List<MessageData> messages = await loadMessages(groupName);
+
+      GroupData groupData = GroupData(
+          utcTime: messages[0].utcTime,
+          name: groupName,
+          firstMessages: messages,
+          admins: admins,
+          members: members
+      );
+
+      Database.groupFromName[groupName] = groupData;
+    }
+
+    return Database.groupFromName.values;
+  }
+
+  // Loads all admins from a group as a list of uids
+  static Future<List<String>> loadAdmins(String groupName) async {
+    DataSnapshot adminsSnap = await loadFullChild("$kGROUPS_CHILD/$groupName/$kADMINS_CHILD");
+    return scrapeSnapshotKeys(adminsSnap);
+  }
+
+  // Loads all members from a group as a list of uids
+  static Future<List<String>> loadMembers(String groupName) async {
+    DataSnapshot membersSnap = await loadFullChild("$kGROUPS_CHILD/$groupName/$kMEMBERS_CHILD");
+    return scrapeSnapshotKeys(membersSnap);
+  }
+
+  // Loads all messages from a group as a list of MessageData objects
+  // TODO: Load a chunk and stream others
+  static Future<List<MessageData>> loadMessages(String groupName) async {
+    DataSnapshot messagesSnap = await loadFullChild("$kGROUPS_CHILD/$groupName/$kMESSAGES_CHILD", true);
+
+    List<MessageData> messages = [];
+    for (var messageKey in messagesSnap.value.keys)
+      messages.add(MessageData.fromSnapshotValue(message: messagesSnap.value[messageKey]));
+
+    return messages;
+  }
 
   // TODO: Doesn't work yet
   // Note: This must be listened to for the first chunk
@@ -186,9 +296,12 @@ class DatabaseReader {
 
 
   // Loads all the child data of a certain child at once
-  static Future<DataSnapshot> loadFullChild(String pathToChild) async {
-    DatabaseReference childRef = database.reference().child(pathToChild);
-    DataSnapshot snap = await childRef.once();
+  static Future<DataSnapshot> loadFullChild([String pathToChild, bool order = false]) async {
+    DatabaseReference childRef = Database.database.reference().child(pathToChild);
+    DataSnapshot snap;
+    if (order)
+      snap = await childRef.orderByKey().once();
+    snap = await childRef.once();
     return snap;
   }
 

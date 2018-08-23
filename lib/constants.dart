@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 const Color kSPLASH_SCREEN_BUTTON_COLOR = Colors.green;
 const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
 
+const String kUSER_EXISTS_TEST = "userExistsTest";
+
 const String kSUDOERS_CHILD = "sudoers";
 
 const String kUSERS_CHILD = "users";

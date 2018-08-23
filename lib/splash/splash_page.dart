@@ -36,7 +36,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   final GoogleSignIn gSignIn = new GoogleSignIn();
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   bool loading = false, startFinishFlag = false, finishingStarted = false, finished = false;
-  GroupsListData groupsListData;
 
   AnimationController loadingAnimationController, signInButtonToLoadingController;
   Animation<double> loadingAnimation;
@@ -121,12 +120,15 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   // If that is still unsuccessful, a full sign in is attempted.
   // If that is null, and error is raised.
   // Finally, it loads the first few messages of a group.
+  // TODO: Update this description
   void startLoading([FirebaseUser user]) async {
     setState(() {
       loading = true;
       loadingAnimationController.forward();
     });
 
+
+    // Double check the user
     if (user == null)
       user = await attemptSignIn();
 
@@ -144,104 +146,37 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       return;
     }
 
-    print("Uid: " + user.uid);
+    // Check if this is a new user
+    if (!(await DatabaseReader.userExists()))
+      // If it is a new user, register them
+      registerNewUser();
 
-    print("=================================");
+    // Load all user uids
+    DatabaseReader.loadUserUids();
 
-    var users = DatabaseReader.loadUsers(user.uid);
-    print(users.toString());
+    // Load all user data (public)
+    DatabaseReader.loadUsers(user.uid);
 
-    print("----------------------------------");
+    // Load all group names
+    DatabaseReader.loadGroupNames();
 
-//    List<GroupData> groupsData = await loadGroupsData();
-//    print("Rec len: " + groupsData.length.toString());
-
-    List<GroupData> groupsData = [];
-    await Future.delayed(Duration(seconds: 10));
-
+    // Load all group data
+    DatabaseReader.loadGroups();
 
     // This should be at the very bottom of this method
     // It signifies loading is finished, start the finish process with received data
     setState((){
       loading = false;
       startFinishFlag = true;
-      groupsListData = new GroupsListData(user: user, groupsData: groupsData);
     });
   }
 
-  // Loads base data about each group to avoid loading down the line.
-  // Also loads the first few messages for each group.
-  Future<List<GroupData>> loadGroupsData() async {
-    List<GroupData> groupsData = [];
+  void registerNewUser(){
 
-    FirebaseDatabase db = FirebaseDatabase.instance;
-    await db.goOnline();
-//    db.setPersistenceEnabled(true);
-
-    DatabaseReference mainRef = db.reference();
-    DataSnapshot groupsSnap = await mainRef.child(kGROUPS_CHILD).once();
-
-    // Now, just traverse this map to get stuff
-    Map groups = groupsSnap.value;
-    String gs = groups.toString();
-    int c = 0;
-    while (gs.length > 100*c)
-      print("($c) Snap: " + gs.substring(100*c++, 100*c < gs.length ? 100*c : gs.length));
-
-    for (var groupName in groups.keys){
-      var groupInfo = groups[groupName];
-      // Get a list of the first few messages for this group
-//      List<Event> childEvents = await mainRef.child(groupName).child(kMESSAGES_CHILD).limitToLast(kGROUPS_PRELOAD).onValue.toList();
-
-      // Turn the events into full MessageData objects
-      List<MessageData> childFirstMessages = [];
-      DateTime lastTime;
-
-      print("Rec: " + groupInfo.toString());
-
-      for (var messageTime in groupInfo[kMESSAGES_CHILD].keys){
-        var messageData = groupInfo[kMESSAGES_CHILD][messageTime];
-        print("Iter recieved: " + messageTime.toString() + ", " + messageData.toString());
-        lastTime = Utils.parseTime(messageTime);
-
-        MessageData thisMessage = new MessageData(
-            text: messageData[kTEXT_CHILD],
-            name: messageData[kNAME_CHILD],
-            utcTime: lastTime);
-
-        // Insert this message at the right place
-        for (int c=0; c<childFirstMessages.length; c++) {
-          if (childFirstMessages[c].utcTime.isAfter(lastTime))
-            childFirstMessages.insert(c, thisMessage);
-          else if (c == childFirstMessages.length - 1)
-            childFirstMessages.add(thisMessage);
-        }
-      }
-
-      // Construct the data object for this group
-      GroupData data = new GroupData(
-        name: groupName,
-        utcTime: lastTime,
-        firstMessages: childFirstMessages,
-      );
-
-      // Add the data for this group to the list of data
-      groupsData.add(data);
-    }
-
-    return groupsData;
   }
 
   void navigateToGroups(){
-    if (groupsListData == null) {
-      scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text("This is problematic")));
-      return;
-    }
-
-    print("Final data length: " + groupsListData.groupsData.length.toString());
-
-    Navigator.of(context).pushReplacement(new InstantRoute(widget: new GroupsListScreen(data: groupsListData)));
+    Navigator.of(context).pushReplacement(new InstantRoute(widget: new GroupsListScreen()));
   }
 
 //  void handleUser(FirebaseUser user){

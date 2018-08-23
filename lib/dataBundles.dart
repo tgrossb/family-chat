@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/utils.dart';
+import 'package:bodt_chat/constants.dart';
 
 class Data {
 
@@ -42,6 +43,7 @@ class Data {
  * This screen is displayed after the splash page if the
  * user sign in is correct.
  */
+/* DON'T NEED ANYMORE
 class GroupsListData extends Data {
   GroupsListData({@required this.user, @required this.groupsData}){
     _registerObjectParam(this.user, "user");
@@ -56,6 +58,7 @@ class GroupsListData extends Data {
   // This list has an uncertain length, and each element corresponds to a group
   List<GroupData> groupsData;
 }
+*/
 
 /*
  * This is the packaged data for a single group.
@@ -65,29 +68,17 @@ class GroupsListData extends Data {
  */
 class GroupData extends Data {
 //  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.firstMessages});
-  GroupData({@required this.utcTime, @required this.name, @required this.firstMessages});
+  GroupData({@required this.utcTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members});
 
-  GroupData.fromRawTime({@required String rawTime, @required this.name, @required this.firstMessages}):
+  GroupData.fromRawTime({@required String rawTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members}):
         this.utcTime = Utils.parseTime(rawTime) {
     _registerStringParam(this.name, "name");
     _registerObjectParam(this.utcTime, "utcTime");
     _registerListParam(this.firstMessages, "firstMessages");
   }
 
-  // This is the unformatted string of the DateTime utcTime.
-  // It is the ISO 8601 string of the utc time.
-  // THIS SHOULD NOT BE NEEDED
-//  String rawTime;
-
   // This is the name of the group.
-  // TODO: Add a uuid?
   String name;
-
-  // This is the readable version of the time.
-  // Use the Utils.formatTime or Utils.timeToFormedString methods to
-  // ensure consistency.
-  // THIS SHOULD NOT BE NEEDED
-//  String time;
 
   // This is the utc time of the last message.
   DateTime utcTime;
@@ -95,6 +86,9 @@ class GroupData extends Data {
   // This is a list of the first messages in this group.
   // This list has an unspecified length because as much data is preloaded as possible.
   List<MessageData> firstMessages;
+
+  List<String> admins;
+  List<String> members;
 
   @override
   String toString() {
@@ -140,6 +134,13 @@ class MessageData extends Data {
     _registerStringParam(this.text, "text");
     _registerStringParam(this.name, "name");
     _registerObjectParam(this.utcTime, "utcTime");
+  }
+
+  factory MessageData.fromSnapshotValue({@required Map message}){
+    String time = message.keys.first;
+    String name = message[time][kNAME_CHILD];
+    String text = message[time][kTEXT_CHILD];
+    return MessageData(text: text, name: name, utcTime: Utils.parseTime(time));
   }
 
   // This is the actual text of the message.

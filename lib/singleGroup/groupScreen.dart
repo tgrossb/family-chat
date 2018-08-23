@@ -20,6 +20,7 @@ import 'package:bodt_chat/singleGroup/groupMessage.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataBundles.dart';
+import 'package:bodt_chat/database.dart';
 
 class GroupScreen extends StatefulWidget {
   GroupScreen({this.user, this.groupName, this.firstMessages});
@@ -28,13 +29,11 @@ class GroupScreen extends StatefulWidget {
   final List<MessageData> firstMessages;
 
   @override
-  State createState() => new GroupScreenState(user: user, groupName: groupName, loadedMessages: firstMessages);
+  State createState() => new GroupScreenState(groupName: groupName);
 }
 
 class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin {
-  FirebaseUser user;
   String groupName;
-  List<MessageData> loadedMessages;
   DatabaseReference mainRef;
   StreamSubscription<Event> mainRefSubscription;
 
@@ -42,11 +41,8 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
   final TextEditingController _textController = new TextEditingController();
   bool _isWriting = false;
 
-  // Requires the current firebase user to get the name, the group
-  // name, and any already loaded messages if there are any.
-  GroupScreenState({@required this.user, @required this.groupName, this.loadedMessages}){
-    print("Recieved loaded messages: " + loadedMessages.length.toString());
-  }
+  // Requires the name, and gets the rest from the Database statics
+  GroupScreenState({@required this.groupName});
 
   // Get the reference to the database for this group
   // Also, put preloaded messages into _messageSaves and start their
@@ -61,10 +57,10 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     mainRef.keepSynced(true);
     mainRefSubscription = mainRef.onChildAdded.listen(_onMessageAdded);
 
-    for (MessageData data in loadedMessages) {
+    for (MessageData data in Database.groupFromName[groupName].firstMessages) {
       GroupMessage message = new GroupMessage.fromData(
           data: data,
-          myName: user.displayName,
+          myName: Database.me.name,
           animationController: new AnimationController(
               vsync: this,
               duration: new Duration(
@@ -92,7 +88,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
 
     GroupMessage message = new GroupMessage.fromData(
       data: data,
-      myName: user.displayName,
+      myName: Database.me.name,
       animationController: new AnimationController(
         duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
         vsync: this
@@ -197,11 +193,9 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
       _isWriting = false;
     });
 
-    // The name will be the current user's display name
-    String name = user.displayName;
-
-    // Stamp it with absolute time so it sorts properly
-    mainRef.child(Utils.timeToKeyString(DateTime.now())).set({"text": text, "name": name});
+    DatabaseWriter.addMessage(
+        groupName: groupName,
+        message: MessageData(text: text, name: Database.me.name, utcTime: DateTime.now()));
 
 
     // DO NOT ADD TO _messageSaves OR START THE ANIMATION

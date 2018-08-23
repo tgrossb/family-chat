@@ -12,17 +12,16 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/dataBundles.dart';
+import 'package:bodt_chat/database.dart';
 
 class GroupsListScreen extends StatefulWidget {
-  GroupsListScreen({@required this.data});
-  final GroupsListData data;
+  GroupsListScreen();
 
   @override
-  State createState() => new GroupsListScreenState(data: data);
+  State createState() => new GroupsListScreenState();
 }
 
 class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderStateMixin {
-  FirebaseUser user;
   DatabaseReference mainRef;
   StreamSubscription<Event> addSub, deleteSub, changeSub;
   bool canSub = false;
@@ -34,9 +33,8 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   AnimationController fadeController;
   Animation fadeInAnimation;
 
-  GroupsListScreenState({@required GroupsListData data}) {
-    this.user = data.user;
-    this.groupsData = data.groupsData;
+  GroupsListScreenState() {
+    this.groupsData = Database.groupFromName.values;
   }
 
   @override
@@ -300,7 +298,6 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     // TODO: I don't know how i did this
     await Navigator.of(context).push(new SlideLeftRoute(
         widget: new GroupScreen(
-            user: user,
             groupName: name,
             firstMessages: groupsData
                 .firstWhere((data) => data.name == name)
@@ -316,27 +313,18 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   }
 
   void _addNewGroup(String groupName) {
-    mainRef.child(groupName).set({
-      kMESSAGES_CHILD: {
-        Utils.timeToKeyString(DateTime.now()): {
-          kNAME_CHILD: "System",
-          kTEXT_CHILD: Utils.getNewGroupText(groupName)
-        }
-      }
-    });
+    DatabaseWriter.registerNewGroup(admins: [Database.me.uid], members: [Database.me.uid], groupName: groupName);
   }
 
   void deleteGroup(BuildContext context, GroupsListItemState group) {
     showDialog(
       context: context,
       builder: (BuildContext context) => new ConfirmDeleteDialog(
-          group: group, deleteGroup: _finishDeleteGroup),
-    );
-  }
+          group: group,
 
-  void _finishDeleteGroup(GroupsListItemState group) {
-    // This will trigger the onChildDelete listener which will handle the rest
-    mainRef.child(group.data.name).remove();
+          // This will trigger the onChildDelete listener which will handle the rest
+          deleteGroup: (GroupsListItemState group) => DatabaseWriter.removeGroup(group.data.name)),
+    );
   }
 
   @override
