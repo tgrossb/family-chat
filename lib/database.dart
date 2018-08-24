@@ -136,6 +136,7 @@ class DatabaseReader {
       if (e is DatabaseError) {
         print("User doesn't exist");
         print(e.message);
+
         return false;
       }
     }

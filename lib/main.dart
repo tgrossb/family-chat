@@ -10,8 +10,12 @@ final ThemeData iosTheme = new ThemeData(
 
 final ThemeData defaultTheme = new ThemeData(
   primarySwatch: Colors.cyan,
-  accentColor: Colors.orangeAccent[400],
+//  accentColor: Colors.orangeAccent[400],
+  accentColor: Colors.green,
   primaryTextTheme: TextTheme(display1: new TextStyle(color: Colors.black54)),
+//  inputDecorationTheme: ThemeData.dark().inputDecorationTheme,
+  brightness: Brightness.dark,
+//  textTheme: Typography(platform: defaultTargetPlatform).white,
 );
 
 void main() {

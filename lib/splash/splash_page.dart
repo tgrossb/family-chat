@@ -12,17 +12,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:bodt_chat/groupsList/groupsListScreen.dart';
 import 'package:bodt_chat/splash/loadingAnimationWidget.dart';
 import 'package:bodt_chat/splash/signInButton.dart';
+import 'package:bodt_chat/splash/newUser/newUserPage.dart';
+import 'package:bodt_chat/splash/newUser/countrySelector.dart';
 import 'package:bodt_chat/routes.dart';
 import 'package:bodt_chat/constants.dart';
-import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/dataBundles.dart';
 import 'package:bodt_chat/database.dart';
 
 
@@ -149,7 +148,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     // Check if this is a new user
     if (!(await DatabaseReader.userExists()))
       // If it is a new user, register them
-      registerNewUser();
+      await registerNewUser(user);
 
     // Load all user uids
     DatabaseReader.loadUserUids();
@@ -171,8 +170,15 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     });
   }
 
-  void registerNewUser(){
+  Future<int> registerNewUser(FirebaseUser newUser) async {
+    print("Needs to be registered");
 
+    // Start loading country data, just to get ahead
+    await CountrySelector.preloadCountries(context);
+
+    await Navigator.of(context).push(new SlideLeftRoute(widget: new NewUserPage(newUser: newUser,)));
+
+    return 0;
   }
 
   void navigateToGroups(){
@@ -237,10 +243,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               new LoadingAnimationWidget(animation: loadingAnimation, count: animationCount),
-//                new Padding(
-//                    padding: EdgeInsets.all(LoadingAnimationWidget.padding),
-//                    child: new Text("Signing you in", style: TextStyle(color: Colors.white)),
-//                )
             ],
           ) :
 
