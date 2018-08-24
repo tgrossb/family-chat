@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class CountrySelector extends StatefulWidget {
   static Map<String, String> codeToPhone, nameToCode;
   static List<Country> countries;
+  static Map<String, Country> nameToCountry;
 
   final Function(String) saveCountry;
   CountrySelector({@required this.saveCountry});
@@ -30,36 +31,50 @@ class CountrySelector extends StatefulWidget {
     nameToCode = ntc.map((dynamic key, dynamic value) => MapEntry(key.toString(), value.toString()));
 
     countries = [];
+    nameToCountry = {};
     for (String name in nameToCode.keys){
       String isoCode = nameToCode[name];
-      countries.add(new Country(name: name, isoCode: isoCode, phoneCode: codeToPhone[isoCode]));
+      Country country = new Country(name: name, isoCode: isoCode, phoneCode: codeToPhone[isoCode]);
+      countries.add(country);
+      nameToCountry[name] = country;
     }
   }
 }
 
 class CountrySelectorState extends State<CountrySelector> {
   Function(String) saveCountry;
+  Country selectedCountry;
 
   CountrySelectorState({@required this.saveCountry}){
     if (CountrySelector.countries == null || CountrySelector.countries.length == 0)
       CountrySelector.preloadCountries(context);
+    selectedCountry = CountrySelector.nameToCountry["United States"];
   }
 
   @override
   Widget build(BuildContext context){
-    return DropdownButton<String>(
+    return DropdownButton<Country>(
+      value: selectedCountry,
       items: CountrySelector.countries.map((Country country) =>
-        DropdownMenuItem<String>(
-          value: country.name,
+        DropdownMenuItem<Country>(
+          value: country,
           child: new Row(
             children: <Widget>[
-//              country.flag,
-              Text(country.name)
+              country.flag,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(country.name + " (+" + country.phoneCode.toString() + ")", overflow: TextOverflow.ellipsis)
+              )
             ],
           ),
         )
       ).toList(),
-      onChanged: saveCountry,
+      onChanged: (Country newCountry){
+        setState(() {
+          selectedCountry = newCountry;//CountrySelector.nameToCountry[newCountry];
+        });
+        saveCountry(newCountry.phoneCode);
+      },
     );
   }
 }
