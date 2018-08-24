@@ -24,7 +24,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/codeToName.json
-    - assets/codeToPhone.json
-    - assets/nameToCode.json
+    - assets/jsons/shortenedNameToCode.json
+    - assets/jsons/codeToPhone.json
     - assets/flags/borderless_16x10/00_cctld/

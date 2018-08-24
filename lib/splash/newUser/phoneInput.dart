@@ -42,6 +42,13 @@ class PhoneInputState extends State<PhoneInput> {
 //      mainAxisAlignment: MainAxisAlignment.start,
 //      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: new Icon(
+            Icons.phone_android,
+            color: Theme.of(context).accentTextTheme.caption.color//.withOpacity(Theme.of(context).accentIconTheme.opacity),
+          )
+        ),
         new CountrySelector(saveCountry: (value) => phoneCode = value),
         Flexible(
           child: TextFormField(

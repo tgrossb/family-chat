@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bodt_chat/searchablePopupMenu/searchablePopupMenuButton.dart';
 
 class CountrySelector extends StatefulWidget {
   static Map<String, String> codeToPhone, nameToCode;
@@ -21,8 +22,8 @@ class CountrySelector extends StatefulWidget {
     if (countries != null && countries.length > 0 && !force)
       return;
 
-    String codeToPhoneString = await DefaultAssetBundle.of(context).loadString("assets/codeToPhone.json");
-    String nameToCodeString = await DefaultAssetBundle.of(context).loadString("assets/nameToCode.json");
+    String codeToPhoneString = await DefaultAssetBundle.of(context).loadString("assets/jsons/codeToPhone.json");
+    String nameToCodeString = await DefaultAssetBundle.of(context).loadString("assets/jsons/shortenedNameToCode.json");
 
     Map ctp = json.decode(codeToPhoneString);
     codeToPhone = ctp.map((dynamic key, dynamic value) => MapEntry(key.toString(), value.toString()));
@@ -51,12 +52,47 @@ class CountrySelectorState extends State<CountrySelector> {
     selectedCountry = CountrySelector.nameToCountry["United States"];
   }
 
+  PopupMenuItem<Country> buildOption(Country country){
+    return PopupMenuItem<Country>(
+      value: country,
+      child: Row(
+        children: <Widget>[
+          country.flag,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(country.name + " (+" + country.phoneCode + ")"),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context){
-    return DropdownButton<Country>(
+    return SearchablePopupMenuButton<Country>(
+      onSelected: (Country result){
+        setState(() {
+          selectedCountry = result;
+        });
+        saveCountry(result.phoneCode);
+      },
+      itemBuilder: (BuildContext context) => CountrySelector.countries.map(buildOption).toList(),
+      child: Row(
+        children: <Widget>[
+          selectedCountry.flag,
+          Padding(
+            padding: EdgeInsets.only(left: 8.0),
+            child: Text("+" + selectedCountry.phoneCode),
+          )
+        ],
+      ),
+      initialValue: selectedCountry,
+    );
+/*
+    return AlternateDropdownButton<Country>(
       value: selectedCountry,
       items: CountrySelector.countries.map((Country country) =>
-        DropdownMenuItem<Country>(
+        AlternateDropdownMenuItem<Country>(
           value: country,
           child: new Row(
             children: <Widget>[
@@ -69,6 +105,20 @@ class CountrySelectorState extends State<CountrySelector> {
           ),
         )
       ).toList(),
+      selectedItems: CountrySelector.countries.map((Country country) =>
+        AlternateDropdownMenuItem<Country>(
+          value: country,
+          child: new Row(
+            children: <Widget>[
+              country.flag,
+              Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text("+" + country.phoneCode.toString())
+              )
+            ],
+          ),
+        )
+      ).toList(),
       onChanged: (Country newCountry){
         setState(() {
           selectedCountry = newCountry;//CountrySelector.nameToCountry[newCountry];
@@ -76,6 +126,7 @@ class CountrySelectorState extends State<CountrySelector> {
         saveCountry(newCountry.phoneCode);
       },
     );
+*/
   }
 }
 
