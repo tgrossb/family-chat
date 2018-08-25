@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/splash/newUser/countrySelector.dart';
+import 'package:bodt_chat/user.dart';
+import 'package:bodt_chat/constants.dart';
 
 class PhoneInput extends StatefulWidget {
   final FirebaseUser newUser;
-  final Function(String) savePhone;
+  final Function(UserParameter<String>) savePhone;
   final Icon phoneIcon;
   PhoneInput({@required this.newUser, @required this.savePhone, @required this.phoneIcon});
 
@@ -15,7 +17,9 @@ class PhoneInput extends StatefulWidget {
 
 class PhoneInputState extends State<PhoneInput> {
   FirebaseUser newUser;
-  Function(String) savePhone;
+  Function(UserParameter<String>) savePhone;
+  UserParameter<String> phone;
+
   Icon phoneIcon;
   NumberTextInputFormatter numberFormatter;
   RegExp numberMatcher;
@@ -23,7 +27,8 @@ class PhoneInputState extends State<PhoneInput> {
 
   PhoneInputState({@required this.newUser, @required this.savePhone, @required this.phoneIcon}):
       numberFormatter = new NumberTextInputFormatter(),
-      numberMatcher = new RegExp(r"^\(\d\d\d\) \d\d\d\-\d\d\d\d$");
+      numberMatcher = new RegExp(r"^\(\d\d\d\) \d\d\d\-\d\d\d\d$"),
+      phone = new UserParameter(name: kUSER_CELLPHONE, value: "");
 
   String validatePhoneNumber(String value){
     value = value.trim();
@@ -33,9 +38,59 @@ class PhoneInputState extends State<PhoneInput> {
     if (!numberMatcher.hasMatch(value))
       return "";
 
+    phone.value = phoneCode + phone.value;
+    savePhone(phone);
     return null;
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: Icon(
+            Icons.phone_android,
+            color: Theme.of(context).accentTextTheme.caption.color,
+          ),
+        ),
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text("Cell phone", style: Theme.of(context).primaryTextTheme.subhead),
+            CountrySelector(saveCountry: (value) => phoneCode = value),
+          ],
+        ),
+
+        Flexible(
+          child: TextFormField(
+            keyboardType: TextInputType.number,
+            initialValue: "914",
+            decoration: InputDecoration(
+              labelText: "Cell phone",
+              suffixIcon: Switch(
+                value: !phone.private,
+                onChanged: (value) =>
+                  setState(() {
+                    phone.setPrivate(!value);
+                  })
+              ),
+            ),
+
+            onSaved: (value) => phone.value = value,
+            validator: validatePhoneNumber,
+            inputFormatters: <TextInputFormatter> [
+              WhitelistingTextInputFormatter.digitsOnly,
+              numberFormatter,
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /*
   @override
   Widget build(BuildContext context){
     return Row(
@@ -46,28 +101,48 @@ class PhoneInputState extends State<PhoneInput> {
           padding: EdgeInsets.only(right: 16.0),
           child: new Icon(
             Icons.phone_android,
-            color: Theme.of(context).accentTextTheme.caption.color//.withOpacity(Theme.of(context).accentIconTheme.opacity),
+            color: Theme.of(context).accentTextTheme.caption.color
           )
         ),
-        new CountrySelector(saveCountry: (value) => phoneCode = value),
-        Flexible(
-          child: TextFormField(
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-                labelText: ""
-            ),
 
-            onSaved: (value) => savePhone(phoneCode + " " + value),
-            validator: validatePhoneNumber,
-            inputFormatters: <TextInputFormatter> [
-              WhitelistingTextInputFormatter.digitsOnly,
-              numberFormatter,
-            ],
-          ),
-        )
+//        Expanded(
+//          child: Column(
+//          Column(
+//            children: <Widget>[
+//              Expanded(
+//                child: Text("Cell phone"),
+//              ),
+//              Expanded(
+//                child: Row(
+//              Row(
+//                  children: <Widget>[
+                    new CountrySelector(saveCountry: (value) => phoneCode = value),
+                    Flexible(
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        initialValue: "914",
+                        decoration: InputDecoration(
+                            labelText: "Name"
+                        ),
+
+                        onSaved: (value) => savePhone(phoneCode + " " + value),
+                        validator: validatePhoneNumber,
+                        inputFormatters: <TextInputFormatter> [
+                          WhitelistingTextInputFormatter.digitsOnly,
+                          numberFormatter,
+                        ],
+                      ),
+                    )
+//                  ],
+//                ),
+//              ),
+//            ],
+//          ),
+//        )
       ],
     );
   }
+*/
 }
 
 class NumberTextInputFormatter extends TextInputFormatter {

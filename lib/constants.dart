@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-const Color kSPLASH_SCREEN_BUTTON_COLOR = Colors.green;
+const Color kSPLASH_SCREEN_BUTTON_COLOR = Color(0xff413c58);
 const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
 
 const String kUSER_EXISTS_TEST = "userExistsTest";

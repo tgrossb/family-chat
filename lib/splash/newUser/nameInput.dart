@@ -13,7 +13,17 @@ class NameInput extends StatefulWidget {
 class NameInputState extends State<NameInput> {
   FirebaseUser newUser;
   Function(String) saveName;
-  NameInputState({@required this.newUser, @required this.saveName});
+  FocusNode focus;
+  bool focused;
+
+  NameInputState({@required this.newUser, @required this.saveName}):
+      focus = new FocusNode();
+
+  @override
+  void initState(){
+    super.initState();
+    focus.addListener(() => setState((){}));
+  }
 
   String validate(String value){
     if (value.isEmpty)
@@ -28,14 +38,38 @@ class NameInputState extends State<NameInput> {
 
   @override
   Widget build(BuildContext context){
-    return TextFormField(
-      initialValue: newUser.displayName,
-      decoration: InputDecoration(
-          labelText: "Name",
-          icon: Icon(Icons.person)
-      ),
-      validator: validate,
-      onSaved: saveName,
+    return Padding(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: Icon(
+                  Icons.person,
+//                  color: Theme.of(context).inputDecorationTheme.labelStyle.color
+              ),
+            ),
+            Flexible(
+              child: TextFormField(
+                initialValue: newUser.displayName,
+                focusNode: focus,
+                decoration: InputDecoration(
+                    labelText: "Name",
+                    filled: focus.hasFocus,
+                    border: OutlineInputBorder()
+                ),
+                validator: validate,
+                onSaved: saveName,
+              ),
+            ),
+          ],
+        )
     );
+  }
+
+  @override
+  void dispose() {
+    focus.dispose();
+    super.dispose();
   }
 }

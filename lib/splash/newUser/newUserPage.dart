@@ -45,7 +45,8 @@ class NewUserForm extends StatefulWidget {
 class _NewUserFormState extends State<NewUserForm> {
   FirebaseUser newUser;
   GlobalKey<FormState> formKey;
-  String name, email, cellPhone, homePhone, address, birthday;
+  String name, email, homePhone, address, birthday;
+  UserParameter<String> cellPhone;
 
   _NewUserFormState({@required this.newUser}):
       formKey = new GlobalKey<FormState>();

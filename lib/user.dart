@@ -102,7 +102,7 @@ class UserParameter<T> {
   T value;
   bool private;
 
-  UserParameter({@required this.name, @required this.value, bool private = true}){
+  UserParameter({@required this.name, @required this.value, this.private = true}){
     if (name == kUSER_NAME)
       private = false;
   }
@@ -113,6 +113,10 @@ class UserParameter<T> {
 
   void makePrivate(){
     private = true;
+  }
+
+  void setPrivate(bool newPrivate){
+    private = newPrivate;
   }
 
   @override

@@ -69,24 +69,27 @@ class CountrySelectorState extends State<CountrySelector> {
 
   @override
   Widget build(BuildContext context){
-    return SearchablePopupMenuButton<Country>(
-      onSelected: (Country result){
-        setState(() {
-          selectedCountry = result;
-        });
-        saveCountry(result.phoneCode);
-      },
-      itemBuilder: (BuildContext context) => CountrySelector.countries.map(buildOption).toList(),
-      child: Row(
-        children: <Widget>[
-          selectedCountry.flag,
-          Padding(
-            padding: EdgeInsets.only(left: 8.0),
-            child: Text("+" + selectedCountry.phoneCode),
-          )
-        ],
+    return Container(
+      color: Colors.redAccent,
+      child: SearchablePopupMenuButton<Country>(
+        onSelected: (Country result){
+          setState(() {
+            selectedCountry = result;
+          });
+          saveCountry(result.phoneCode);
+        },
+        itemBuilder: (BuildContext context) => CountrySelector.countries.map(buildOption).toList(),
+        child: Row(
+          children: <Widget>[
+            selectedCountry.flag,
+            Padding(
+              padding: EdgeInsets.only(left: 8.0),
+              child: Text("+" + selectedCountry.phoneCode, style: Theme.of(context).primaryTextTheme.subhead),
+            )
+          ],
+        ),
+        initialValue: selectedCountry,
       ),
-      initialValue: selectedCountry,
     );
 /*
     return AlternateDropdownButton<Country>(

@@ -98,10 +98,10 @@ class SignInButton extends StatelessWidget {
         width: shrinkWidth.value,
         height: expandHeight.value,
         child: shrinkWidth.value > 200 ?
-          new Text("Sign in with Google", style: Theme.of(context).primaryTextTheme.title.copyWith(color: kSPLASH_SCREEN_LOADING_COLOR)) : null,
+          new Text("Sign in with Google", style: Theme.of(context).primaryTextTheme.title) : null,
         alignment: FractionalOffset.center,
         decoration: new BoxDecoration(
-            color: kSPLASH_SCREEN_BUTTON_COLOR,
+            color: Theme.of(context).accentColor,
             borderRadius: new BorderRadius.all(Radius.circular(buttonBorderRadius.value))
         ),
       ),
