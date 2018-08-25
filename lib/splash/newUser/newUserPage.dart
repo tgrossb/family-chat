@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/splash/newUser/nameInput.dart';
 import 'package:bodt_chat/splash/newUser/emailInput.dart';
 import 'package:bodt_chat/splash/newUser/phoneInput.dart';
+import 'package:bodt_chat/splash/newUser/simplePhoneInput.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/user.dart';
 import 'package:bodt_chat/database.dart';
@@ -45,8 +46,8 @@ class NewUserForm extends StatefulWidget {
 class _NewUserFormState extends State<NewUserForm> {
   FirebaseUser newUser;
   GlobalKey<FormState> formKey;
-  String name, email, homePhone, address, birthday;
-  UserParameter<String> cellPhone;
+  String name, address, birthday;
+  UserParameter<String> cellPhone, email, homePhone;
 
   _NewUserFormState({@required this.newUser}):
       formKey = new GlobalKey<FormState>();
@@ -96,7 +97,7 @@ class _NewUserFormState extends State<NewUserForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).accentColor,
       padding: EdgeInsets.symmetric(horizontal: 10.0),
       child: Form(
         key: formKey,
@@ -106,7 +107,8 @@ class _NewUserFormState extends State<NewUserForm> {
           children: <Widget>[
             new NameInput(newUser: newUser, saveName: (value) => name = value),
             new EmailInput(newUser: newUser, saveEmail: (value) => email = value),
-            new PhoneInput(newUser: newUser, savePhone: (value) => cellPhone = value, phoneIcon: Icon(Icons.phone_android)),
+            new SimplePhoneInput(newUser: newUser, savePhone: (value) => cellPhone = value, phoneIcon: Icon(Icons.phone_android), label: "Cell phone"),
+            new SimplePhoneInput(newUser: newUser, savePhone: (value) => homePhone = value, phoneIcon: Icon(Icons.phone), label: "Home phone"),
             buildSubmitButton(context)
          ],
        ),

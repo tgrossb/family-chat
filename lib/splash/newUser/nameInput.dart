@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bodt_chat/constants.dart';
 
 class NameInput extends StatefulWidget {
   final FirebaseUser newUser;
@@ -10,19 +11,32 @@ class NameInput extends StatefulWidget {
   State<StatefulWidget> createState() => new NameInputState(newUser: newUser, saveName: saveName);
 }
 
-class NameInputState extends State<NameInput> {
+class NameInputState extends State<NameInput> with SingleTickerProviderStateMixin {
   FirebaseUser newUser;
   Function(String) saveName;
-  FocusNode focus;
-  bool focused;
+  FocusNode node;
+  AnimationController backgroundController;
+  Animation<double> background;
 
   NameInputState({@required this.newUser, @required this.saveName}):
-      focus = new FocusNode();
+        node = FocusNode();
 
   @override
   void initState(){
     super.initState();
-    focus.addListener(() => setState((){}));
+
+    Tween<double> opacityTween = Tween(begin: 0.0, end: 1.0);
+    backgroundController = AnimationController(vsync: this, duration: Duration(milliseconds: kSELECT_FIELD_SHADE));
+    background = opacityTween.animate(backgroundController);
+
+    node.addListener((){
+      setState(() {
+        if (node.hasFocus)
+          backgroundController.forward(from: 0.0);
+        else
+          backgroundController.reverse(from: 1.0);
+      });
+    });
   }
 
   String validate(String value){
@@ -37,7 +51,20 @@ class NameInputState extends State<NameInput> {
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      builder: buildFormAnimation,
+      animation: backgroundController,
+    );
+  }
+
+  Widget buildFormAnimation(BuildContext context, Widget child){
+    Color goalColor = Theme.of(context).inputDecorationTheme.fillColor;
+    Color thisCol = goalColor.withOpacity(goalColor.opacity * background.value);
+
+    Color iconBaseColor = Theme.of(context).inputDecorationTheme.labelStyle.color;
+    Color iconColor = iconBaseColor.withOpacity(iconBaseColor.opacity - 2*goalColor.opacity * background.value);
+
     return Padding(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
@@ -45,17 +72,17 @@ class NameInputState extends State<NameInput> {
             Padding(
               padding: EdgeInsets.only(right: 16.0),
               child: Icon(
-                  Icons.person,
-//                  color: Theme.of(context).inputDecorationTheme.labelStyle.color
+                Icons.person,
+                color: iconColor
               ),
             ),
             Flexible(
               child: TextFormField(
                 initialValue: newUser.displayName,
-                focusNode: focus,
+                focusNode: node,
                 decoration: InputDecoration(
                     labelText: "Name",
-                    filled: focus.hasFocus,
+                    fillColor: thisCol,
                     border: OutlineInputBorder()
                 ),
                 validator: validate,
@@ -69,7 +96,7 @@ class NameInputState extends State<NameInput> {
 
   @override
   void dispose() {
-    focus.dispose();
+    node.dispose();
     super.dispose();
   }
 }

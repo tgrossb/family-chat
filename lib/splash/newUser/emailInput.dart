@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bodt_chat/constants.dart';
+import 'package:bodt_chat/user.dart';
 
 class EmailInput extends StatefulWidget {
   final FirebaseUser newUser;
-  final Function(String) saveEmail;
+  final Function(UserParameter<String>) saveEmail;
   EmailInput({@required this.newUser, @required this.saveEmail});
 
   @override
@@ -12,24 +14,24 @@ class EmailInput extends StatefulWidget {
 
 class EmailInputState extends State<EmailInput> with SingleTickerProviderStateMixin {
   FirebaseUser newUser;
-  Function(String) saveEmail;
+  Function(UserParameter<String>) saveEmail;
+  UserParameter<String> email;
   RegExp emailChecker;
   FocusNode node;
   AnimationController backgroundController;
   Animation<double> background;
 
   EmailInputState({@required this.newUser, @required this.saveEmail}):
-      emailChecker = new RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-  {
-    node = FocusNode();
-  }
+      node = FocusNode(),
+      email = UserParameter<String>(value: "", name: kUSER_EMAIL),
+      emailChecker = new RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
 
   @override
   void initState(){
     super.initState();
 
     Tween<double> opacityTween = Tween(begin: 0.0, end: 1.0);
-    backgroundController = AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+    backgroundController = AnimationController(vsync: this, duration: Duration(milliseconds: kSELECT_FIELD_SHADE));
     background = opacityTween.animate(backgroundController);
 
     node.addListener((){
@@ -51,6 +53,8 @@ class EmailInputState extends State<EmailInput> with SingleTickerProviderStateMi
     if (emailMatch == null || emailMatch.length != value.length)
       return 'Please enter a valid email';
 
+    email.value = value;
+    saveEmail(email);
     return null;
   }
 
@@ -63,9 +67,12 @@ class EmailInputState extends State<EmailInput> with SingleTickerProviderStateMi
   }
 
   Widget buildFormAnimation(BuildContext context, Widget child){
-//    Color goalColor = Theme.of(context).inputDecorationTheme.fillColor;
-//    Color thisCol = goalColor.withOpacity(goalColor.opacity * background.value);
-//    print(thisCol);
+    Color goalColor = Theme.of(context).inputDecorationTheme.fillColor;
+    Color thisCol = goalColor.withOpacity(goalColor.opacity * background.value);
+
+    Color iconBaseColor = Theme.of(context).inputDecorationTheme.labelStyle.color;
+    Color iconColor = iconBaseColor.withOpacity(iconBaseColor.opacity - 2*goalColor.opacity * background.value);
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -74,7 +81,7 @@ class EmailInputState extends State<EmailInput> with SingleTickerProviderStateMi
             padding: EdgeInsets.only(right: 16.0),
             child: Icon(
                 Icons.email,
-//                color: Theme.of(context).inputDecorationTheme.labelStyle.color
+                color: iconColor
             ),
           ),
           Flexible(
@@ -83,15 +90,30 @@ class EmailInputState extends State<EmailInput> with SingleTickerProviderStateMi
               focusNode: node,
               decoration: InputDecoration(
                 labelText: "Email",
-//                border: InputBorder.
+                fillColor: thisCol,
+                suffixIcon: Switch(
+                  value: !email.private,
+                  onChanged: (value) =>
+                      setState(() {
+                        email.setPrivate(!value);
+                      }),
+                  activeColor: Theme.of(context).primaryColor,
+                ),
+                border: OutlineInputBorder()
               ),
 
-              onSaved: saveEmail,
+              onSaved: (value) => email.value = value,
               validator: validate,
             ),
           ),
         ],
       )
     );
+  }
+
+  @override
+  void dispose() {
+    node.dispose();
+    super.dispose();
   }
 }

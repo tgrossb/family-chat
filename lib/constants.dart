@@ -40,6 +40,8 @@ const double kSIGN_IN_END_WIDTH =
     (kLOADING_DIAMETER + kLOADING_PADDING) * math.sqrt2 * 3;
 const double kSIGN_IN_SWITCH_POINT = 0.25;
 
+const int kSELECT_FIELD_SHADE = 300;
+
 const String kDOT_REPLACEMENT = ",";
 
 const Color kGROUPS_LIST_BACKGROUND = Colors.white;

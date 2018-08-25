@@ -101,7 +101,7 @@ class SignInButton extends StatelessWidget {
           new Text("Sign in with Google", style: Theme.of(context).primaryTextTheme.title) : null,
         alignment: FractionalOffset.center,
         decoration: new BoxDecoration(
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).primaryColor,
             borderRadius: new BorderRadius.all(Radius.circular(buttonBorderRadius.value))
         ),
       ),

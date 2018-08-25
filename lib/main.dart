@@ -9,8 +9,8 @@ final ThemeData iosTheme = new ThemeData(
 );
 
 final ThemeData defaultTheme = new ThemeData(
-  primaryColor: Color(0xff63a375),
-  accentColor: Color(0xff413c58),
+  primaryColor: Color(0xff413c58),
+  accentColor: Color(0xff63a375),
 
   textTheme: TextTheme(
     body1: TextStyle(color: Colors.black),
@@ -60,12 +60,12 @@ final ThemeData defaultTheme = new ThemeData(
   ),
 
   // Used for the form
-//  inputDecorationTheme: InputDecorationTheme(
-//    labelStyle: TextStyle(color: Colors.white70),
-//    filled: true,
-//    fillColor: Color(0x11000000),
+  inputDecorationTheme: InputDecorationTheme(
+    labelStyle: TextStyle(color: Colors.white70),
+    filled: true,
+    fillColor: Color(0x11000000),
 //    prefixStyle: TextStyle(color: Colors.white)
-//  ),
+  ),
 
 //  primaryIconTheme: IconThemeData(color: Colors.white70),
 //  brightness: Brightness.light,

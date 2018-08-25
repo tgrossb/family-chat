@@ -236,7 +236,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     return new Scaffold(
       key: scaffoldKey,
       body: new Container(
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).accentColor,
         child: new Center(
           child: loading || startFinishFlag || finishingStarted || finished ?
           new Column(
