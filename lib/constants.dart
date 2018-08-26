@@ -18,6 +18,8 @@ const String kUSER_PRIVATE_VARS = "private";
 const String kUSER_NAME = "name";
 const String kUSER_EMAIL = "email";
 const String kUSER_CELLPHONE = "cellphone";
+const String kUSER_HOME_PHONE = "homePhone";
+const String kUSER_DOB = "dob";
 
 const String kGROUPS_CHILD = "groups";
 const String kGROUPS_LIST_CHILD = "groupsList";

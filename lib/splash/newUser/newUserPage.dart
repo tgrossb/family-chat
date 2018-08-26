@@ -12,8 +12,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bodt_chat/splash/newUser/nameInput.dart';
-import 'package:bodt_chat/splash/newUser/emailInput.dart';
+import 'package:bodt_chat/splash/newUser/simpleInput.dart';
 import 'package:bodt_chat/splash/newUser/phoneInput.dart';
 import 'package:bodt_chat/splash/newUser/simplePhoneInput.dart';
 import 'package:bodt_chat/constants.dart';
@@ -46,11 +45,14 @@ class NewUserForm extends StatefulWidget {
 class _NewUserFormState extends State<NewUserForm> {
   FirebaseUser newUser;
   GlobalKey<FormState> formKey;
-  String name, address, birthday;
-  UserParameter<String> cellPhone, email, homePhone;
+  String address;
+  UserParameter<String> name, email, cellPhone, homePhone, dob;
+  RegExp emailChecker;
 
   _NewUserFormState({@required this.newUser}):
-      formKey = new GlobalKey<FormState>();
+      formKey = new GlobalKey<FormState>(),
+      emailChecker = new RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+
 
   List<Widget> buildForm(){
     return [
@@ -94,6 +96,34 @@ class _NewUserFormState extends State<NewUserForm> {
     );
   }
 
+  String validateName(String value, UserParameter<String> param){
+    value = value.trim();
+    if (value.isEmpty)
+      return "Please enter your name";
+
+    final RegExp nameExp = new RegExp(r'^[A-Za-z ]+$');
+    if (!nameExp.hasMatch(value))
+      return "Please enter only alphabetical characters";
+
+    name = param;
+    return null;
+  }
+
+  String validateEmail(String value, UserParameter<String> param){
+    value = value.trim();
+    if (value.isEmpty)
+      return "Please enter your email";
+
+    String emailMatch = emailChecker.stringMatch(value);
+    if (emailMatch == null || emailMatch.length != value.length)
+      return 'Please enter a valid email';
+
+    email.value = value;
+
+    email = param;
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -105,10 +135,43 @@ class _NewUserFormState extends State<NewUserForm> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new NameInput(newUser: newUser, saveName: (value) => name = value),
-            new EmailInput(newUser: newUser, saveEmail: (value) => email = value),
-            new SimplePhoneInput(newUser: newUser, savePhone: (value) => cellPhone = value, phoneIcon: Icon(Icons.phone_android), label: "Cell phone"),
-            new SimplePhoneInput(newUser: newUser, savePhone: (value) => homePhone = value, phoneIcon: Icon(Icons.phone), label: "Home phone"),
+            new SimpleInput(
+              initialValue: UserParameter<String>(name: kUSER_NAME, value: newUser.displayName),
+              validate: validateName,
+              icon: Icons.person,
+              label: "Name",
+              keyboardType: TextInputType.text,
+              switchValue: true,
+            ),
+            new SimpleInput(
+              initialValue: UserParameter<String>(name: kUSER_EMAIL, value: newUser.email),
+              validate: validateEmail,
+              icon: Icons.email,
+              keyboardType: TextInputType.emailAddress,
+              label: "Email"
+            ),
+            new SimplePhoneInput(
+              newUser: newUser,
+              savePhone: (value) => cellPhone = value,
+              phoneIcon: Icon(Icons.phone_android),
+              label: "Cell phone"
+            ),
+            new SimplePhoneInput(
+                newUser: newUser,
+                savePhone: (value) => homePhone = value,
+                phoneIcon: Icon(Icons.phone),
+                label: "Home phone"
+            ),
+            new SimpleInput(
+              initialValue: UserParameter<String>(name: kUSER_DOB, value: ""),
+              validate: (value, param){
+                dob = param;
+                return null;
+              },
+              icon: Icons.calendar_today,
+              keyboardType: TextInputType.datetime,
+              label: "Date of birth",
+            ),
             buildSubmitButton(context)
          ],
        ),
