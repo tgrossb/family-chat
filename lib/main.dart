@@ -66,6 +66,7 @@ final ThemeData defaultTheme = new ThemeData(
   // Used for the form
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(color: Colors.white70),
+    hintStyle: TextStyle(color: Colors.white70),
     errorStyle: TextStyle(color: Color(0xff8c0808)),
     filled: true,
     fillColor: Color(0x11000000),

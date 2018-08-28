@@ -16,6 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/splash/newUser/simpleInput.dart';
 import 'package:bodt_chat/splash/newUser/phoneInput.dart';
 import 'package:bodt_chat/splash/newUser/simplePhoneInput.dart';
+import 'package:bodt_chat/splash/newUser/simpleDateInput.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/user.dart';
 import 'package:bodt_chat/database.dart';
@@ -203,7 +204,7 @@ class _NewUserFormState extends State<NewUserForm> {
                 phoneIcon: Icon(Icons.phone),
                 label: "Home phone"
             ),
-            new SimpleInput(
+            new SimpleDateInput(
               initialValue: dob,
               validate: (value, param){
                 dob = param;
