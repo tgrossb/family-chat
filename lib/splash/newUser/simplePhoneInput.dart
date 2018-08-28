@@ -10,7 +10,8 @@ class SimplePhoneInput extends StatefulWidget {
   final Function(UserParameter<String>) savePhone;
   final Icon phoneIcon;
   final String label;
-  SimplePhoneInput({@required this.newUser, @required this.savePhone, @required this.phoneIcon, @required this.label});
+  final bool isRequired;
+  SimplePhoneInput({@required this.newUser, @required this.savePhone, @required this.phoneIcon, @required this.label, this.isRequired: false});
 
   @override
   State<StatefulWidget> createState() => new SimplePhoneInputState(newUser: newUser, savePhone: savePhone, phoneIcon: phoneIcon);
@@ -55,10 +56,10 @@ class SimplePhoneInputState extends State<SimplePhoneInput> with SingleTickerPro
 
   String validatePhoneNumber(String value){
     value = value.trim();
-    if (value.length == 0)
+    if (value.length == 0 && widget.isRequired)
       return "Enter your phone number";
 
-    if (!numberMatcher.hasMatch(value))
+    if (value.length != 0 && !numberMatcher.hasMatch(value))
       return "";
 
     savePhone(phone);
@@ -130,38 +131,29 @@ class SimplePhoneInputState extends State<SimplePhoneInput> with SingleTickerPro
 }
 
 class NumberTextInputFormatter extends TextInputFormatter {
+  static List<int> stripNumbers(String s){
+    return s.codeUnits.where((charCode) => 47 < charCode && charCode < 58).toList();
+  }
+
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final int newTextLength = newValue.text.length;
-    int selectionIndex = newValue.selection.end;
-    int usedSubstringIndex = 0;
-    final StringBuffer newText = new StringBuffer();
-    if (newTextLength >= 1) {
-      newText.write('(');
-      if (newValue.selection.end >= 1)
-        selectionIndex++;
+    List<int> phoneNums = stripNumbers(newValue.text);
+    int phoneCount = phoneNums.length;
+    List<String> output = ["(", " ", " ", " ", ") ", " ", " ", " ", " - ", " ", " ", " ", " "];
+    int outputIndex = 1;
+    for (int phoneIndex=0; phoneIndex<phoneCount; phoneIndex++){
+      outputIndex = phoneIndex + (phoneIndex > 2 ? (phoneIndex > 5 ? 3 : 2) : 1);
+      output[outputIndex] = String.fromCharCode(phoneNums[phoneIndex]);
     }
-    if (newTextLength >= 4) {
-      newText.write(newValue.text.substring(0, usedSubstringIndex = 3) + ') ');
-      if (newValue.selection.end >= 3)
-        selectionIndex += 2;
-    }
-    if (newTextLength >= 7) {
-      newText.write(newValue.text.substring(3, usedSubstringIndex = 6) + '-');
-      if (newValue.selection.end >= 6)
-        selectionIndex++;
-    }
-    if (newTextLength >= 11) {
-      newText.write(newValue.text.substring(6, usedSubstringIndex = 10) + ' ');
-      if (newValue.selection.end >= 10)
-        selectionIndex++;
-    }
-    // Dump the rest.
-    if (newTextLength >= usedSubstringIndex)
-      newText.write(newValue.text.substring(usedSubstringIndex));
+
+    // Sum the length of the output up to outputIndex
+    int outputCharIndex = 0;
+    for (int c=0; c<outputIndex; c++)
+      outputCharIndex += output[c].length;
+
     return new TextEditingValue(
-      text: newText.toString(),
-      selection: new TextSelection.collapsed(offset: selectionIndex),
+      text: output.join(),
+      selection: new TextSelection.collapsed(offset: outputCharIndex+1),
     );
   }
 }

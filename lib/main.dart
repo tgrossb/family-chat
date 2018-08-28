@@ -45,6 +45,10 @@ final ThemeData defaultTheme = new ThemeData(
     title: TextStyle(color: Colors.white),
   ),
 
+  buttonTheme: ButtonThemeData(
+    textTheme: ButtonTextTheme.primary
+  ),
+
   accentTextTheme: TextTheme(
     body1: TextStyle(color: Colors.black),
     body2: TextStyle(color: Colors.black),
@@ -62,10 +66,13 @@ final ThemeData defaultTheme = new ThemeData(
   // Used for the form
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(color: Colors.white70),
+    errorStyle: TextStyle(color: Color(0xff8c0808)),
     filled: true,
     fillColor: Color(0x11000000),
 //    prefixStyle: TextStyle(color: Colors.white)
   ),
+
+  errorColor: Color(0xff8c0808),
 
 //  primaryIconTheme: IconThemeData(color: Colors.white70),
 //  brightness: Brightness.light,

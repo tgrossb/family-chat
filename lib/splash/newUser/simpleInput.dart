@@ -9,11 +9,15 @@ class SimpleInput extends StatefulWidget {
   final String label;
   final TextInputType keyboardType;
   final bool switchValue;
+  final bool isRequired;
+  final bool autovalidate;
 
   // If switchValue is given, the switch will be set to this and disabled
   // To give it an initial value, define the private variable of initialValue
   SimpleInput({@required this.initialValue, @required this.validate,
-    @required this.icon, @required this.label, @required this.keyboardType, this.switchValue});
+    @required this.icon, @required this.label, @required this.keyboardType,
+    this.switchValue, this.isRequired: false, this.autovalidate: false
+  });
 
   @override
   State<StatefulWidget> createState() => new _SimpleInputState();
@@ -79,6 +83,7 @@ class _SimpleInputState extends State<SimpleInput> with SingleTickerProviderStat
                 initialValue: widget.initialValue.value,
                 focusNode: node,
                 keyboardType: widget.keyboardType,
+                autovalidate: widget.autovalidate,
                 decoration: InputDecoration(
                     labelText: widget.label,
                     fillColor: thisCol,

@@ -9,6 +9,7 @@
  * Written by: Theo Grossberndt
  */
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,6 +52,11 @@ class _NewUserFormState extends State<NewUserForm> {
 
   _NewUserFormState({@required this.newUser}):
       formKey = new GlobalKey<FormState>(),
+      name = new UserParameter<String>(name: kUSER_NAME, value: newUser.displayName, private: false),
+      email = new UserParameter<String>(name: kUSER_EMAIL, value: newUser.email, private: false),
+      cellPhone = new UserParameter<String>(name: kUSER_CELLPHONE, value: newUser.phoneNumber?? "", private: true),
+      homePhone = new UserParameter<String>(name: kUSER_HOME_PHONE, value: "", private: true),
+      dob = new UserParameter<String>(name: kUSER_DOB, value: "", private: true),
       emailChecker = new RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
 
 
@@ -124,6 +130,20 @@ class _NewUserFormState extends State<NewUserForm> {
     return null;
   }
 
+  Future<Null> showInfo() async {
+    await showDialog<Null>(
+        context: context,
+        builder: (BuildContext context) {
+          return new SimpleDialog(
+            title: const Text('Public/Private Data'),
+            children: <Widget>[
+              new Text("Welcome")
+            ],
+          );
+        }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -135,26 +155,47 @@ class _NewUserFormState extends State<NewUserForm> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new SimpleInput(
-              initialValue: UserParameter<String>(name: kUSER_NAME, value: newUser.displayName),
-              validate: validateName,
-              icon: Icons.person,
-              label: "Name",
-              keyboardType: TextInputType.text,
-              switchValue: true,
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new FlatButton(
+                  padding: EdgeInsets.only(right: 0.0),
+                  onPressed: showInfo,
+                  child: new Row(
+                    children: <Widget>[
+                      Text("Public"),
+                      Padding(
+                        padding: EdgeInsets.only(left: 4.0),
+                        child: Icon(Icons.info_outline),
+                      )
+                    ],
+                  )
+                ),
+              ],
             ),
             new SimpleInput(
-              initialValue: UserParameter<String>(name: kUSER_EMAIL, value: newUser.email),
+              initialValue: name,
+              validate: validateName,
+              icon: Icons.person,
+              label: "* Name",
+              keyboardType: TextInputType.text,
+              switchValue: true,
+              isRequired: true,
+              autovalidate: true,
+            ),
+            new SimpleInput(
+              initialValue: email,
               validate: validateEmail,
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
-              label: "Email"
+              label: "* Email",
             ),
             new SimplePhoneInput(
               newUser: newUser,
               savePhone: (value) => cellPhone = value,
               phoneIcon: Icon(Icons.phone_android),
-              label: "Cell phone"
+              label: "* Cell phone",
+              isRequired: true,
             ),
             new SimplePhoneInput(
                 newUser: newUser,
@@ -163,7 +204,7 @@ class _NewUserFormState extends State<NewUserForm> {
                 label: "Home phone"
             ),
             new SimpleInput(
-              initialValue: UserParameter<String>(name: kUSER_DOB, value: ""),
+              initialValue: dob,
               validate: (value, param){
                 dob = param;
                 return null;
@@ -171,6 +212,10 @@ class _NewUserFormState extends State<NewUserForm> {
               icon: Icons.calendar_today,
               keyboardType: TextInputType.datetime,
               label: "Date of birth",
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 42.0),
+              child: Text("* Required", style: Theme.of(context).inputDecorationTheme.labelStyle),
             ),
             buildSubmitButton(context)
          ],
