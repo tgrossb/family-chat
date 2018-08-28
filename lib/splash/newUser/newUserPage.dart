@@ -17,6 +17,7 @@ import 'package:bodt_chat/splash/newUser/simpleInput.dart';
 import 'package:bodt_chat/splash/newUser/phoneInput.dart';
 import 'package:bodt_chat/splash/newUser/simplePhoneInput.dart';
 import 'package:bodt_chat/splash/newUser/simpleDateInput.dart';
+import 'package:bodt_chat/splash/newUser/validators.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/user.dart';
 import 'package:bodt_chat/database.dart';
@@ -49,7 +50,6 @@ class _NewUserFormState extends State<NewUserForm> {
   GlobalKey<FormState> formKey;
   String address;
   UserParameter<String> name, email, cellPhone, homePhone, dob;
-  RegExp emailChecker;
 
   _NewUserFormState({@required this.newUser}):
       formKey = new GlobalKey<FormState>(),
@@ -57,8 +57,7 @@ class _NewUserFormState extends State<NewUserForm> {
       email = new UserParameter<String>(name: kUSER_EMAIL, value: newUser.email, private: false),
       cellPhone = new UserParameter<String>(name: kUSER_CELLPHONE, value: newUser.phoneNumber?? "", private: true),
       homePhone = new UserParameter<String>(name: kUSER_HOME_PHONE, value: "", private: true),
-      dob = new UserParameter<String>(name: kUSER_DOB, value: "", private: true),
-      emailChecker = new RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+      dob = new UserParameter<String>(name: kUSER_DOB, value: "", private: true);
 
 
   List<Widget> buildForm(){
@@ -101,34 +100,6 @@ class _NewUserFormState extends State<NewUserForm> {
           )
       ),
     );
-  }
-
-  String validateName(String value, UserParameter<String> param){
-    value = value.trim();
-    if (value.isEmpty)
-      return "Please enter your name";
-
-    final RegExp nameExp = new RegExp(r'^[A-Za-z ]+$');
-    if (!nameExp.hasMatch(value))
-      return "Please enter only alphabetical characters";
-
-    name = param;
-    return null;
-  }
-
-  String validateEmail(String value, UserParameter<String> param){
-    value = value.trim();
-    if (value.isEmpty)
-      return "Please enter your email";
-
-    String emailMatch = emailChecker.stringMatch(value);
-    if (emailMatch == null || emailMatch.length != value.length)
-      return 'Please enter a valid email';
-
-    email.value = value;
-
-    email = param;
-    return null;
   }
 
   Future<Null> showInfo() async {
@@ -176,7 +147,7 @@ class _NewUserFormState extends State<NewUserForm> {
             ),
             new SimpleInput(
               initialValue: name,
-              validate: validateName,
+              validate: (value, param) => Validators.validateName(value, param, (param) => name = param),
               icon: Icons.person,
               label: "* Name",
               keyboardType: TextInputType.text,
@@ -186,7 +157,7 @@ class _NewUserFormState extends State<NewUserForm> {
             ),
             new SimpleInput(
               initialValue: email,
-              validate: validateEmail,
+              validate: (value, param) => Validators.validateEmail(value, param, (param) => email = param),
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
               label: "* Email",
@@ -206,10 +177,7 @@ class _NewUserFormState extends State<NewUserForm> {
             ),
             new SimpleDateInput(
               initialValue: dob,
-              validate: (value, param){
-                dob = param;
-                return null;
-              },
+              validate: (value, param) => Validators.validateDob(value, param, (param) => dob = param),
               icon: Icons.calendar_today,
               keyboardType: TextInputType.datetime,
               label: "Date of birth",
