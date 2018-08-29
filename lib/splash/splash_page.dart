@@ -9,12 +9,13 @@
  * Written by: Theo Grossberndt
  */
 
+import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:async';
-import 'dart:math' as math;
 import 'package:bodt_chat/groupsList/groupsListScreen.dart';
 import 'package:bodt_chat/splash/loadingAnimationWidget.dart';
 import 'package:bodt_chat/splash/signInButton.dart';
@@ -129,20 +130,25 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     // Double check the user
     if (user == null)
-      user = await attemptSignIn();
-
-    if (user == null){
-      SnackBar snackBar = new SnackBar(content: new Text("There was an error signing you in"));
-      scaffoldKey.currentState.showSnackBar(snackBar);
-      setState((){
-        loading = false;
-        startFinishFlag = false;
-        finishingStarted = false;
-        finished = false;
-      });
-      loadingAnimationController.stop(canceled: false);
-      print("User is null, problem");
-      return;
+      try {
+        user = await attemptSignIn();
+      } on PlatformException catch(e){
+        String snackBarMessage = "Error: " + e.code;
+        if (e.code == "NETWORK_ERROR"){
+          // Show connection error dialog, but for now, just add a snack bar
+          snackBarMessage = "Network error signing you in";
+        }
+        SnackBar snackBar = new SnackBar(content: new Text(snackBarMessage));
+        scaffoldKey.currentState.showSnackBar(snackBar);
+        setState((){
+          loading = false;
+          startFinishFlag = false;
+          finishingStarted = false;
+          finished = false;
+        });
+        loadingAnimationController.stop(canceled: false);
+        print("User is null, problem");
+        return;
     }
 
     // Check if this is a new user
