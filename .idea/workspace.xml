@@ -5,28 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInputPhoneInput.dart" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/lib/dataBundles.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/database.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/database.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groupsList/confirmDeleteDialog.dart" afterPath="$PROJECT_DIR$/lib/dialogs/confirmDeleteDialog.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groupsList/groupsListItem.dart" afterPath="$PROJECT_DIR$/lib/groupsList/groupsListItem.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart" afterPath="$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/groupsList/newGroupDialog.dart" afterPath="$PROJECT_DIR$/lib/dialogs/newGroupDialog.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/routes.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/routes.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/singleGroup/groupMessage.dart" afterPath="$PROJECT_DIR$/lib/singleGroup/groupMessage.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/singleGroup/groupScreen.dart" afterPath="$PROJECT_DIR$/lib/singleGroup/groupScreen.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/countrySelector.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/countrySelector.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/defInputs/emailInput.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/defInputs/emailInput.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/maskedTextInputFormatter.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart" />
       <change beforePath="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/phoneInput.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/phoneInput.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/simpleDateInput.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleDateInput.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/simpleInput.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/simplePhoneInput.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/inputs/simplePhoneInput.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/validators.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/validators.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/splash_page.dart" afterPath="$PROJECT_DIR$/lib/splash/splash_page.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/user.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/user.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -51,13 +34,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="newUserPage.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="newUserPage.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="354">
-              <caret line="149" column="56" lean-forward="false" selection-start-line="149" selection-start-column="56" selection-end-line="149" selection-end-column="56" />
+              <caret line="175" column="41" lean-forward="false" selection-start-line="175" selection-start-column="41" selection-end-line="175" selection-end-column="41" />
               <folding>
-                <element signature="e#0#9253#0" expanded="true" />
+                <element signature="e#0#7347#0" expanded="true" />
                 <element signature="e#347#367#0" expanded="true" />
               </folding>
             </state>
@@ -67,18 +50,30 @@
       <file leaf-file-name="validators.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/widgetUtils/validators.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="59" column="39" lean-forward="false" selection-start-line="59" selection-start-column="39" selection-end-line="59" selection-end-column="39" />
+            <state relative-caret-position="336">
+              <caret line="51" column="104" lean-forward="false" selection-start-line="51" selection-start-column="104" selection-end-line="51" selection-end-column="104" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="simpleInput.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="dataBundles.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/dataUtils/dataBundles.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="318">
+              <caret line="189" column="0" lean-forward="false" selection-start-line="189" selection-start-column="0" selection-end-line="189" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="simpleInput.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="468">
-              <caret line="107" column="77" lean-forward="true" selection-start-line="107" selection-start-column="77" selection-end-line="107" selection-end-column="77" />
+            <state relative-caret-position="408">
+              <caret line="37" column="39" lean-forward="false" selection-start-line="37" selection-start-column="39" selection-end-line="37" selection-end-column="39" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -123,8 +118,8 @@
       <file leaf-file-name="maskedTextInputFormatter.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="444">
-              <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+            <state relative-caret-position="90">
+              <caret line="63" column="113" lean-forward="false" selection-start-line="63" selection-start-column="113" selection-end-line="63" selection-end-column="113" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -191,8 +186,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/lib/groups/groupsListItem.dart" />
-        <option value="$PROJECT_DIR$/lib/groups/groupsListScreen.dart" />
         <option value="$PROJECT_DIR$/lib/singleGroup/groupMessage.dart" />
         <option value="$PROJECT_DIR$/lib/utils.dart" />
         <option value="$PROJECT_DIR$/lib/groupsList/groupsListItem.dart" />
@@ -240,8 +233,10 @@
         <option value="$PROJECT_DIR$/lib/dialogs/confirmDeleteDialog.dart" />
         <option value="$PROJECT_DIR$/lib/dialogs/newGroupDialog.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/validators.dart" />
-        <option value="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart" />
+        <option value="$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart" />
+        <option value="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" />
         <option value="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" />
+        <option value="$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart" />
       </list>
     </option>
   </component>
@@ -282,6 +277,12 @@
               <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
               <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="dataUtils" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
               <item name="splash" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -298,6 +299,12 @@
               <item name="splash" type="462c0819:PsiDirectoryNode" />
               <item name="newUser" type="462c0819:PsiDirectoryNode" />
               <item name="inputs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="widgetUtils" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -592,7 +599,7 @@
         <state relative-caret-position="350">
           <caret line="25" column="54" lean-forward="false" selection-start-line="25" selection-start-column="54" selection-end-line="25" selection-end-column="54" />
           <folding>
-            <element signature="e#0#39#0" expanded="false" />
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -619,16 +626,6 @@
           <caret line="94" column="1" lean-forward="false" selection-start-line="94" selection-start-column="1" selection-end-line="94" selection-end-column="1" />
           <folding>
             <element signature="e#456#495#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/dataUtils/dataBundles.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#39#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -851,36 +848,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#36#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInputPhoneInput.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="49" lean-forward="false" selection-start-line="3" selection-start-column="49" selection-end-line="3" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simplePhoneInput.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/dialogs/newGroupDialog.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
@@ -897,14 +864,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="68" column="46" lean-forward="false" selection-start-line="68" selection-start-column="46" selection-end-line="68" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/splash/splash_page.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -913,18 +872,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/widgetUtils/validators.dart">
+    <entry file="file://$PROJECT_DIR$/lib/widgetUtils/maskedTextInputFormatter.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="59" column="39" lean-forward="false" selection-start-line="59" selection-start-column="39" selection-end-line="59" selection-end-column="39" />
+        <state relative-caret-position="90">
+          <caret line="63" column="113" lean-forward="false" selection-start-line="63" selection-start-column="113" selection-end-line="63" selection-end-column="113" />
+          <folding>
+            <element signature="e#0#36#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="68" column="46" lean-forward="false" selection-start-line="68" selection-start-column="46" selection-end-line="68" selection-end-column="46" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart">
+    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simplePhoneInput.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="107" column="77" lean-forward="true" selection-start-line="107" selection-start-column="77" selection-end-line="107" selection-end-column="77" />
+        <state relative-caret-position="270">
+          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInputPhoneInput.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="49" lean-forward="false" selection-start-line="3" selection-start-column="49" selection-end-line="3" selection-end-column="49" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
@@ -934,10 +913,38 @@
     <entry file="file://$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="354">
-          <caret line="149" column="56" lean-forward="false" selection-start-line="149" selection-start-column="56" selection-end-line="149" selection-end-column="56" />
+          <caret line="175" column="41" lean-forward="false" selection-start-line="175" selection-start-column="41" selection-end-line="175" selection-end-column="41" />
           <folding>
-            <element signature="e#0#9253#0" expanded="true" />
+            <element signature="e#0#7347#0" expanded="true" />
             <element signature="e#347#367#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/widgetUtils/validators.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="51" column="104" lean-forward="false" selection-start-line="51" selection-start-column="104" selection-end-line="51" selection-end-column="104" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/dataUtils/dataBundles.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="189" column="0" lean-forward="false" selection-start-line="189" selection-start-column="0" selection-end-line="189" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simpleInput.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="37" column="39" lean-forward="false" selection-start-line="37" selection-start-column="39" selection-end-line="37" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>

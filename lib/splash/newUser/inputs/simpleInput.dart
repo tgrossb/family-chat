@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
+import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/constants.dart';
 
 class SimpleInput extends StatefulWidget {
   final UserParameter<String> initialValue;
   final Function(String, UserParameter<String>, bool isRequired, String label) validate;
   final Function(int) requestNextFocus;
-  final int focusIndex;
+  final int location;
   final IconData icon;
   final String label, requiredLabel;
   final TextInputType keyboardType;
@@ -21,8 +22,20 @@ class SimpleInput extends StatefulWidget {
     @required this.icon, @required this.label, @required this.keyboardType,
     this.switchValue, this.isRequired: false, this.autovalidate: false,
     this.inputFormatters, this.requiredLabel: "* ", @required this.focusNode,
-    @required this.requestNextFocus, @required this.focusIndex
+    @required this.requestNextFocus, @required this.location
   });
+
+  SimpleInput.fromParams({@required this.initialValue, @required this.validate, @required this.requestNextFocus,
+                            @required this.location, @required InputFieldParams params}):
+      this.icon = params.icon,
+      this.label = params.label,
+      this.requiredLabel = params.requiredLabel,
+      this.keyboardType = params.keyboardType ?? TextInputType.text,
+      this.switchValue = params.switchValue,
+      this.isRequired = params.isRequired ?? false,
+      this.autovalidate = params.autovalidate ?? false,
+      this.inputFormatters = params.formatters,
+      this.focusNode = params.focusNode;
 
   @override
   State<StatefulWidget> createState() => new SimpleInputState();
@@ -105,7 +118,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
                   return widget.validate(value, param, widget.isRequired, widget.label);
                 },
                 inputFormatters: widget.inputFormatters,
-                onFieldSubmitted: widget.requestNextFocus(widget.focusIndex),
+                onFieldSubmitted: (String s) => widget.requestNextFocus(widget.location),
               ),
             ),
           ],

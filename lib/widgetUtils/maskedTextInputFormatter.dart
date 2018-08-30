@@ -13,8 +13,7 @@ class MaskedTextInputFormatter extends TextInputFormatter {
   String mask, masker, placeHolder;
   List<String> maskList;
   Map<int, int> forwardInputToMaskIndex, backwardInputToMaskIndex;
-  int lastMask;
-  int staticCounter;
+  int staticCounter, maskerCount;
   RegExp maskedValueMatcher;
 
   // String mask: The representative mask of this input (ex. "(xxx) xxx - xxxx")
@@ -25,7 +24,6 @@ class MaskedTextInputFormatter extends TextInputFormatter {
   MaskedTextInputFormatter({@required this.mask, @required this.masker, @required this.maskedValueMatcher, this.placeHolder: " "}){
     maskList = mask.split("");
     print(maskList);
-    lastMask = maskList.lastIndexOf(masker);
 
     forwardInputToMaskIndex = {};
     backwardInputToMaskIndex = {};
@@ -33,7 +31,7 @@ class MaskedTextInputFormatter extends TextInputFormatter {
     // I honestly have no idea how this works, but it does
     // Please, just don't fucking touch it
     int lastIndex = -1;
-    int maskerCount = masker.allMatches(mask).length;
+    maskerCount = masker.allMatches(mask).length;
     for (int c=0; c<maskerCount; c++) {
       lastIndex = maskList.indexOf(masker, lastIndex+1);
       forwardInputToMaskIndex[c] = lastIndex;
@@ -62,8 +60,8 @@ class MaskedTextInputFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    // Lop off the end of newValue if its more than 10
-    String newText = newValue.text.length > 9 ? newValue.text.substring(0, 10) : newValue.text;
+    // Lop off the end of newValue if its more than the number of maskable inputs
+    String newText = newValue.text.length > maskerCount ? newValue.text.substring(0, maskerCount) : newValue.text;
 
     Queue<String> oldMaskables = stripMaskable(oldValue.text);
     Queue<String> newMaskables = stripMaskable(newText);

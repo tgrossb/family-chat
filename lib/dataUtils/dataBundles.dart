@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/constants.dart';
+
 
 class Data {
 
@@ -164,5 +166,36 @@ class MessageData extends Data {
   int get hashCode {
     print("This shouldn't happen, but it did (hashCode was used for messageData)");
     return utcTime.millisecondsSinceEpoch;
+  }
+}
+
+/*
+ * This class is the logic and parameters of a SimpleInput widget.
+ * This is everything but the gui, location, and text input level validator,
+ */
+class InputFieldParams extends Data {
+  String label, requiredLabel;
+  Function(String, UserParameter<String>, bool, String, Function) validator;
+  IconData icon;
+  bool isRequired, switchValue, autovalidate;
+  List<TextInputFormatter> formatters;
+  TextInputType keyboardType;
+  FocusNode focusNode;
+
+  // Default values are assumed by SimpleInput
+  InputFieldParams({@required this.label, @required this.validator, @required this.icon, String requiredLabel,
+                    this.formatters, this.keyboardType, FocusNode focusNode, this.isRequired, this.switchValue, this.autovalidate}):
+        requiredLabel = requiredLabel ?? "* ",
+        focusNode = focusNode ?? new FocusNode(){
+    _registerStringParam(label, "label");
+    _registerStringParam(requiredLabel, "requiredLabel");
+    _registerObjectParam(validator, "validator");
+    _registerObjectParam(icon, "icon");
+    _registerListParam(formatters, "formatters");
+    _registerObjectParam(keyboardType, "keyboardType");
+    _registerObjectParam(this.focusNode, "focusNode");
+    _registerObjectParam(isRequired, "isRequired");
+    _registerObjectParam(switchValue, "switchValue");
+    _registerObjectParam(autovalidate, "autovalidate");
   }
 }
