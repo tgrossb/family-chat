@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/constants.dart';
+import 'package:bodt_chat/widgetUtils/animatedIconSwitch.dart';
 
 class SimpleInput extends StatefulWidget {
   final UserParameter<String> initialValue;
@@ -15,6 +16,7 @@ class SimpleInput extends StatefulWidget {
   final bool switchValue, isRequired, autovalidate;
   final List<TextInputFormatter> inputFormatters;
   final FocusNode focusNode;
+  final bool useNew;
 
   // If switchValue is given, the switch will be set to this and disabled
   // To give it an initial value, define the private variable of initialValue
@@ -22,7 +24,7 @@ class SimpleInput extends StatefulWidget {
     @required this.icon, @required this.label, @required this.keyboardType,
     this.switchValue, this.isRequired: false, this.autovalidate: false,
     this.inputFormatters, this.requiredLabel: "* ", @required this.focusNode,
-    @required this.requestNextFocus, @required this.location
+    @required this.requestNextFocus, @required this.location, this.useNew: false
   });
 
   SimpleInput.fromParams({@required this.initialValue, @required this.validate, @required this.requestNextFocus,
@@ -35,6 +37,7 @@ class SimpleInput extends StatefulWidget {
       this.isRequired = params.isRequired ?? false,
       this.autovalidate = params.autovalidate ?? false,
       this.inputFormatters = params.formatters,
+      this.useNew = params.useNew ?? false,
       this.focusNode = params.focusNode;
 
   @override
@@ -42,14 +45,17 @@ class SimpleInput extends StatefulWidget {
 }
 
 class SimpleInputState extends State<SimpleInput> with SingleTickerProviderStateMixin {
+  static IconData globeIcon = IconData(0xf57d, fontFamily: 'solid');
   AnimationController backgroundController;
   Animation<double> background;
   UserParameter<String> param;
+  GlobalKey<FormFieldState> fieldKey;
 
   @override
   void initState(){
     super.initState();
 
+    fieldKey = new GlobalKey();
     param = new UserParameter(name: widget.initialValue.name, value: widget.initialValue.value, private: widget.initialValue.private);
 
     Tween<double> opacityTween = Tween(begin: 0.0, end: 1.0);
@@ -74,6 +80,22 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
     );
   }
 
+  Widget buildSwitch(BuildContext context){
+    Color defaultIconColor = Colors.black45;  // Found in Flutter source code (https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/input_decorator.dart, line 1630 ish)
+    Color focusedIconColor = Theme.of(context).primaryColor;
+    return AnimatedIconSwitch(
+      initiallySelected: !param.private,
+      unselected: Icons.lock,
+      selected: globeIcon,
+      duration: Duration(milliseconds: 300),
+      onPressed: widget.switchValue == null ? () =>
+        setState((){
+          param.setPrivate(!param.private);
+        }) : null,
+      color: widget.focusNode.hasFocus ? focusedIconColor : defaultIconColor,
+    );
+  }
+
   Widget buildFormAnimation(BuildContext context, Widget child){
     Color goalColor = Theme.of(context).inputDecorationTheme.fillColor;
     Color thisCol = goalColor.withOpacity(goalColor.opacity * background.value);
@@ -94,6 +116,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
             ),
             Flexible(
               child: TextFormField(
+                key: fieldKey,
                 initialValue: widget.initialValue.value,
                 focusNode: widget.focusNode,
                 keyboardType: widget.keyboardType,
@@ -101,14 +124,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
                 decoration: InputDecoration(
                   labelText: (widget.isRequired ? widget.requiredLabel : "") + widget.label,
                   fillColor: thisCol,
-                  suffixIcon: Switch(
-                    value: widget.switchValue?? !param.private,
-                    onChanged: widget.switchValue == null ? (value) =>
-                      setState(() {
-                        param.setPrivate(!value);
-                      }) : null,
-                    activeColor: Theme.of(context).primaryColor,
-                  ),
+                  suffixIcon: buildSwitch(context),
                   border: OutlineInputBorder()
                 ),
 
@@ -118,7 +134,10 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
                   return widget.validate(value, param, widget.isRequired, widget.label);
                 },
                 inputFormatters: widget.inputFormatters,
-                onFieldSubmitted: (String s) => widget.requestNextFocus(widget.location),
+                onFieldSubmitted: (String s){
+                  fieldKey.currentState.validate();
+                  widget.requestNextFocus(widget.location);
+                },
               ),
             ),
           ],

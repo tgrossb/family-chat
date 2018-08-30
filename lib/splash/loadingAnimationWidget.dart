@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 
 class LoadingAnimationWidget extends AnimatedWidget {
   final int count;
-  LoadingAnimationWidget(
-      {Key key, @required Animation<double> animation, @required this.count})
-      : super(key: key, listenable: animation);
+  LoadingAnimationWidget({Key key, @required Animation<double> animation, @required this.count}): super(key: key, listenable: animation);
 
   @override
   Widget build(BuildContext context) {

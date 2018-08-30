@@ -39,10 +39,10 @@ final ThemeData defaultTheme = new ThemeData(
     display3: TextStyle(color: Colors.black),
     display4: TextStyle(color: Colors.black),
     headline: TextStyle(color: Colors.black),
-    subhead: TextStyle(color: Colors.black),
 
     // Used for the sign in button
     title: TextStyle(color: Colors.white),
+    subhead: TextStyle(color: Colors.white),
   ),
 
   buttonTheme: ButtonThemeData(

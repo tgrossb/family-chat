@@ -177,13 +177,13 @@ class InputFieldParams extends Data {
   String label, requiredLabel;
   Function(String, UserParameter<String>, bool, String, Function) validator;
   IconData icon;
-  bool isRequired, switchValue, autovalidate;
+  bool isRequired, switchValue, autovalidate, useNew;
   List<TextInputFormatter> formatters;
   TextInputType keyboardType;
   FocusNode focusNode;
 
   // Default values are assumed by SimpleInput
-  InputFieldParams({@required this.label, @required this.validator, @required this.icon, String requiredLabel,
+  InputFieldParams({@required this.label, @required this.validator, @required this.icon, String requiredLabel, this.useNew,
                     this.formatters, this.keyboardType, FocusNode focusNode, this.isRequired, this.switchValue, this.autovalidate}):
         requiredLabel = requiredLabel ?? "* ",
         focusNode = focusNode ?? new FocusNode(){
@@ -197,5 +197,6 @@ class InputFieldParams extends Data {
     _registerObjectParam(isRequired, "isRequired");
     _registerObjectParam(switchValue, "switchValue");
     _registerObjectParam(autovalidate, "autovalidate");
+    _registerObjectParam(useNew, "useNew");
   }
 }

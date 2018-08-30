@@ -27,3 +27,7 @@ flutter:
     - assets/jsons/shortenedNameToCode.json
     - assets/jsons/codeToPhone.json
     - assets/flags/borderless_16x10/00_cctld/
+  fonts:
+    - family: solid
+      fonts:
+        - asset: fonts/fontawesome/otfs/solid-900.otf

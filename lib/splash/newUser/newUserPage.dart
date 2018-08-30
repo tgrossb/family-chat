@@ -93,13 +93,16 @@ class _NewUserFormState extends State<NewUserForm> {
                         keyboardType: TextInputType.text),
 
       InputFieldParams(label: "Cell phone", isRequired: true, validator: Validators.validatePhoneNumber, icon: Icons.phone_android,
-                        formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, cellPhoneFormatter]),
+                        formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, cellPhoneFormatter],
+                        keyboardType: TextInputType.number),
 
       InputFieldParams(label: "Home phone", isRequired: false, validator: Validators.validatePhoneNumber, icon: Icons.phone,
-                        formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, homePhoneFormatter]),
+                        formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, homePhoneFormatter],
+                        keyboardType: TextInputType.number),
 
       InputFieldParams(label: "Date of birth", isRequired: false, validator: Validators.validateDob, icon: Icons.calendar_today,
-                        formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, dobFormatter])
+                        formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, dobFormatter], useNew: true,
+                        keyboardType: TextInputType.number)
     ];
   }
 
@@ -107,18 +110,21 @@ class _NewUserFormState extends State<NewUserForm> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Center(
-          child: RaisedButton(
-            onPressed: () {
-              // Validate will return true if the form is valid, or false if
-              // the form is invalid.
-              if (formKey.currentState.validate()) {
-                // If the form is valid, we want to show a Snackbar
-                Scaffold
-                    .of(context)
-                    .showSnackBar(SnackBar(content: Text('Processing Data')));
-              }
+          child: new GestureDetector(
+            onTap: () {
+              if (formKey.currentState.validate())
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
             },
-            child: Text('Submit'),
+            child: new Container(
+              width: 100.0,
+              height: 50.0,
+              child: new Text("Continue", style: Theme.of(context).primaryTextTheme.subhead),
+              alignment: FractionalOffset.center,
+              decoration: new BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: new BorderRadius.all(Radius.circular(25.0))
+              ),
+            ),
           )
       ),
     );
@@ -131,24 +137,27 @@ class _NewUserFormState extends State<NewUserForm> {
   }
   
   Widget buildPublicLabel(BuildContext context){
-    return new Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        new FlatButton(
-            padding: EdgeInsets.only(right: 0.0),
-            onPressed: showInfo,
-            child: new Row(
-              children: <Widget>[
-                Text("Public"),
-                Padding(
-                  padding: EdgeInsets.only(left: 4.0),
-                  child: Icon(Icons.info_outline),
-                )
-              ],
-            )
-        ),
+       Padding(
+         padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+         child: InkWell(
+           onTap: showInfo,
+           child: Icon(
+             Icons.info_outline,
+             color: Theme.of(context).primaryColor,
+           ),
+         ),
+       )
       ],
     );
+/*
+Padding(
+          padding: EdgeInsets.only(right: 0.0),
+          child:
+        )
+*/
   }
   
   Widget buildField(BuildContext context, int c){
@@ -167,6 +176,10 @@ class _NewUserFormState extends State<NewUserForm> {
     List<Widget> fields = [];
     for (int c=0; c<fieldsParams.length; c++)
       fields.add(buildField(context, c));
+    fields.add(Padding(
+      padding: EdgeInsets.only(left: 42.0),
+      child: Text("* Required", style: Theme.of(context).inputDecorationTheme.labelStyle),
+    ));
     return fields;
   }
 
