@@ -13,14 +13,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bodt_chat/splash/newUser/simpleInput.dart';
-import 'package:bodt_chat/splash/newUser/phoneInput.dart';
-import 'package:bodt_chat/splash/newUser/simplePhoneInput.dart';
-import 'package:bodt_chat/splash/newUser/simpleDateInput.dart';
-import 'package:bodt_chat/splash/newUser/validators.dart';
+import 'package:bodt_chat/splash/newUser/inputs/simpleInput.dart';
+import 'package:bodt_chat/splash/newUser/inputs/phoneInput.dart';
+import 'package:bodt_chat/splash/newUser/inputs/simplePhoneInput.dart';
+import 'package:bodt_chat/splash/newUser/inputs/simpleDateInput.dart';
+import 'package:bodt_chat/widgetUtils/validators.dart';
+import 'package:bodt_chat/widgetUtils/maskedTextInputFormatter.dart';
 import 'package:bodt_chat/constants.dart';
-import 'package:bodt_chat/user.dart';
-import 'package:bodt_chat/database.dart';
+import 'package:bodt_chat/dataUtils/user.dart';
+import 'package:bodt_chat/dataUtils/database.dart';
 
 
 class NewUserPage extends StatelessWidget {
@@ -37,28 +38,55 @@ class NewUserPage extends StatelessWidget {
 }
 
 class NewUserForm extends StatefulWidget {
+  static String phoneMask = "(xxx) xxx - xxxx";
+  static String phoneMasker = "x";
+  static RegExp phoneMaskable = new RegExp(r"[0-9]");
+
+  static String dateMask = "xx / xx / xx";
+  static String dateMasker = "x";
+  // TODO: By-character regexing in masker
+  static RegExp dateMaskable = new RegExp(r"[0-9]");
+
+  static MaskedTextInputFormatter getPhoneMask() =>
+    new MaskedTextInputFormatter(mask: phoneMask, masker: phoneMasker, maskedValueMatcher: phoneMaskable);
+
+  static MaskedTextInputFormatter getDateMask() =>
+    new MaskedTextInputFormatter(mask: dateMask, masker: dateMasker, maskedValueMatcher: dateMaskable);
+
   NewUserForm({@required this.newUser});
 
   final FirebaseUser newUser;
 
   @override
-  State createState() => new _NewUserFormState(newUser: newUser);
+  State createState() => new _NewUserFormState();
 }
 
 class _NewUserFormState extends State<NewUserForm> {
-  FirebaseUser newUser;
   GlobalKey<FormState> formKey;
   String address;
   UserParameter<String> name, email, cellPhone, homePhone, dob;
+  MaskedTextInputFormatter cellPhoneFormatter, homePhoneFormatter, dobFormatter;
+  List<FocusNode> focusNodes;
 
-  _NewUserFormState({@required this.newUser}):
-      formKey = new GlobalKey<FormState>(),
-      name = new UserParameter<String>(name: kUSER_NAME, value: newUser.displayName, private: false),
-      email = new UserParameter<String>(name: kUSER_EMAIL, value: newUser.email, private: false),
-      cellPhone = new UserParameter<String>(name: kUSER_CELLPHONE, value: newUser.phoneNumber?? "", private: true),
-      homePhone = new UserParameter<String>(name: kUSER_HOME_PHONE, value: "", private: true),
-      dob = new UserParameter<String>(name: kUSER_DOB, value: "", private: true);
+  @override
+  void initState(){
+    super.initState();
+    formKey = new GlobalKey<FormState>();
 
+    name = new UserParameter<String>(name: kUSER_NAME, value: widget.newUser.displayName, private: false);
+    email = new UserParameter<String>(name: kUSER_EMAIL, value: widget.newUser.email, private: false);
+    cellPhone = new UserParameter<String>(name: kUSER_CELLPHONE, value: widget.newUser.phoneNumber?? "", private: true);
+    homePhone = new UserParameter<String>(name: kUSER_HOME_PHONE, value: "", private: true);
+    dob = new UserParameter<String>(name: kUSER_DOB, value: "", private: true);
+
+    cellPhoneFormatter = NewUserForm.getPhoneMask();
+    homePhoneFormatter = NewUserForm.getPhoneMask();
+    dobFormatter = NewUserForm.getDateMask();
+
+    focusNodes = List<FocusNode>(5);
+    for (int c=0; c<focusNodes.length; c++)
+      focusNodes[c] = new FocusNode();
+  }
 
   List<Widget> buildForm(){
     return [
@@ -116,6 +144,12 @@ class _NewUserFormState extends State<NewUserForm> {
     );
   }
 
+  void requestNextFocus(int c) {
+    focusNodes[c].unfocus();
+    if (c+1 < focusNodes.length)
+      FocusScope.of(context).requestFocus(focusNodes[c+1]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -147,40 +181,75 @@ class _NewUserFormState extends State<NewUserForm> {
             ),
             new SimpleInput(
               initialValue: name,
-              validate: (value, param) => Validators.validateName(value, param, (param) => name = param),
+              validate: (value, param, isRequired, label) =>
+                  Validators.validateName(value, param, isRequired, label, (param) => name = param),
               icon: Icons.person,
-              label: "* Name",
+              label: "Name",
               keyboardType: TextInputType.text,
               switchValue: true,
               isRequired: true,
               autovalidate: true,
+              focusNode: focusNodes[0],
+              focusIndex: 0,
+              requestNextFocus: requestNextFocus,
             ),
             new SimpleInput(
               initialValue: email,
-              validate: (value, param) => Validators.validateEmail(value, param, (param) => email = param),
+              validate: (value, param, isRequired, label) =>
+                  Validators.validateEmail(value, param, isRequired, label, (param) => email = param),
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
-              label: "* Email",
+              label: "Email",
+              focusNode: focusNodes[1],
+              focusIndex: 1,
+              requestNextFocus: requestNextFocus,
             ),
-            new SimplePhoneInput(
-              newUser: newUser,
-              savePhone: (value) => cellPhone = value,
-              phoneIcon: Icon(Icons.phone_android),
-              label: "* Cell phone",
+            new SimpleInput(
+              initialValue: cellPhone,
+              validate: (value, param, isRequired, label) =>
+                  Validators.validatePhoneNumber(value, param, isRequired, label, (param) => cellPhone = param),
+              icon: Icons.phone_android,
+              label: "Cell phone",
+              keyboardType: TextInputType.number,
               isRequired: true,
+              inputFormatters: <TextInputFormatter>[
+                WhitelistingTextInputFormatter.digitsOnly,
+                cellPhoneFormatter
+              ],
+              focusNode: focusNodes[2],
+              focusIndex: 2,
+              requestNextFocus: requestNextFocus,
             ),
-            new SimplePhoneInput(
-                newUser: newUser,
-                savePhone: (value) => homePhone = value,
-                phoneIcon: Icon(Icons.phone),
-                label: "Home phone"
+            new SimpleInput(
+              initialValue: cellPhone,
+              validate: (value, param, isRequired, label) =>
+                  Validators.validatePhoneNumber(value, param, isRequired, label, (param) => homePhone = param),
+              icon: Icons.phone,
+              label: "Home phone",
+              keyboardType: TextInputType.number,
+              isRequired: true,
+              inputFormatters: <TextInputFormatter>[
+                WhitelistingTextInputFormatter.digitsOnly,
+                homePhoneFormatter
+              ],
+              focusNode: focusNodes[3],
+              focusIndex: 3,
+              requestNextFocus: requestNextFocus,
             ),
-            new SimpleDateInput(
+            new SimpleInput(
               initialValue: dob,
-              validate: (value, param) => Validators.validateDob(value, param, (param) => dob = param),
+              validate: (value, param, isRequired, label) =>
+                Validators.validateDob(value, param, isRequired, label, (param) => dob = param),
               icon: Icons.calendar_today,
-              keyboardType: TextInputType.datetime,
               label: "Date of birth",
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                WhitelistingTextInputFormatter.digitsOnly,
+                dobFormatter
+              ],
+              focusNode: focusNodes[4],
+              focusIndex: 4,
+              requestNextFocus: requestNextFocus,
             ),
             Padding(
               padding: EdgeInsets.only(left: 42.0),

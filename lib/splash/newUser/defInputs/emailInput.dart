@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/constants.dart';
-import 'package:bodt_chat/user.dart';
+import 'package:bodt_chat/dataUtils/user.dart';
 
 class EmailInput extends StatefulWidget {
   final FirebaseUser newUser;

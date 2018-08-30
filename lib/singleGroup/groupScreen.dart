@@ -19,8 +19,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:bodt_chat/singleGroup/groupMessage.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/dataBundles.dart';
-import 'package:bodt_chat/database.dart';
+import 'package:bodt_chat/dataUtils/dataBundles.dart';
+import 'package:bodt_chat/dataUtils/database.dart';
 
 class GroupScreen extends StatefulWidget {
   GroupScreen({this.user, this.groupName, this.firstMessages});

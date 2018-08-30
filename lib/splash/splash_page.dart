@@ -20,10 +20,10 @@ import 'package:bodt_chat/groupsList/groupsListScreen.dart';
 import 'package:bodt_chat/splash/loadingAnimationWidget.dart';
 import 'package:bodt_chat/splash/signInButton.dart';
 import 'package:bodt_chat/splash/newUser/newUserPage.dart';
-import 'package:bodt_chat/splash/newUser/countrySelector.dart';
-import 'package:bodt_chat/routes.dart';
+import 'package:bodt_chat/splash/newUser/inputs/countrySelector.dart';
+import 'package:bodt_chat/widgetUtils/routes.dart';
 import 'package:bodt_chat/constants.dart';
-import 'package:bodt_chat/database.dart';
+import 'package:bodt_chat/dataUtils/database.dart';
 
 
 class SplashPage extends StatefulWidget {

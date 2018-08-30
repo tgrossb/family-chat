@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/dataBundles.dart';
+import 'package:bodt_chat/dataUtils/dataBundles.dart';
 
 class EaseIn extends Tween<Offset> {
   EaseIn(): super(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0));

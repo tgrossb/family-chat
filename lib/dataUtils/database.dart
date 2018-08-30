@@ -17,8 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/user.dart';
-import 'package:bodt_chat/dataBundles.dart';
+import 'package:bodt_chat/dataUtils/user.dart';
+import 'package:bodt_chat/dataUtils/dataBundles.dart';
 
 /*
  * Database data lives here

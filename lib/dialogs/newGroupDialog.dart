@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'groupsListItem.dart';
+import 'package:bodt_chat/groupsList/groupsListItem.dart';
 
 class NewGroupDialog extends StatefulWidget {
   final Map<String, GlobalKey<GroupsListItemState>> groups;

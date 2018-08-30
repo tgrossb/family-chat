@@ -2,9 +2,9 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bodt_chat/splash/newUser/countrySelector.dart';
-import 'package:bodt_chat/splash/newUser/maskedTextInputFormatter.dart';
-import 'package:bodt_chat/user.dart';
+import 'package:bodt_chat/splash/newUser/inputs/countrySelector.dart';
+import 'package:bodt_chat/widgetUtils/maskedTextInputFormatter.dart';
+import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/constants.dart';
 
 class SimplePhoneInput extends StatefulWidget {
@@ -16,17 +16,14 @@ class SimplePhoneInput extends StatefulWidget {
   SimplePhoneInput({@required this.newUser, @required this.savePhone, @required this.phoneIcon, @required this.label, this.isRequired: false});
 
   @override
-  State<StatefulWidget> createState() => new SimplePhoneInputState(newUser: newUser, savePhone: savePhone, phoneIcon: phoneIcon);
+  State<StatefulWidget> createState() => new SimplePhoneInputState();
 }
 
 class SimplePhoneInputState extends State<SimplePhoneInput> with SingleTickerProviderStateMixin {
   static String mask = "(xxx) xxx - xxxx";
 
-  FirebaseUser newUser;
-  Function(UserParameter<String>) savePhone;
   UserParameter<String> phone;
 
-  Icon phoneIcon;
   MaskedTextInputFormatter numberFormatter;
   RegExp numberMatcher;
 
@@ -34,9 +31,9 @@ class SimplePhoneInputState extends State<SimplePhoneInput> with SingleTickerPro
   AnimationController backgroundController;
   Animation<double> background;
 
-  SimplePhoneInputState({@required this.newUser, @required this.savePhone, @required this.phoneIcon}):
+  SimplePhoneInputState():
         numberFormatter = new MaskedTextInputFormatter(mask: mask, masker: "x", maskedValueMatcher: RegExp(r'[0-9]')),
-        numberMatcher = new RegExp(r"^[0-9]\1{10}$"),
+        numberMatcher = new RegExp(r"\(\d{3}\) \d{3} \- \d{4}"),
         node = new FocusNode(),
         phone = new UserParameter(name: kUSER_CELLPHONE, value: "");
 
@@ -59,15 +56,17 @@ class SimplePhoneInputState extends State<SimplePhoneInput> with SingleTickerPro
   }
 
   String validatePhoneNumber(String value){
-    value = value.trim();
-    print("Values: '${phone.value}' , '$value'");
     if (value.length == 0 && widget.isRequired)
-      return "Enter your phone number";
+      return "Please enter your ${widget.label.toLowerCase()} number";
+    else if (value.length == 0)
+      // Don't need to validate if it is length 0 and not required
+      return null;
 
-    if (value.length != 10 || numberMatcher.firstMatch(value).group(0).length != 10)
-      return "Enter a valid 10-digit phone number";
+    if (value.length != mask.length || numberMatcher.firstMatch(value).group(0).length != mask.length)
+      return "Please enter a valid 10-digit phone number";
 
-    savePhone(phone);
+    phone.value = value;
+    widget.savePhone(phone);
     return null;
   }
 
@@ -93,7 +92,7 @@ class SimplePhoneInputState extends State<SimplePhoneInput> with SingleTickerPro
             Padding(
               padding: EdgeInsets.only(right: 16.0),
               child: Icon(
-                  phoneIcon.icon,
+                  widget.phoneIcon.icon,
                   color: iconColor
               ),
             ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bodt_chat/splash/newUser/countrySelector.dart';
-import 'package:bodt_chat/user.dart';
+import 'package:bodt_chat/splash/newUser/inputs/countrySelector.dart';
+import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/constants.dart';
 
 class PhoneInput extends StatefulWidget {

@@ -15,7 +15,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:bodt_chat/dataBundles.dart';
+import 'package:bodt_chat/dataUtils/dataBundles.dart';
 
 class GroupMessage extends StatelessWidget {
   GroupMessage({@required String text, @required String name, @required DateTime time, @required String myName, @required this.animationController}):

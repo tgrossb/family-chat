@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/singleGroup/groupScreen.dart';
-import 'package:bodt_chat/groupsList/confirmDeleteDialog.dart';
+import 'package:bodt_chat/dialogs/confirmDeleteDialog.dart';
 import 'package:bodt_chat/groupsList/groupsListItem.dart';
-import 'package:bodt_chat/groupsList/newGroupDialog.dart';
-import 'package:bodt_chat/routes.dart';
+import 'package:bodt_chat/dialogs/newGroupDialog.dart';
+import 'package:bodt_chat/widgetUtils/routes.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bodt_chat/dataBundles.dart';
-import 'package:bodt_chat/database.dart';
+import 'package:bodt_chat/dataUtils/dataBundles.dart';
+import 'package:bodt_chat/dataUtils/database.dart';
 
 class GroupsListScreen extends StatefulWidget {
   GroupsListScreen();
