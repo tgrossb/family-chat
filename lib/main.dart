@@ -36,9 +36,11 @@ final ThemeData defaultTheme = new ThemeData(
     caption: TextStyle(color: Colors.black),
     display1: TextStyle(color: Colors.black),
     display2: TextStyle(color: Colors.black),
-    display3: TextStyle(color: Colors.black),
     display4: TextStyle(color: Colors.black),
     headline: TextStyle(color: Colors.black),
+
+    // Used for the welcome on new user screen
+    display3: TextStyle(color: Colors.white70),
 
     // Used for the sign in button
     title: TextStyle(color: Colors.white),

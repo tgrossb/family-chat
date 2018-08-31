@@ -16,7 +16,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/splash/newUser/inputs/simpleInput.dart';
 import 'package:bodt_chat/splash/newUser/inputs/phoneInput.dart';
 import 'package:bodt_chat/splash/newUser/inputs/simplePhoneInput.dart';
-import 'package:bodt_chat/splash/newUser/inputs/simpleDateInput.dart';
 import 'package:bodt_chat/widgetUtils/validators.dart';
 import 'package:bodt_chat/widgetUtils/maskedTextInputFormatter.dart';
 import 'package:bodt_chat/constants.dart';
@@ -43,7 +42,7 @@ class NewUserForm extends StatefulWidget {
   static String phoneMasker = "x";
   static RegExp phoneMaskable = new RegExp(r"[0-9]");
 
-  static String dateMask = "xx / xx / xx";
+  static String dateMask = "xx / xx / xxxx";
   static String dateMasker = "x";
   // TODO: By-character regexing in masker
   static RegExp dateMaskable = new RegExp(r"[0-9]");
@@ -63,7 +62,10 @@ class NewUserForm extends StatefulWidget {
 }
 
 class _NewUserFormState extends State<NewUserForm> {
+  static double continueHeight, continueWidth;
+
   GlobalKey<FormState> formKey;
+  ScrollController scrollController;
   String address;
   List<UserParameter<String>> params;
   List<InputFieldParams> fieldsParams;
@@ -71,7 +73,10 @@ class _NewUserFormState extends State<NewUserForm> {
   @override
   void initState(){
     super.initState();
+
     formKey = new GlobalKey<FormState>();
+
+    scrollController = new ScrollController();
 
     MaskedTextInputFormatter cellPhoneFormatter = NewUserForm.getPhoneMask();
     MaskedTextInputFormatter homePhoneFormatter = NewUserForm.getPhoneMask();
@@ -104,9 +109,32 @@ class _NewUserFormState extends State<NewUserForm> {
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, dobFormatter], useNew: true,
                         keyboardType: TextInputType.number)
     ];
+
+
+    for (int c=0; c<fieldsParams.length; c++)
+      fieldsParams[c].focusNode.addListener((){
+        if (fieldsParams[c].focusNode.hasFocus)
+          scrollController.animateTo(map(0, fieldsParams.length-1, 0, scrollController.position.maxScrollExtent, c),
+              duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      });
+  }
+
+  double map(int r1Start, int r1End, int r2Start, double r2End, int num){
+    return r2Start + ((r2End - r2Start) / (r1End - r1Start)) * (num - r1Start);
   }
 
   Widget buildSubmitButton(BuildContext context){
+    TextStyle buttonTextStyle = Theme.of(context).primaryTextTheme.title;
+    if (continueHeight == null || continueWidth == null){
+      TextPainter buttonText = TextPainter(text: TextSpan(text: "Continue", style: buttonTextStyle), textDirection: TextDirection.ltr);
+      buttonText.layout();
+      continueHeight = buttonText.height;
+      continueWidth = buttonText.width;
+    }
+
+    double horizontalPadding = 32.0;
+    double verticlePadding = 12.0;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Center(
@@ -116,13 +144,16 @@ class _NewUserFormState extends State<NewUserForm> {
                 Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
             },
             child: new Container(
-              width: 100.0,
-              height: 50.0,
-              child: new Text("Continue", style: Theme.of(context).primaryTextTheme.subhead),
+              width: continueWidth + horizontalPadding*2,
+              height: continueHeight + verticlePadding*2,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: verticlePadding, horizontal: horizontalPadding),
+                child: Text("Continue", style: buttonTextStyle),
+              ),
               alignment: FractionalOffset.center,
               decoration: new BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: new BorderRadius.all(Radius.circular(25.0))
+                color: Theme.of(context).primaryColor,
+                borderRadius: new BorderRadius.all(Radius.circular(continueHeight/2 + verticlePadding)),
               ),
             ),
           )
@@ -152,12 +183,6 @@ class _NewUserFormState extends State<NewUserForm> {
        )
       ],
     );
-/*
-Padding(
-          padding: EdgeInsets.only(right: 0.0),
-          child:
-        )
-*/
   }
   
   Widget buildField(BuildContext context, int c){
@@ -173,19 +198,20 @@ Padding(
   }
 
   List<Widget> buildFields(BuildContext context){
+    ThemeData theme = Theme.of(context);
     List<Widget> fields = [];
     for (int c=0; c<fieldsParams.length; c++)
       fields.add(buildField(context, c));
     fields.add(Padding(
       padding: EdgeInsets.only(left: 42.0),
-      child: Text("* Required", style: Theme.of(context).inputDecorationTheme.labelStyle),
+      child: Text("* Required", style: theme.textTheme.subhead.copyWith(color: theme.inputDecorationTheme.labelStyle.color)),
     ));
     return fields;
   }
 
   List<Widget> buildForm(BuildContext context){
     List<Widget> widgets = [];
-    widgets.add(buildPublicLabel(context));
+//    widgets.add(Container(color: Colors.purpleAccent, child: buildPublicLabel(context)));
     widgets.addAll(buildFields(context));
     widgets.add(buildSubmitButton(context));
     return widgets;
@@ -210,14 +236,32 @@ Padding(
     return Container(
       color: Theme.of(context).accentColor,
       padding: EdgeInsets.symmetric(horizontal: 10.0),
-      child: Form(
-        key: formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: buildForm(context),
-       ),
-     )
+      child: Column(
+//        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+//            color: Colors.blue,
+            padding: EdgeInsets.only(top: 50.0),
+            child: Text(
+              "Welcome",
+              style: Theme.of(context).primaryTextTheme.display3.copyWith(fontFamily: "curvy")
+            ),
+          ),
+          Container(
+//            color: Colors.red,
+            child: Form(
+              key: formKey,
+              child: Center(
+                child: ListView(
+                  shrinkWrap: true,
+                  controller: scrollController,
+                  children: buildForm(context),
+                ),
+              )
+            ),
+          )
+        ],
+      )
     );
   }
 }

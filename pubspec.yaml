@@ -31,3 +31,6 @@ flutter:
     - family: solid
       fonts:
         - asset: fonts/fontawesome/otfs/solid-900.otf
+    - family: curvy
+      fonts:
+        - asset: fonts/AguafinaScript-Regular.ttf
