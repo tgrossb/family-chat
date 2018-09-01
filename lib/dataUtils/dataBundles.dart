@@ -181,9 +181,10 @@ class InputFieldParams extends Data {
   List<TextInputFormatter> formatters;
   TextInputType keyboardType;
   FocusNode focusNode;
+  Widget Function(BuildContext) buildPrefix;
 
   // Default values are assumed by SimpleInput
-  InputFieldParams({@required this.label, @required this.validator, @required this.icon, String requiredLabel, this.useNew,
+  InputFieldParams({@required this.label, @required this.validator, @required this.icon, String requiredLabel, this.useNew, this.buildPrefix,
                     this.formatters, this.keyboardType, FocusNode focusNode, this.isRequired, this.switchValue, this.autovalidate}):
         requiredLabel = requiredLabel ?? "* ",
         focusNode = focusNode ?? new FocusNode(){
@@ -197,6 +198,7 @@ class InputFieldParams extends Data {
     _registerObjectParam(isRequired, "isRequired");
     _registerObjectParam(switchValue, "switchValue");
     _registerObjectParam(autovalidate, "autovalidate");
+    _registerObjectParam(buildPrefix, "prefix");
     _registerObjectParam(useNew, "useNew");
   }
 }

@@ -50,6 +50,7 @@ class CountrySelectorState extends State<CountrySelector> {
     if (CountrySelector.countries == null || CountrySelector.countries.length == 0)
       CountrySelector.preloadCountries(context);
     selectedCountry = CountrySelector.nameToCountry["United States"];
+//    selectedCountry = CountrySelector.nameToCountry[0];
   }
 
   PopupMenuItem<Country> buildOption(Country country){
@@ -60,8 +61,9 @@ class CountrySelectorState extends State<CountrySelector> {
           country.flag,
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(country.name + " (+" + country.phoneCode + ")"),
-          )
+            child: Text(country.name, style: Theme.of(context).accentTextTheme.subhead),
+          ),
+          Text(country.phoneCode, style: Theme.of(context).accentTextTheme.subhead.copyWith(color: Colors.black26))
         ],
       ),
     );
@@ -69,8 +71,8 @@ class CountrySelectorState extends State<CountrySelector> {
 
   @override
   Widget build(BuildContext context){
-    return Container(
-      color: Colors.redAccent,
+    return FittedBox(
+      fit: BoxFit.cover,
       child: SearchablePopupMenuButton<Country>(
         onSelected: (Country result){
           setState(() {
@@ -83,8 +85,8 @@ class CountrySelectorState extends State<CountrySelector> {
           children: <Widget>[
             selectedCountry.flag,
             Padding(
-              padding: EdgeInsets.only(left: 8.0),
-              child: Text("+" + selectedCountry.phoneCode, style: Theme.of(context).primaryTextTheme.subhead),
+                padding: EdgeInsets.only(left: 4.0, right: 8.0),
+                child: Text("+" + selectedCountry.phoneCode, style: Theme.of(context).primaryTextTheme.subhead)
             )
           ],
         ),

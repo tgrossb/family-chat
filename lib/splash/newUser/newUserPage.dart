@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/splash/newUser/inputs/simpleInput.dart';
-import 'package:bodt_chat/splash/newUser/inputs/phoneInput.dart';
+import 'package:bodt_chat/splash/newUser/inputs/countrySelector.dart';
 import 'package:bodt_chat/splash/newUser/inputs/simplePhoneInput.dart';
 import 'package:bodt_chat/widgetUtils/validators.dart';
 import 'package:bodt_chat/widgetUtils/maskedTextInputFormatter.dart';
@@ -32,6 +32,16 @@ class NewUserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+//      appBar: new AppBar(
+//        elevation: 0.0,
+//        backgroundColor: Theme.of(context).accentColor,
+//        centerTitle: true,
+//        title: Padding(
+//          padding: EdgeInsets.only(top: 20.0),
+//          child: Text("Welcome", style: Theme.of(context).primaryTextTheme.display3.copyWith(fontFamily: "curvy")),
+//        ),
+//        leading: new Container(),
+//      ),
       body: new NewUserForm(newUser: newUser),
     );
   }
@@ -99,7 +109,7 @@ class _NewUserFormState extends State<NewUserForm> {
 
       InputFieldParams(label: "Cell phone", isRequired: true, validator: Validators.validatePhoneNumber, icon: Icons.phone_android,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, cellPhoneFormatter],
-                        keyboardType: TextInputType.number),
+                        keyboardType: TextInputType.number, buildPrefix: (BuildContext context) => CountrySelector(saveCountry: (s){})),
 
       InputFieldParams(label: "Home phone", isRequired: false, validator: Validators.validatePhoneNumber, icon: Icons.phone,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, homePhoneFormatter],
@@ -197,22 +207,19 @@ class _NewUserFormState extends State<NewUserForm> {
     );
   }
 
-  List<Widget> buildFields(BuildContext context){
+  List<Widget> buildForm(BuildContext context){
     ThemeData theme = Theme.of(context);
-    List<Widget> fields = [];
+    List<Widget> widgets = [];
+    widgets.add(buildPublicLabel(context));
+
     for (int c=0; c<fieldsParams.length; c++)
-      fields.add(buildField(context, c));
-    fields.add(Padding(
+      widgets.add(buildField(context, c));
+
+    widgets.add(Padding(
       padding: EdgeInsets.only(left: 42.0),
       child: Text("* Required", style: theme.textTheme.subhead.copyWith(color: theme.inputDecorationTheme.labelStyle.color)),
     ));
-    return fields;
-  }
 
-  List<Widget> buildForm(BuildContext context){
-    List<Widget> widgets = [];
-//    widgets.add(Container(color: Colors.purpleAccent, child: buildPublicLabel(context)));
-    widgets.addAll(buildFields(context));
     widgets.add(buildSubmitButton(context));
     return widgets;
   }
@@ -236,31 +243,15 @@ class _NewUserFormState extends State<NewUserForm> {
     return Container(
       color: Theme.of(context).accentColor,
       padding: EdgeInsets.symmetric(horizontal: 10.0),
-      child: Column(
-//        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-//            color: Colors.blue,
-            padding: EdgeInsets.only(top: 50.0),
-            child: Text(
-              "Welcome",
-              style: Theme.of(context).primaryTextTheme.display3.copyWith(fontFamily: "curvy")
-            ),
-          ),
-          Container(
-//            color: Colors.red,
-            child: Form(
-              key: formKey,
-              child: Center(
-                child: ListView(
-                  shrinkWrap: true,
-                  controller: scrollController,
-                  children: buildForm(context),
-                ),
-              )
+      child: Form(
+          key: formKey,
+          child: Center(
+            child: ListView(
+              shrinkWrap: true,
+              controller: scrollController,
+              children: buildForm(context),
             ),
           )
-        ],
       )
     );
   }

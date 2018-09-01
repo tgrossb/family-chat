@@ -76,16 +76,15 @@ class _SearchablePopupMenuButtonState<T> extends State<SearchablePopupMenuButton
 
   @override
   Widget build(BuildContext context) {
-    return widget.child != null
-        ? new InkWell(
-      onTap: showButtonMenu,
-      child: widget.child,
-    )
-        : new IconButton(
-      icon: widget.icon ?? _getIcon(Theme.of(context).platform),
-      padding: widget.padding,
-      tooltip: widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
-      onPressed: showButtonMenu,
+    return widget.child != null ?
+      new InkWell(
+        onTap: showButtonMenu,
+        child: widget.child,
+      ) : new IconButton(
+        icon: widget.icon ?? _getIcon(Theme.of(context).platform),
+        padding: widget.padding,
+        tooltip: widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
+        onPressed: showButtonMenu,
     );
   }
 }

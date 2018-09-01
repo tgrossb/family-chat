@@ -40,7 +40,7 @@ final ThemeData defaultTheme = new ThemeData(
     headline: TextStyle(color: Colors.black),
 
     // Used for the welcome on new user screen
-    display3: TextStyle(color: Colors.white70),
+    display3: TextStyle(color: Colors.white),
 
     // Used for the sign in button
     title: TextStyle(color: Colors.white),

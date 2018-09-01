@@ -17,6 +17,7 @@ class SimpleInput extends StatefulWidget {
   final List<TextInputFormatter> inputFormatters;
   final FocusNode focusNode;
   final bool useNew;
+  final Widget Function(BuildContext) buildPrefix;
 
   // If switchValue is given, the switch will be set to this and disabled
   // To give it an initial value, define the private variable of initialValue
@@ -24,7 +25,7 @@ class SimpleInput extends StatefulWidget {
     @required this.icon, @required this.label, @required this.keyboardType,
     this.switchValue, this.isRequired: false, this.autovalidate: false,
     this.inputFormatters, this.requiredLabel: "* ", @required this.focusNode,
-    @required this.requestNextFocus, @required this.location, this.useNew: false
+    @required this.requestNextFocus, @required this.location, this.useNew: false, this.buildPrefix
   });
 
   SimpleInput.fromParams({@required this.initialValue, @required this.validate, @required this.requestNextFocus,
@@ -38,6 +39,7 @@ class SimpleInput extends StatefulWidget {
       this.autovalidate = params.autovalidate ?? false,
       this.inputFormatters = params.formatters,
       this.useNew = params.useNew ?? false,
+      this.buildPrefix = params.buildPrefix,
       this.focusNode = params.focusNode;
 
   @override
@@ -125,6 +127,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
                   labelText: (widget.isRequired ? widget.requiredLabel : "") + widget.label,
                   fillColor: thisCol,
                   suffixIcon: buildSwitch(context),
+                  prefixIcon: widget.buildPrefix == null ? null : widget.buildPrefix(context),
                   border: OutlineInputBorder()
                 ),
 
