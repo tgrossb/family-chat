@@ -177,15 +177,17 @@ class InputFieldParams extends Data {
   String label, requiredLabel;
   Function(String, UserParameter<String>, bool, String, Function) validator;
   IconData icon;
-  bool isRequired, switchValue, autovalidate, useNew;
+  bool isRequired, switchValue, autovalidate, useNew, useCountryPicker;
   List<TextInputFormatter> formatters;
   TextInputType keyboardType;
   FocusNode focusNode;
   Widget Function(BuildContext) buildPrefix;
+  Function(CountryData) onSelected;
 
   // Default values are assumed by SimpleInput
   InputFieldParams({@required this.label, @required this.validator, @required this.icon, String requiredLabel, this.useNew, this.buildPrefix,
-                    this.formatters, this.keyboardType, FocusNode focusNode, this.isRequired, this.switchValue, this.autovalidate}):
+                    this.formatters, this.keyboardType, FocusNode focusNode, this.isRequired, this.switchValue, this.autovalidate,
+                    this.useCountryPicker, this.onSelected}):
         requiredLabel = requiredLabel ?? "* ",
         focusNode = focusNode ?? new FocusNode(){
     _registerStringParam(label, "label");
@@ -199,6 +201,21 @@ class InputFieldParams extends Data {
     _registerObjectParam(switchValue, "switchValue");
     _registerObjectParam(autovalidate, "autovalidate");
     _registerObjectParam(buildPrefix, "prefix");
+    _registerObjectParam(useCountryPicker, "useCountryPicker");
+    _registerObjectParam(onSelected, "onSelected");
     _registerObjectParam(useNew, "useNew");
+  }
+}
+
+class CountryData extends Data {
+  String name, isoCode, phoneCode;
+  Image flag;
+
+  CountryData({@required this.name, @required this.isoCode, @required this.phoneCode}):
+        flag = Image.asset('assets/flags/${isoCode.toUpperCase()}.png', fit: BoxFit.cover) {
+    _registerStringParam(name, "name");
+    _registerStringParam(isoCode, "isoCode");
+    _registerStringParam(phoneCode, "phoneCode");
+    _registerObjectParam(flag, "flag");
   }
 }

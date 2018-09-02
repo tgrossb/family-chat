@@ -13,11 +13,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bodt_chat/splash/newUser/inputs/simpleInput.dart';
-import 'package:bodt_chat/splash/newUser/inputs/countrySelector.dart';
-import 'package:bodt_chat/splash/newUser/inputs/simplePhoneInput.dart';
+import 'package:bodt_chat/splash/newUser/simpleInput.dart';
 import 'package:bodt_chat/widgetUtils/validators.dart';
 import 'package:bodt_chat/widgetUtils/maskedTextInputFormatter.dart';
+import 'package:bodt_chat/widgetUtils/countryPickerButton.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
@@ -109,15 +108,13 @@ class _NewUserFormState extends State<NewUserForm> {
 
       InputFieldParams(label: "Cell phone", isRequired: true, validator: Validators.validatePhoneNumber, icon: Icons.phone_android,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, cellPhoneFormatter],
-                        keyboardType: TextInputType.number, buildPrefix: (BuildContext context) => CountrySelector(saveCountry: (s){})),
-
+                        keyboardType: TextInputType.number, useCountryPicker: true, onSelected: (s){}),
       InputFieldParams(label: "Home phone", isRequired: false, validator: Validators.validatePhoneNumber, icon: Icons.phone,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, homePhoneFormatter],
-                        keyboardType: TextInputType.number),
-
+                        keyboardType: TextInputType.number, useCountryPicker: true, onSelected: (s){}),
       InputFieldParams(label: "Date of birth", isRequired: false, validator: Validators.validateDob, icon: Icons.calendar_today,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, dobFormatter], useNew: true,
-                        keyboardType: TextInputType.number)
+                        keyboardType: TextInputType.number),
     ];
 
 

@@ -72,6 +72,10 @@ final ThemeData defaultTheme = new ThemeData(
     errorStyle: TextStyle(color: Color(0xff8c0808)),
     filled: true,
     fillColor: Color(0x11000000),
+
+    // Found at https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/input_decorator.dart line 1849
+    // Explicitly defined instead of using defaults so that it can be used in calculations easily
+    contentPadding: EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0)
 //    prefixStyle: TextStyle(color: Colors.white)
   ),
 

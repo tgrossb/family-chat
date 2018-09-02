@@ -20,7 +20,6 @@ import 'package:bodt_chat/groupsList/groupsListScreen.dart';
 import 'package:bodt_chat/splash/loadingAnimationWidget.dart';
 import 'package:bodt_chat/splash/signInButton.dart';
 import 'package:bodt_chat/splash/newUser/newUserPage.dart';
-import 'package:bodt_chat/splash/newUser/inputs/countrySelector.dart';
 import 'package:bodt_chat/widgetUtils/routes.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
@@ -178,9 +177,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   Future<int> registerNewUser(FirebaseUser newUser) async {
     print("Needs to be registered");
-
-    // Start loading country data, just to get ahead
-    await CountrySelector.preloadCountries(context);
 
     await Navigator.of(context).push(new SlideLeftRoute(widget: new NewUserPage(newUser: newUser,)));
 
