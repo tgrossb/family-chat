@@ -56,6 +56,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
   AnimationController backgroundController;
   Animation<double> background;
   UserParameter<String> param;
+  String prefix;
   GlobalKey<FormFieldState> fieldKey;
 
   @override
@@ -132,7 +133,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
     Widget prefixIcon;
     if (widget.useCountryPicker)
       prefixIcon = CountryPickerButton(
-        onSelection: widget.onSelected,
+        onSelection: widget.onSelected ?? (CountryData data) => prefix = data.phoneCode,
         height: 58.0,
         padding: EdgeInsets.symmetric(horizontal: contentPadding.left)
       );
@@ -168,8 +169,8 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
 
                 onSaved: (value) => param.value = value,
                 validator: (value){
-                  param.value = value;
-                  return widget.validate(value, param, widget.isRequired, widget.label);
+                  param.value = prefix + value;
+                  return widget.validate(prefix + value, param, widget.isRequired, widget.label);
                 },
                 inputFormatters: widget.inputFormatters,
                 onFieldSubmitted: (String s){

@@ -92,8 +92,8 @@ class _NewUserFormState extends State<NewUserForm> {
     MaskedTextInputFormatter dobFormatter = NewUserForm.getDateMask();
 
     params = [
-      new UserParameter<String>(name: kUSER_NAME, value: widget.newUser.displayName, private: false),
-      new UserParameter<String>(name: kUSER_EMAIL, value: widget.newUser.email, private: false),
+      new UserParameter<String>(name: kUSER_NAME, value: widget.newUser.displayName?? "", private: false),
+      new UserParameter<String>(name: kUSER_EMAIL, value: widget.newUser.email?? "", private: false),
       new UserParameter<String>(name: kUSER_CELLPHONE, value: widget.newUser.phoneNumber?? "", private: true),
       new UserParameter<String>(name: kUSER_HOME_PHONE, value: "", private: true),
       new UserParameter<String>(name: kUSER_DOB, value: "", private: true)
@@ -108,10 +108,12 @@ class _NewUserFormState extends State<NewUserForm> {
 
       InputFieldParams(label: "Cell phone", isRequired: true, validator: Validators.validatePhoneNumber, icon: Icons.phone_android,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, cellPhoneFormatter],
-                        keyboardType: TextInputType.number, useCountryPicker: true, onSelected: (s){}),
+                        keyboardType: TextInputType.number, useCountryPicker: true),
+
       InputFieldParams(label: "Home phone", isRequired: false, validator: Validators.validatePhoneNumber, icon: Icons.phone,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, homePhoneFormatter],
-                        keyboardType: TextInputType.number, useCountryPicker: true, onSelected: (s){}),
+                        keyboardType: TextInputType.number, useCountryPicker: true),
+
       InputFieldParams(label: "Date of birth", isRequired: false, validator: Validators.validateDob, icon: Icons.calendar_today,
                         formatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly, dobFormatter], useNew: true,
                         keyboardType: TextInputType.number),
@@ -130,6 +132,18 @@ class _NewUserFormState extends State<NewUserForm> {
     return r2Start + ((r2End - r2Start) / (r1End - r1Start)) * (num - r1Start);
   }
 
+  void handleForm() async {
+    Me me = Me.fromParams(
+      uid: widget.newUser.uid,
+      name: params[0],
+      email: params[1],
+      cellphone: params[2],
+      homePhone: params[3],
+      dob: params[4]
+    );
+    await DatabaseWriter.registerNewUser(me: me);
+  }
+
   Widget buildSubmitButton(BuildContext context){
     TextStyle buttonTextStyle = Theme.of(context).primaryTextTheme.title;
     if (continueHeight == null || continueWidth == null){
@@ -140,7 +154,7 @@ class _NewUserFormState extends State<NewUserForm> {
     }
 
     double horizontalPadding = 32.0;
-    double verticlePadding = 12.0;
+    double verticalPadding = 12.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -148,19 +162,19 @@ class _NewUserFormState extends State<NewUserForm> {
           child: new GestureDetector(
             onTap: () {
               if (formKey.currentState.validate())
-                Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
+                handleForm();
             },
             child: new Container(
               width: continueWidth + horizontalPadding*2,
-              height: continueHeight + verticlePadding*2,
+              height: continueHeight + verticalPadding*2,
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: verticlePadding, horizontal: horizontalPadding),
+                padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
                 child: Text("Continue", style: buttonTextStyle),
               ),
               alignment: FractionalOffset.center,
               decoration: new BoxDecoration(
                 color: Theme.of(context).primaryColor,
-                borderRadius: new BorderRadius.all(Radius.circular(continueHeight/2 + verticlePadding)),
+                borderRadius: new BorderRadius.all(Radius.circular(continueHeight/2 + verticalPadding)),
               ),
             ),
           )

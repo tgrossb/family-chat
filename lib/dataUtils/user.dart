@@ -9,11 +9,28 @@ class User {
   UserParameter<String> _name;
   UserParameter<String> _email;
   UserParameter<String> _cellphone;
+  UserParameter<String> _homePhone;
+  UserParameter<String> _dob;
 
   User({@required this.uid, @required String name}){
     _name = UserParameter(name: kUSER_NAME, value: name, private: false);
     _email = null;
     _cellphone = null;
+    _homePhone = null;
+    _dob = null;
+  }
+
+  User.fromParams({@required this.uid, @required UserParameter<String> name,
+                    UserParameter<String> email, UserParameter<String> cellphone,
+                    UserParameter<String> homePhone, UserParameter<String> dob}):
+      this._name = name,
+      this._email = email,
+      this._cellphone = cellphone,
+      this._homePhone = homePhone,
+      this._dob = dob;
+
+  static UserParameter<T> stripFromValues<T>([String name, Map values, bool private = false]){
+    return values.containsKey(name) ? UserParameter<T>(name: name, value: values[name], private: private) : null;
   }
 
   User.fromValues({@required this.uid, @required this.values}){
@@ -22,8 +39,10 @@ class User {
 
     // These are not guaranteed
     // Assume that these are not private because they have been given
-    _email = values.containsKey(kUSER_EMAIL) ? UserParameter(name: kUSER_EMAIL, value: values[kUSER_EMAIL], private: false) : null;
-    _cellphone = values.containsKey(kUSER_CELLPHONE) ? UserParameter(name: kUSER_CELLPHONE, value: values[kUSER_CELLPHONE], private: false) : null;
+    _email = stripFromValues(kUSER_EMAIL, values);
+    _cellphone = stripFromValues(kUSER_CELLPHONE, values);
+    _homePhone = stripFromValues(kUSER_HOME_PHONE, values);
+    _dob = stripFromValues(kUSER_DOB, values);
   }
 
   User.fromSnapshot({@required String uid, @required DataSnapshot snapshot}): this.fromValues(uid: uid, values: snapshot.value[kUSER_PUBLIC_VARS]);
@@ -47,13 +66,23 @@ class User {
   get name => _name.value;
   get email => _email.value;
   get cellphone => _cellphone.value;
+  get homePhone => homePhone.value;
+  get dob => dob.value;
 
   set name(String name) => _name.value = name;
   set email(String email) => _email.value = email;
   set cellphone(String cellphone) => _cellphone.value = cellphone;
+  set homePhone(String homePhone) => _homePhone.value = homePhone;
+  set dob(String dob) => _dob.value = dob;
 }
 
 class Me extends User {
+  // This is needed for registering new users
+  Me.fromParams({@required String uid, @required UserParameter<String> name,
+                  UserParameter<String> email, UserParameter<String> cellphone,
+                  UserParameter<String> homePhone, UserParameter<String> dob}):
+      super.fromParams(uid: uid, name: name, email: email, cellphone: cellphone, homePhone: homePhone, dob: dob);
+
   // This is just needed for the factory
   Me.fromValues({@required String uid, @required Map values}):
     super.fromValues(uid: uid, values: values);
@@ -73,19 +102,23 @@ class Me extends User {
 
     // Set the proper public/private values
     // All are set to public by default, so check for existence in the private set
-    if (snapshot.value[uid][kUSER_PRIVATE_VARS].containsKey(kUSER_EMAIL))
-      me.email.makePrivate();
-    if (snapshot.value[uid][kUSER_PRIVATE_VARS].containsKey(kUSER_EMAIL))
-      me.email.makePrivate();
+    me.email.setPrivate(stripPrivate(kUSER_EMAIL, uid, snapshot.value));
+    me.cellphone.setPrivate(stripPrivate(kUSER_CELLPHONE, uid, snapshot.value));
+    me.homePhone.setPrivate(stripPrivate(kUSER_HOME_PHONE, uid, snapshot.value));
+    me.dob.setPrivate(stripPrivate(kUSER_DOB, uid, snapshot.value));
 
     return me;
+  }
+
+  static bool stripPrivate(String name, String uid, Map values){
+    return values[uid][kUSER_PRIVATE_VARS].containsKey(name);
   }
 
   Map toDatabaseChild(){
     Map public = {};
     Map private = {};
 
-    List<UserParameter> params = [name, email, cellphone];
+    List<UserParameter> params = [_name, _email, _cellphone, _homePhone, _dob];
     for (UserParameter param in params) {
       if (param.private)
         private[param.name] = param.value;

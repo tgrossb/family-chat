@@ -93,8 +93,12 @@ void main() {
 class BodtChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       theme: defaultTargetPlatform == TargetPlatform.iOS ? iosTheme : defaultTheme,
+//      initialRoute: "/",
+//      routes: {
+//        "/": (context) => SplashPage()
+//      },
       home: new SplashPage(),
     );
   }

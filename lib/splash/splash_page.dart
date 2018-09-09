@@ -23,6 +23,7 @@ import 'package:bodt_chat/splash/newUser/newUserPage.dart';
 import 'package:bodt_chat/widgetUtils/routes.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
+import 'package:bodt_chat/loaderTest.dart';
 
 
 class SplashPage extends StatefulWidget {
@@ -178,7 +179,15 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   Future<int> registerNewUser(FirebaseUser newUser) async {
     print("Needs to be registered");
 
-    await Navigator.of(context).push(new SlideLeftRoute(widget: new NewUserPage(newUser: newUser,)));
+//    await Navigator.of(context).pushReplacement(SlideLeftRoute(widget: NewUserPage(newUser: newUser)));
+
+//    await Navigator.of(context).pushAndRemoveUntil(
+//        new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)),
+//        ModalRoute.withName("/"));
+
+
+//    await Navigator.of(context).push(new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)));
+    await Navigator.of(context).push(new SlideLeftRoute(widget: new LoaderTest()));
 
     return 0;
   }

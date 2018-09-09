@@ -43,9 +43,9 @@ class Database {
 }
 
 class DatabaseWriter {
-  static void registerNewUser({@required Me me}) async {
-    Database.database.reference().child("$kUSERS_CHILD").set(me.toDatabaseChild());
-    Database.database.reference().child("$kUSERS_LIST_CHILD").set({me.uid: "uid"});
+  static Future<void> registerNewUser({@required Me me}) async {
+    await Database.database.reference().child("$kUSERS_CHILD").set(me.toDatabaseChild()).catchError((e) => throw e);
+    await Database.database.reference().child("$kUSERS_LIST_CHILD").set({me.uid: "uid"}).catchError((e) => throw e);
 
     // Update the database class to reflect this change
     Database.userUids.add(me.uid);
@@ -53,14 +53,14 @@ class DatabaseWriter {
   }
 
   // They must be a registered user as well, verified by database rules
-  static void registerNewSudoer({@required User user}) async {
-    Database.database.reference().child(kSUDOERS_CHILD).set({user.uid: "uid"});
+  static Future<void> registerNewSudoer({@required User user}) async {
+    await Database.database.reference().child(kSUDOERS_CHILD).set({user.uid: "uid"});
 
     // Update the database class to reflect this change
     Database.sudoerUids.add(user.uid);
   }
 
-  static void registerNewGroup({@required List<String> admins, @required List<String> members, @required String groupName}) async {
+  static Future<void> registerNewGroup({@required List<String> admins, @required List<String> members, @required String groupName}) async {
     if (!admins.contains(Database.me.uid))
       admins.add(Database.me.uid);
     if (!members.contains(Database.me))
