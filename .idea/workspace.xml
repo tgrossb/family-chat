@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/lib/constants.dart" afterPath="$PROJECT_DIR$/lib/constants.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" afterPath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" afterPath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/severedSquarePainter.dart" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/splash/splash_page.dart" afterPath="$PROJECT_DIR$/lib/splash/splash_page.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart" afterPath="$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -29,7 +24,7 @@
       <file leaf-file-name="splash_page.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/splash/splash_page.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1818">
+            <state relative-caret-position="0">
               <caret line="124" column="26" lean-forward="false" selection-start-line="124" selection-start-column="26" selection-end-line="124" selection-end-column="26" />
               <folding>
                 <element signature="e#347#367#0" expanded="true" />
@@ -64,8 +59,8 @@
       <file leaf-file-name="chocolateLoaderWidget.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="822">
-              <caret line="52" column="42" lean-forward="false" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
+            <state relative-caret-position="498">
+              <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -76,7 +71,7 @@
       <file leaf-file-name="loaderTest.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/loaderTest.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="396">
+            <state relative-caret-position="414">
               <caret line="23" column="19" lean-forward="false" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
@@ -88,11 +83,9 @@
       <file leaf-file-name="chocolateLoaderAnimation.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="15" column="55" lean-forward="false" selection-start-line="15" selection-start-column="55" selection-end-line="15" selection-end-column="55" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="0">
+              <caret line="0" column="39" lean-forward="true" selection-start-line="0" selection-start-column="39" selection-end-line="0" selection-end-column="39" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -100,8 +93,8 @@
       <file leaf-file-name="barPainter.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="149" column="8" lean-forward="true" selection-start-line="149" selection-start-column="8" selection-end-line="149" selection-end-column="8" />
+            <state relative-caret-position="198">
+              <caret line="162" column="29" lean-forward="false" selection-start-line="162" selection-start-column="29" selection-end-line="162" selection-end-column="29" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -122,18 +115,8 @@
       <file leaf-file-name="loadingAnimationWidget.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/splash/loadingAnimationWidget.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4158">
+            <state relative-caret-position="782">
               <caret line="236" column="0" lean-forward="false" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="signInButton.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/splash/signInButton.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1692">
-              <caret line="97" column="22" lean-forward="false" selection-start-line="97" selection-start-column="22" selection-end-line="97" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -253,8 +236,8 @@
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/severedSquarePainter.dart" />
         <option value="$PROJECT_DIR$/lib/splash/splash_page.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" />
-        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" />
         <option value="$PROJECT_DIR$/lib/constants.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart" />
       </list>
     </option>
@@ -507,7 +490,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Dart Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Flutter Outline" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -515,7 +498,7 @@
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -575,7 +558,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/lib/groupsList/test.dart" />
     <entry file="file://$PROJECT_DIR$/lib/representativeDropdown/representativeDropdown.dart" />
     <entry file="file://$PROJECT_DIR$/lib/splash/newUser/alternateDropdown.dart" />
     <entry file="file://$USER_HOME$/computerScience/flutter/flutter/packages/flutter/lib/src/material/dropdown.dart">
@@ -796,17 +778,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/loadingAnimationWidget.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4158">
-          <caret line="236" column="0" lean-forward="false" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/splash/splash_page.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1818">
+        <state relative-caret-position="0">
           <caret line="124" column="26" lean-forward="false" selection-start-line="124" selection-start-column="26" selection-end-line="124" selection-end-column="26" />
           <folding>
             <element signature="e#347#367#0" expanded="true" />
@@ -825,31 +799,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/loaderTest.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="23" column="19" lean-forward="false" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
           <caret line="14" column="42" lean-forward="false" selection-start-line="14" selection-start-column="42" selection-end-line="14" selection-end-column="42" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="822">
-          <caret line="52" column="42" lean-forward="false" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -861,20 +815,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart">
+    <entry file="file://$PROJECT_DIR$/lib/splash/loadingAnimationWidget.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="55" lean-forward="false" selection-start-line="15" selection-start-column="55" selection-end-line="15" selection-end-column="55" />
+        <state relative-caret-position="782">
+          <caret line="236" column="0" lean-forward="false" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaderTest.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="23" column="19" lean-forward="false" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="39" lean-forward="true" selection-start-line="0" selection-start-column="39" selection-end-line="0" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="498">
+          <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/computerScience/flutter/flutter/packages/flutter/lib/src/rendering/custom_paint.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="179" column="7" lean-forward="false" selection-start-line="179" selection-start-column="7" selection-end-line="179" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="149" column="8" lean-forward="true" selection-start-line="149" selection-start-column="8" selection-end-line="149" selection-end-column="8" />
+        <state relative-caret-position="198">
+          <caret line="162" column="29" lean-forward="false" selection-start-line="162" selection-start-column="29" selection-end-line="162" selection-end-column="29" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>

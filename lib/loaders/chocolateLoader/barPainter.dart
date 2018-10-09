@@ -4,10 +4,11 @@ import 'package:bodt_chat/constants.dart';
 
 class BarPainter extends CustomPainter {
   ChocolateLoaderWidget widget;
-  double value;
-  double slope = 0.4;
+  double value, slope;
+  double padding = 10.0;
 
-  BarPainter({@required this.widget, @required this.value});
+  BarPainter({@required this.widget, @required this.value}):
+      slope = (2 * widget.squareHeight) / (5 * widget.squareWidth);
 
   void paintSquare(Canvas canvas){
     Paint paint = Paint()
@@ -81,14 +82,15 @@ class BarPainter extends CustomPainter {
   }
 
   // Do pretty much the same thing as the bottom section, but paint a different part
-  void paintMiddleLeftSection(Canvas canvas, double startX, double startY){
+  // Also, paint an additional growHeight down from the line
+  void paintMiddleLeftSection(Canvas canvas, double startX, double startY, double growHeight){
     // Only paint the section from (startX, startY) to (startX, startY) up by 2 and over by 3
     double endX = widget.squareWidth * 3;
     double endY = startY - endX * slope;
 
     Path keeper = new Path()
-      ..moveTo(startX, startY)
-      ..lineTo(endX, endY)
+      ..moveTo(startX, startY + growHeight)
+      ..lineTo(endX, endY + growHeight)
       ..lineTo(endX, widget.squareHeight)
       ..lineTo(startX, widget.squareHeight)
       ..close();
@@ -97,14 +99,14 @@ class BarPainter extends CustomPainter {
     paintBar(canvas, widget.widthCount, widget.heightCount);
   }
 
-  void paintRightSection(Canvas canvas, double startX, double startY, double endX, double endY){
-    // Only paint the section from (startX, startY) up by 2 and over by 3 to (endX, endY)
+  void paintRightSection(Canvas canvas, double startX, double startY, double endX, double endY, double growHeight){
+    // Only paint the section from (startX, startY) up by 1 and over by 3 to (endX, endY)
     double newStartX = widget.squareWidth * 3;
     double newStartY = startY - newStartX * slope;
 
     Path keeper = new Path()
-      ..moveTo(newStartX, newStartY)
-      ..lineTo(endX, endY)
+      ..moveTo(newStartX, newStartY + growHeight)
+      ..lineTo(endX, endY + growHeight)
       ..lineTo(endX, 0.0)
       ..lineTo(newStartX, 0.0)
       ..close();
@@ -143,44 +145,58 @@ class BarPainter extends CustomPainter {
     paintBottomSection(canvas, startX, startY, endX, endY);
     canvas.restore();
 
+    value = 0.375;
+
     canvas.save();
-    double midLeftSepMax = 10.0;
-    if (value < 0.25)
-      canvas.translate(0.0, -1 * map(value, 0.0, 0.25, 0.0, midLeftSepMax));
-    else
-      canvas.translate(0.0, -1 * midLeftSepMax);
-    paintMiddleLeftSection(canvas, startX, startY);
+    double midLeftSepMax = widget.squareHeight / 5;
+
+    double leftVertSep = map(value, 0.0, 0.25, 0.0, midLeftSepMax);
+    double growHeight = map(value, 0.25, 0.5, 0.0, midLeftSepMax);
+    double leftTravel = map(value, 0.25, 0.5, 0.0, widget.squareWidth * 2);
+
+    canvas.translate(leftTravel, -1 * leftVertSep - leftTravel * slope);
+
+    paintMiddleLeftSection(canvas, startX, startY, growHeight);
     canvas.restore();
 
     canvas.save();
-    double rightSepMax = (startY - widget.squareWidth * 3 * slope - 0*widget.squareHeight) + 2 * midLeftSepMax;
-    if (value < 0.25)
-      canvas.translate(0.0, -1 * map(value, 0.0, 0.25, 0.0, rightSepMax));
-    else
-      canvas.translate(0.0, -1 * rightSepMax);
-    paintRightSection(canvas, startX, startY, endX, endY);
+    // Todo: Fix this sep max
+    double rightSepMax = (startY - widget.squareWidth * 3 * slope);
+
+    double rightVertSep = map(value, 0.0, 0.25, 0.0, rightSepMax);
+    double dropSep = map(value, 0.5, 0.75, 0.0, rightSepMax + widget.squareHeight);
+    growHeight = map(value, 0.5, 0.75, 0.0, midLeftSepMax);
+    double rightTravel = map(value, 0.25, 0.5, 0.0, widget.squareWidth * 3);
+
+    canvas.translate(-1 * rightTravel, -1 * rightVertSep + dropSep);
+
+    paintRightSection(canvas, startX, startY - 0*widget.squareHeight, endX, endY, growHeight);
     canvas.restore();
 
     canvas.save();
     double topSepMax = rightSepMax - widget.squareHeight;
     double topHorizontalSepMax = midLeftSepMax;
-    if (value < 0.25)
-      canvas.translate(-1 * map(value, 0.0, 0.25, 0.0, topHorizontalSepMax), -1 * map(value, 0.0, 0.25, 0.0, topSepMax));
-    else
-      canvas.translate(-1 * topHorizontalSepMax, -1 * topSepMax);
+
+    double moveRight = map(value, 0.25, 0.5, 0.0, widget.squareWidth);
+    double increasePadding = map(value, 0.0, 0.25, 0.0, padding);
+
+    canvas.translate(moveRight, -1 * leftVertSep - leftTravel * slope - increasePadding);
     paintTopMiddleSection(canvas);
     canvas.restore();
 
     canvas.save();
-    if (value < 0.25)
-      canvas.translate(-1 * map(value, 0.0, 0.25, 0.0, 2 * topHorizontalSepMax), -1 * map(value, 0.0, 0.25, 0.0, topSepMax));
-    else
-      canvas.translate(-2 * topHorizontalSepMax, -1 * topSepMax);
+    double moveLeft = map(value, 0.0, 0.1, 0.0, widget.squareWidth + padding);
+    double moveDown = map(value, 0.1, 0.25, 0.0, widget.squareHeight + padding);
+    canvas.translate(-1 * moveLeft, moveDown - leftVertSep - increasePadding);
     paintSquare(canvas);
     canvas.restore();
   }
 
   double map(double input, double inMin, double inMax, double outMin, double outMax){
+    if (input > inMax)
+      return outMax;
+    if (input < inMin)
+      return outMin;
     return inMin + ((outMax - outMin) / (inMax - inMin)) * (input - inMin);
   }
 
