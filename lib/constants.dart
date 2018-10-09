@@ -8,16 +8,19 @@ const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
 
 const double kCHOCOLATE_INSET = 5.0;
 const double kCHOCOLATE_ELEVATION = 4.0;
-const double kCHOCOLATE_SQUARE_WIDTH = 75.0;
-const double kCHOCOLATE_SQUARE_HEIGHT = 50.0;
-const int kCHOCOLATE_WIDTH_COUNT = 3;
+
+// Chocolate bar should have an aspect ratio of 1:1.5
+const double kCHOCOLATE_SQUARE_WIDTH = 50.0;
+const double kCHOCOLATE_SQUARE_HEIGHT = 75.0;
+
+const int kCHOCOLATE_WIDTH_COUNT = 5;
 const int kCHOCOLATE_HEIGHT_COUNT = 5;
 const Color kCHOCOLATE_BASE_COLOR = Color(0xffbf8673);
 const Color kCHOCOLATE_ELEVATED_COLOR = Color(0xffbf8672);
 const Color kCHOCOLATE_DARK_EDGE_COLOR = Color(0xff502d27);
 const Color kCHOCOLATE_LIGHT_EDGE_COLOR = Color(0xfff2c1ba);
 const Color kCHOCOLATE_MIDDLE_EDGE_COLOR = Color(0xffa46b64);
-const int kCHOCOLATE_DURATION = 500;
+const int kCHOCOLATE_DURATION = 1000;
 
 
 const String kUSER_EXISTS_TEST = "userExistsTest";

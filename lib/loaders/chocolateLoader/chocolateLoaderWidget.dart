@@ -50,7 +50,7 @@ class ChocolateLoaderWidgetState extends State<ChocolateLoaderWidget> with Singl
 
     // Set up the animation controller
     controller = new AnimationController(vsync: this, duration: widget._duration);
-    animation = Tween(begin: 0.0, end: math.pi * 2).animate(controller);
+    animation = Tween(begin: 0.0, end: 1.0).animate(controller);
 
     // Set the controller to repeat when finished
     controller.addStatusListener((AnimationStatus status) {

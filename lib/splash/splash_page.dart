@@ -122,6 +122,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   // Finally, it loads the first few messages of a group.
   // TODO: Update this description
   void startLoading([FirebaseUser user]) async {
+    registerNewUser(user);
     setState(() {
       loading = true;
       loadingAnimationController.forward();
