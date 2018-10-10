@@ -10,8 +10,8 @@ const double kCHOCOLATE_INSET = 5.0;
 const double kCHOCOLATE_ELEVATION = 4.0;
 
 // Chocolate bar should have an aspect ratio of 1:1.5
-const double kCHOCOLATE_SQUARE_WIDTH = 50.0;
-const double kCHOCOLATE_SQUARE_HEIGHT = 75.0;
+const double kCHOCOLATE_SQUARE_WIDTH = 50.0 / 5 * 4;
+const double kCHOCOLATE_SQUARE_HEIGHT = 75.0 / 5 * 4;
 
 const int kCHOCOLATE_WIDTH_COUNT = 5;
 const int kCHOCOLATE_HEIGHT_COUNT = 5;
@@ -20,7 +20,7 @@ const Color kCHOCOLATE_ELEVATED_COLOR = Color(0xffbf8672);
 const Color kCHOCOLATE_DARK_EDGE_COLOR = Color(0xff502d27);
 const Color kCHOCOLATE_LIGHT_EDGE_COLOR = Color(0xfff2c1ba);
 const Color kCHOCOLATE_MIDDLE_EDGE_COLOR = Color(0xffa46b64);
-const int kCHOCOLATE_DURATION = 1000;
+const int kCHOCOLATE_DURATION = 1500;
 
 
 const String kUSER_EXISTS_TEST = "userExistsTest";

@@ -1,6 +1,19 @@
+/**
+ * PLEASE
+ * Do not look in this file.
+ *
+ * This is the largest collection of hacked together strings of double math and poor naming convention.
+ * The paint accessory methods are kind of okay, but DO NOT look at the main paint method.
+ * This chocolate bar animation has been performed using **linear mapping** instead of tweens or any thing like that
+ * and it is the result of my blood, sweat, and tears over multiple months.  It is the biggest plate of spaghetti known
+ * to man.
+ *
+ * FOR YOUR OWN SAFETY, DO NOT ENTER
+ *
+ * (Poorly) Written by: Theo Grossberndt
+ */
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/loaders/chocolateLoader/chocolateLoaderWidget.dart';
-import 'package:bodt_chat/constants.dart';
 
 class BarPainter extends CustomPainter {
   ChocolateLoaderWidget widget;
@@ -10,13 +23,15 @@ class BarPainter extends CustomPainter {
   BarPainter({@required this.widget, @required this.value}):
       slope = (2 * widget.squareHeight) / (5 * widget.squareWidth);
 
-  void paintSquare(Canvas canvas){
+  void paintSquare([Canvas canvas, double fade = 1.0]){
+    if (fade < 0.0)
+      fade = 0.0;
     Paint paint = Paint()
       ..style = PaintingStyle.fill
       ..strokeWidth = 0.0;
 
     Rect baseRect = Rect.fromLTWH(0.0, 0.0, widget.squareWidth, widget.squareHeight);
-    canvas.drawRect(baseRect, paint..color = widget.baseColor);
+    canvas.drawRect(baseRect, paint..color = widget.baseColor.withOpacity(fade));
 
     double baseW = widget.squareWidth - 2 * widget.inset;
     double topW = baseW - 2 * widget.elevation;
@@ -30,10 +45,10 @@ class BarPainter extends CustomPainter {
     Path bottomTrap = horizontalTrapezoid(widget.inset, widget.squareHeight - widget.inset, baseW, topW, -1 * hw);
     Path leftTrap = verticalTrapezoid(widget.squareWidth - widget.inset, widget.inset, baseH, rightH, -1 * hw);
 
-    canvas.drawPath(topTrap, paint..color = widget.middleEdgeColor);
-    canvas.drawPath(rightTrap, paint..color = widget.darkEdgeColor);
-    canvas.drawPath(bottomTrap, paint..color = widget.darkEdgeColor);
-    canvas.drawPath(leftTrap, paint..color = widget.lightEdgeColor);
+    canvas.drawPath(topTrap, paint..color = widget.middleEdgeColor.withOpacity(fade));
+    canvas.drawPath(rightTrap, paint..color = widget.darkEdgeColor.withOpacity(fade));
+    canvas.drawPath(bottomTrap, paint..color = widget.darkEdgeColor.withOpacity(fade));
+    canvas.drawPath(leftTrap, paint..color = widget.lightEdgeColor.withOpacity(fade));
 
     Rect elevatedRect = new Rect.fromLTRB(
         widget.inset + widget.elevation,
@@ -44,7 +59,7 @@ class BarPainter extends CustomPainter {
     LinearGradient gradient = LinearGradient(
       begin: Alignment.topRight,
       end: Alignment.bottomLeft,
-      colors: [widget.elevatedColor, Color.lerp(widget.elevatedColor, widget.darkEdgeColor, 0.25)],
+      colors: [widget.elevatedColor.withOpacity(fade), Color.lerp(widget.elevatedColor.withOpacity(fade), widget.darkEdgeColor.withOpacity(fade), 0.25)],
     );
 
     canvas.drawRect(elevatedRect, paint..shader = gradient.createShader(elevatedRect));
@@ -145,14 +160,15 @@ class BarPainter extends CustomPainter {
     paintBottomSection(canvas, startX, startY, endX, endY);
     canvas.restore();
 
-    value = 0.375;
+//    value = 1.0;
 
     canvas.save();
     double midLeftSepMax = widget.squareHeight / 5;
 
+    double leftMotionEnd = 0.4;
     double leftVertSep = map(value, 0.0, 0.25, 0.0, midLeftSepMax);
-    double growHeight = map(value, 0.25, 0.5, 0.0, midLeftSepMax);
-    double leftTravel = map(value, 0.25, 0.5, 0.0, widget.squareWidth * 2);
+    double growHeight = map(value, 0.25, leftMotionEnd, 0.0, midLeftSepMax);
+    double leftTravel = map(value, 0.25, leftMotionEnd, 0.0, widget.squareWidth * 2);
 
     canvas.translate(leftTravel, -1 * leftVertSep - leftTravel * slope);
 
@@ -160,13 +176,13 @@ class BarPainter extends CustomPainter {
     canvas.restore();
 
     canvas.save();
-    // Todo: Fix this sep max
-    double rightSepMax = (startY - widget.squareWidth * 3 * slope);
+    double dropDownEnd = 0.7;
+    double rightSepMax = widget.squareHeight * 3 + padding * 2 + slope * widget.squareWidth;
 
     double rightVertSep = map(value, 0.0, 0.25, 0.0, rightSepMax);
-    double dropSep = map(value, 0.5, 0.75, 0.0, rightSepMax + widget.squareHeight);
-    growHeight = map(value, 0.5, 0.75, 0.0, midLeftSepMax);
-    double rightTravel = map(value, 0.25, 0.5, 0.0, widget.squareWidth * 3);
+    double dropSep = map(value, leftMotionEnd, dropDownEnd, 0.0, rightSepMax + widget.squareHeight);
+    growHeight = map(value, 0.25, dropDownEnd, 0.0, midLeftSepMax);
+    double rightTravel = map(value, 0.25, leftMotionEnd, 0.0, widget.squareWidth * 3);
 
     canvas.translate(-1 * rightTravel, -1 * rightVertSep + dropSep);
 
@@ -174,21 +190,30 @@ class BarPainter extends CustomPainter {
     canvas.restore();
 
     canvas.save();
-    double topSepMax = rightSepMax - widget.squareHeight;
-    double topHorizontalSepMax = midLeftSepMax;
 
-    double moveRight = map(value, 0.25, 0.5, 0.0, widget.squareWidth);
+    double fadeMoveSplit = 0.85;
+
+    double moveRight = map(value, 0.25, leftMotionEnd, 0.0, widget.squareWidth);
     double increasePadding = map(value, 0.0, 0.25, 0.0, padding);
+    // Start moving back once the (dropSep + widget.squareHeight * 2 + widget.squareWidth * slope) passes the bottom edge
+    // dropSep maps linearly from [0.5, 0.75] to [0.0, rightSepMax + widget.squareHeight]
+    // We want to know when it will map to (leftVertSep_max + leftTravel_max * slope + increasePadding_max)
+    double dropYPos = (midLeftSepMax + widget.squareWidth * 2 * slope + padding * 2) + (widget.squareHeight * 2 + widget.squareWidth * slope);
+    double dropSepPassTime = (((dropYPos + leftMotionEnd) * (dropDownEnd - leftMotionEnd)) / (rightSepMax + widget.squareHeight) + leftMotionEnd);
+    double dropSepPassTimeMid = (fadeMoveSplit - dropSepPassTime) / 2 + dropSepPassTime;
+    double moveBack = map(value, dropSepPassTime, dropSepPassTimeMid, 0.0, widget.squareWidth*2);
+    double drop = map(value, dropSepPassTimeMid, fadeMoveSplit, 0.0, widget.squareHeight + padding);
 
-    canvas.translate(moveRight, -1 * leftVertSep - leftTravel * slope - increasePadding);
+    canvas.translate(moveRight - moveBack, -1 * leftVertSep - leftTravel * slope - increasePadding + drop);
     paintTopMiddleSection(canvas);
     canvas.restore();
 
     canvas.save();
     double moveLeft = map(value, 0.0, 0.1, 0.0, widget.squareWidth + padding);
     double moveDown = map(value, 0.1, 0.25, 0.0, widget.squareHeight + padding);
+    double fade = map(value, fadeMoveSplit, 1.0, 0.0, 100.0);
     canvas.translate(-1 * moveLeft, moveDown - leftVertSep - increasePadding);
-    paintSquare(canvas);
+    paintSquare(canvas, 1.0 - fade/100.0);
     canvas.restore();
   }
 
