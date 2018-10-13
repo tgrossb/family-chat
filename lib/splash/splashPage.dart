@@ -122,7 +122,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   // Finally, it loads the first few messages of a group.
   // TODO: Update this description
   void startLoading([FirebaseUser user]) async {
-    registerNewUser(user);
+//    registerNewUser(user);
     setState(() {
       loading = true;
       loadingAnimationController.forward();
@@ -180,15 +180,20 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   Future<int> registerNewUser(FirebaseUser newUser) async {
     print("Needs to be registered");
 
+    if (newUser == null) {
+      print("Null new user");
+      scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text("Null newUser")));
+    }
 //    await Navigator.of(context).pushReplacement(SlideLeftRoute(widget: NewUserPage(newUser: newUser)));
 
-//    await Navigator.of(context).pushAndRemoveUntil(
-//        new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)),
-//        ModalRoute.withName("/"));
+    await Navigator.of(context).pushAndRemoveUntil(
+        new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)),
+        ModalRoute.withName("/"));
 
 
 //    await Navigator.of(context).push(new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)));
-    await Navigator.of(context).push(new SlideLeftRoute(widget: new LoaderTest()));
+//    await Navigator.of(context).push(new SlideLeftRoute(widget: new LoaderTest()));
 
     return 0;
   }

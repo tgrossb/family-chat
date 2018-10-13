@@ -10,8 +10,8 @@ const double kCHOCOLATE_INSET = 5.0;
 const double kCHOCOLATE_ELEVATION = 4.0;
 
 // Chocolate bar should have an aspect ratio of 1:1.5
-const double kCHOCOLATE_SQUARE_WIDTH = 50.0 / 5 * 4;
-const double kCHOCOLATE_SQUARE_HEIGHT = 75.0 / 5 * 4;
+const double kCHOCOLATE_SQUARE_WIDTH = 50.0 / 10 * 7;
+const double kCHOCOLATE_SQUARE_HEIGHT = 75.0 / 10 * 7;
 
 const int kCHOCOLATE_WIDTH_COUNT = 5;
 const int kCHOCOLATE_HEIGHT_COUNT = 5;

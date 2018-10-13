@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:bodt_chat/splash/splash_page.dart';
+import 'package:bodt_chat/splash/splashPage.dart';
 
 final ThemeData iosTheme = new ThemeData(
   primarySwatch: Colors.orange,

@@ -15,8 +15,10 @@ class Validators {
       return null;
 
     String regexMatch = checker.stringMatch(value);
-    if (regexMatch == null || regexMatch.length != value.length)
+    if (regexMatch == null || regexMatch.length != value.length) {
+      print("Mismatch error on $value");
       return onMismatch;
+    }
 
     save(param);
     return null;
@@ -39,8 +41,10 @@ class Validators {
     String onMismatch = "Please enter a valid date";
 
     value = value.trim();
-    if (value.isEmpty)
+    if (value.isEmpty && isRequired)
       return onEmpty;
+    else if (value.isEmpty)
+      return null;
 
     String nums = RegExp(r"[0-9]").allMatches(value).map((m) => m[0]).join();
     if (nums.length < 8)
@@ -60,7 +64,7 @@ class Validators {
     DateTime date = new DateTime(year, month, day);
 
     if (now.isBefore(date))
-      return "Really, you're born in the future? Fuck off.";
+      return "Really, you're born in the future? Get. Out.";
 
     int age = (now.difference(date).inDays/365).floor();
     if (age > 100)
@@ -86,7 +90,8 @@ class Validators {
     String onEmpty = "Please enter your ${label.toLowerCase()}";
     String onMismatch = "Please enter a valid ${label.toLowerCase()} number";
     value = RegExp(r"[0-9]").allMatches(value).map((m) => m[0]).join();
-    return _validate(value, param, isRequired, onEmpty, onMismatch, RegExp(r"\d{10}"), save);
+    // TODO: The regex below needs to be 13 to 11 matches, but I need to check how to do that
+    return _validate(value, param, isRequired, onEmpty, onMismatch, RegExp(r"\d{13-11}"), save);
   }
 
   // This doesn't work yet

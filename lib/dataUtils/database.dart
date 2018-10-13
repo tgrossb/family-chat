@@ -31,12 +31,12 @@ import 'package:bodt_chat/dataUtils/dataBundles.dart';
 class Database {
   static final FirebaseDatabase database = FirebaseDatabase.instance;
 
-  static List<String> sudoerUids;
-  static List<String> userUids;
-  static Map<String, User> userFromUid;
+  static List<String> sudoerUids = List();
+  static List<String> userUids = List();
+  static Map<String, User> userFromUid = {};
   static User me;
-  static List<String> groupNames;
-  static Map<String, GroupData> groupFromName;
+  static List<String> groupNames = List();
+  static Map<String, GroupData> groupFromName = {};
 
 //  get groups => groupFromName.values;
 //  get users => userFromUid.values;

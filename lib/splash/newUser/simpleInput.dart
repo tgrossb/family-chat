@@ -56,7 +56,8 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
   AnimationController backgroundController;
   Animation<double> background;
   UserParameter<String> param;
-  String prefix;
+  // Not going to lie... I forgot what this variable is for
+  String prefix = "";
   GlobalKey<FormFieldState> fieldKey;
 
   @override

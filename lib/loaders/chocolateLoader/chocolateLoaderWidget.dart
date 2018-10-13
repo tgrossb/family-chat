@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/loaders/loader.dart';
 import 'package:bodt_chat/loaders/chocolateLoader/chocolateLoaderAnimation.dart';
