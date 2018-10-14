@@ -34,18 +34,19 @@ class DotConstants {
 
   static const Color kDOT_COLOR = Colors.white;
 
-  static const int kDOT_DURATION = 300;
+  static const int kDOT_DURATION = 1000;
+  static const int kDOT_FROM_CONTAINER_DURATION = 500;
 }
 
 // These are all for the generic animated loading button
 class LoadingButtonConstants {
   static const int kBUTTON_MORPH_DURATION = 500;
   static const double kBUTTON_FADE_TEXT_PORTION = 0.5;
-  static const EdgeInsets kBUTTON_PADDING = EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0);
+  static const EdgeInsets kBUTTON_PADDING = EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0);
 }
 
-// These correspond to the firebase tags
-// Make sure that any superficial changes in the database are reflected here
+// These correspond to the firebase database id names
+// Make sure that any naming changes in the database are reflected here
 class DatabaseConstants {
   static const String kUSER_EXISTS_TEST = "userExistsTest";
 

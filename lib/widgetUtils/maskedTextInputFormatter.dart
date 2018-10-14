@@ -23,7 +23,7 @@ class MaskedTextInputFormatter extends TextInputFormatter {
   // maskedValueMatcher should match exactly one character and not use ^ or $
   MaskedTextInputFormatter({@required this.mask, @required this.masker, @required this.maskedValueMatcher, this.placeHolder: " "}){
     maskList = mask.split("");
-    print(maskList);
+//    print(maskList);
 
     forwardInputToMaskIndex = {};
     backwardInputToMaskIndex = {};
@@ -50,8 +50,8 @@ class MaskedTextInputFormatter extends TextInputFormatter {
     // Add the first by hand to be right before the first masker
     backwardInputToMaskIndex[0] = backwardInputToMaskIndex[1]-1;
 
-    print("Forward  : $forwardInputToMaskIndex");
-    print("Backgward: $backwardInputToMaskIndex");
+//    print("Forward  : $forwardInputToMaskIndex");
+//    print("Backgward: $backwardInputToMaskIndex");
   }
 
   Queue<String> stripMaskable(String s){

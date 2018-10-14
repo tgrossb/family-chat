@@ -140,8 +140,8 @@ class MessageData extends Data {
 
   factory MessageData.fromSnapshotValue({@required Map message}){
     String time = message.keys.first;
-    String name = message[time][kNAME_CHILD];
-    String text = message[time][kTEXT_CHILD];
+    String name = message[time][DatabaseConstants.kNAME_CHILD];
+    String text = message[time][DatabaseConstants.kTEXT_CHILD];
     return MessageData(text: text, name: name, utcTime: Utils.parseTime(time));
   }
 

@@ -13,7 +13,7 @@ class User {
   UserParameter<String> _dob;
 
   User({@required this.uid, @required String name}){
-    _name = UserParameter(name: kUSER_NAME, value: name, private: false);
+    _name = UserParameter(name: DatabaseConstants.kUSER_NAME, value: name, private: false);
     _email = null;
     _cellphone = null;
     _homePhone = null;
@@ -35,17 +35,17 @@ class User {
 
   User.fromValues({@required this.uid, @required this.values}){
     // This is guaranteed to exist thanks to the database rules
-    _name = UserParameter(name: kUSER_NAME, value: values[kUSER_NAME], private: false);
+    _name = UserParameter(name: DatabaseConstants.kUSER_NAME, value: values[DatabaseConstants.kUSER_NAME], private: false);
 
     // These are not guaranteed
     // Assume that these are not private because they have been given
-    _email = stripFromValues(kUSER_EMAIL, values);
-    _cellphone = stripFromValues(kUSER_CELLPHONE, values);
-    _homePhone = stripFromValues(kUSER_HOME_PHONE, values);
-    _dob = stripFromValues(kUSER_DOB, values);
+    _email = stripFromValues(DatabaseConstants.kUSER_EMAIL, values);
+    _cellphone = stripFromValues(DatabaseConstants.kUSER_CELLPHONE, values);
+    _homePhone = stripFromValues(DatabaseConstants.kUSER_HOME_PHONE, values);
+    _dob = stripFromValues(DatabaseConstants.kUSER_DOB, values);
   }
 
-  User.fromSnapshot({@required String uid, @required DataSnapshot snapshot}): this.fromValues(uid: uid, values: snapshot.value[kUSER_PUBLIC_VARS]);
+  User.fromSnapshot({@required String uid, @required DataSnapshot snapshot}): this.fromValues(uid: uid, values: snapshot.value[DatabaseConstants.kUSER_PUBLIC_VARS]);
 
   @override
   bool operator ==(other) {
@@ -94,24 +94,24 @@ class Me extends User {
 
     // Flatten the snapshot to remove public and private distinction
     Map values = {};
-    values.addAll(snapshot.value[uid][kUSER_PUBLIC_VARS]);
-    values.addAll(snapshot.value[uid][kUSER_PRIVATE_VARS]);
+    values.addAll(snapshot.value[uid][DatabaseConstants.kUSER_PUBLIC_VARS]);
+    values.addAll(snapshot.value[uid][DatabaseConstants.kUSER_PRIVATE_VARS]);
 
     // Use the values and the uid to construct the user
     Me me =  Me.fromValues(uid: uid, values: values);
 
     // Set the proper public/private values
     // All are set to public by default, so check for existence in the private set
-    me.email.setPrivate(stripPrivate(kUSER_EMAIL, uid, snapshot.value));
-    me.cellphone.setPrivate(stripPrivate(kUSER_CELLPHONE, uid, snapshot.value));
-    me.homePhone.setPrivate(stripPrivate(kUSER_HOME_PHONE, uid, snapshot.value));
-    me.dob.setPrivate(stripPrivate(kUSER_DOB, uid, snapshot.value));
+    me.email.setPrivate(stripPrivate(DatabaseConstants.kUSER_EMAIL, uid, snapshot.value));
+    me.cellphone.setPrivate(stripPrivate(DatabaseConstants.kUSER_CELLPHONE, uid, snapshot.value));
+    me.homePhone.setPrivate(stripPrivate(DatabaseConstants.kUSER_HOME_PHONE, uid, snapshot.value));
+    me.dob.setPrivate(stripPrivate(DatabaseConstants.kUSER_DOB, uid, snapshot.value));
 
     return me;
   }
 
   static bool stripPrivate(String name, String uid, Map values){
-    return values[uid][kUSER_PRIVATE_VARS].containsKey(name);
+    return values[uid][DatabaseConstants.kUSER_PRIVATE_VARS].containsKey(name);
   }
 
   Map toDatabaseChild(){
@@ -126,7 +126,7 @@ class Me extends User {
         public[param.name] = param.value;
     }
 
-    return {uid: {kUSER_PUBLIC_VARS: public, kUSER_PRIVATE_VARS: private}};
+    return {uid: {DatabaseConstants.kUSER_PUBLIC_VARS: public, DatabaseConstants.kUSER_PRIVATE_VARS: private}};
   }
 }
 
@@ -136,7 +136,7 @@ class UserParameter<T> {
   bool private;
 
   UserParameter({@required this.name, @required this.value, this.private = true}){
-    if (name == kUSER_NAME)
+    if (name == DatabaseConstants.kUSER_NAME)
       private = false;
   }
 

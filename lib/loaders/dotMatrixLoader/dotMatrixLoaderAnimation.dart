@@ -5,13 +5,15 @@ import 'dart:math' as math;
 
 class DotMatrixLoaderAnimation extends AnimatedWidget {
   final DotMatrixLoaderWidget widget;
-  DotMatrixLoaderAnimation({Key key, @required Animation<double> animation, @required this.widget}):
+  final int loopCounter;
+
+  DotMatrixLoaderAnimation({Key key, @required Animation<double> animation, @required this.widget, @required this.loopCounter}):
       super(key: key, listenable: animation);
 
   @override
   Widget build(BuildContext context) {
     double angle = (listenable as Animation<double>).value;
-    return Transform.rotate(angle: angle, child: buildBasic(angle, context));
+    return Transform.rotate(angle: angle/2 + (loopCounter % 2 == 0 ? 0 : math.pi), child: buildBasic(angle, context));
   }
 
   // A row where the middle dot moves up and down
@@ -157,14 +159,12 @@ class DotMatrixLoaderAnimation extends AnimatedWidget {
 //    if (count == kLOADING_FINISH)
 //      return buildCollapseThenExpandState(animation, context);
 
-    double oneThird = math.pi * 2 / 3;
-    if (value <= oneThird)
-      return buildAnimatedMiddlesState(value * 3);
-
-    else if (value <= 2 * oneThird)
-      return buildAnimatedCornersState((value - oneThird) * 3);
-
-    return buildCollapsingState((value - 2 * oneThird) * 3);
+    if (loopCounter % 3 == 0)
+      return buildAnimatedMiddlesState(value);
+    else if (loopCounter % 3 == 1)
+      return buildAnimatedCornersState(value);
+    else
+      return buildCollapsingState(value);
   }
 
   Widget simpleCircle(double diameter) {

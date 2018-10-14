@@ -50,13 +50,17 @@ class ChocolateLoaderWidget extends StatefulWidget implements Loader {
   }
 
   @override
+  get hasAnimated => (super.key as GlobalKey).currentState == null ? false :
+    ((super.key as GlobalKey).currentState as ChocolateLoaderWidgetState).hasAnimated;
+
+  @override
   State<StatefulWidget> createState() => ChocolateLoaderWidgetState();
 }
 
 class ChocolateLoaderWidgetState extends State<ChocolateLoaderWidget> with SingleTickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
-  bool finishing = false;
+  bool finishing = false, hasAnimated = false;
 
   @override
   void initState() {
@@ -75,6 +79,7 @@ class ChocolateLoaderWidgetState extends State<ChocolateLoaderWidget> with Singl
 
   void startLoadingAnimation() {
     controller.forward();
+    hasAnimated = true;
   }
 
   Future<int> finishLoadingAnimation() async {

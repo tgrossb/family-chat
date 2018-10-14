@@ -55,7 +55,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(kGROUPS_CHILD);
+    mainRef = db.reference().child(DatabaseConstants.kGROUPS_CHILD);
     mainRef.keepSynced(true);
     addSub = mainRef.onChildAdded
         .listen((Event event) => _onGroupAdded(event.snapshot));
@@ -186,7 +186,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   Future<GroupData> getGroupData(String groupName) async {
     Event event = await mainRef
         .child(groupName)
-        .child(kMESSAGES_CHILD)
+        .child(DatabaseConstants.kMESSAGES_CHILD)
         .limitToLast(1)
         .onChildAdded
         .first;

@@ -53,7 +53,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(kGROUPS_CHILD).child(groupName).child(kMESSAGES_CHILD);
+    mainRef = db.reference().child(DatabaseConstants.kGROUPS_CHILD).child(groupName).child(DatabaseConstants.kMESSAGES_CHILD);
     mainRef.keepSynced(true);
     mainRefSubscription = mainRef.onChildAdded.listen(_onMessageAdded);
 

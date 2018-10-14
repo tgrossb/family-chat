@@ -54,10 +54,10 @@ class DatabaseWriter {
   }
 
   static Future<bool> registerNewUser({@required Me me}) async {
-    bool successful = await performCheckedOperation(kUSERS_CHILD, me.toDatabaseChild());
+    bool successful = await performCheckedOperation(DatabaseConstants.kUSERS_CHILD, me.toDatabaseChild());
     if (!successful)
       return false;
-    successful = await performCheckedOperation(kUSERS_LIST_CHILD, {me.uid: "uid"});
+    successful = await performCheckedOperation(DatabaseConstants.kUSERS_LIST_CHILD, {me.uid: "uid"});
     if (!successful)
       return false;
 
@@ -70,7 +70,7 @@ class DatabaseWriter {
 
   // They must be a registered user as well, verified by database rules
   static Future<void> registerNewSudoer({@required User user}) async {
-    await Database.database.reference().child(kSUDOERS_CHILD).set({user.uid: "uid"});
+    await Database.database.reference().child(DatabaseConstants.kSUDOERS_CHILD).set({user.uid: "uid"});
 
     // Update the database class to reflect this change
     Database.sudoerUids.add(user.uid);
@@ -92,26 +92,26 @@ class DatabaseWriter {
 
     Map group = {
       groupName: {
-        kADMINS_CHILD: adminsMap,
-        kMEMBERS_CHILD: membersMap,
-        kMESSAGES_CHILD: {
+        DatabaseConstants.kADMINS_CHILD: adminsMap,
+        DatabaseConstants.kMEMBERS_CHILD: membersMap,
+        DatabaseConstants.kMESSAGES_CHILD: {
           Utils.timeToKeyString(DateTime.now()): {
-            kNAME_CHILD: "System",
-            kTEXT_CHILD: "${Database.me.name} created the group $groupName"
+            DatabaseConstants.kNAME_CHILD: "System",
+            DatabaseConstants.kTEXT_CHILD: "${Database.me.name} created the group $groupName"
           }
         }
       }
     };
 
-    Database.database.reference().child(kGROUPS_CHILD).set(group);
-    Database.database.reference().child(kGROUPS_LIST_CHILD).set({groupName: "group"});
+    Database.database.reference().child(DatabaseConstants.kGROUPS_CHILD).set(group);
+    Database.database.reference().child(DatabaseConstants.kGROUPS_LIST_CHILD).set({groupName: "group"});
 
     // Update the database class to reflect this change
-    DateTime utcTime = group[groupName][kMESSAGES_CHILD].keys[0];
+    DateTime utcTime = group[groupName][DatabaseConstants.kMESSAGES_CHILD].keys[0];
     GroupData groupData = GroupData(
         utcTime: utcTime,
         name: groupName,
-        firstMessages: [MessageData.fromSnapshotValue(message: group[groupName][kMESSAGES_CHILD][utcTime])],
+        firstMessages: [MessageData.fromSnapshotValue(message: group[groupName][DatabaseConstants.kMESSAGES_CHILD][utcTime])],
         admins: admins,
         members: members
     );
@@ -121,7 +121,7 @@ class DatabaseWriter {
   }
 
   static void removeGroup(String groupName){
-    Database.database.reference().child("$kGROUPS_CHILD/$groupName").remove();
+    Database.database.reference().child("$DatabaseConstants.kGROUPS_CHILD/$groupName").remove();
 
     // Update the database class to reflect this change
     Database.groupNames.remove(groupName);
@@ -129,11 +129,11 @@ class DatabaseWriter {
   }
 
   static void addMessage({@required String groupName, @required MessageData message}) async {
-    Database.database.reference().child("$kGROUPS_CHILD/$groupName/$kMESSAGES_CHILD").set(
+    Database.database.reference().child("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kMESSAGES_CHILD").set(
       {
         Utils.timeToKeyString(message.utcTime): {
-          kNAME_CHILD: message.name,
-          kTEXT_CHILD: message.text
+          DatabaseConstants.kNAME_CHILD: message.name,
+          DatabaseConstants.kTEXT_CHILD: message.text
         }
       });
 
@@ -147,7 +147,7 @@ class DatabaseReader {
   // This will cause an error if the user doesn't exist
   static Future<bool> userExists() async {
     try {
-      await loadFullChild(kUSER_EXISTS_TEST);
+      await loadFullChild(DatabaseConstants.kUSER_EXISTS_TEST);
     } catch (e){
       if (e is DatabaseError) {
         print("User doesn't exist");
@@ -162,7 +162,7 @@ class DatabaseReader {
   // Loads a list of all sudoers' uids in the database
   // TODO: I don't **think** we need this
   static Future<List<String>> loadSudoerUids() async {
-    DataSnapshot sudoersSnap = await loadFullChild(kSUDOERS_CHILD);
+    DataSnapshot sudoersSnap = await loadFullChild(DatabaseConstants.kSUDOERS_CHILD);
     print("Loading sudoers, snapped value: " + sudoersSnap.value.toString() + ", snapped key: " + sudoersSnap.key.toString());
 
     Database.sudoerUids = scrapeSnapshotKeys(sudoersSnap);
@@ -171,7 +171,7 @@ class DatabaseReader {
 
   // Loads a list of all users in the database without their data
   static Future<List<String>> loadUserUids() async {
-    DataSnapshot usersSnap = await loadFullChild(kUSERS_LIST_CHILD);
+    DataSnapshot usersSnap = await loadFullChild(DatabaseConstants.kUSERS_LIST_CHILD);
     Database.userUids = scrapeSnapshotKeys(usersSnap);
     return Database.userUids;
   }
@@ -192,14 +192,14 @@ class DatabaseReader {
 
       // Query the public data of each user
       // Access is denied to private data, so this is not the only defense
-      DataSnapshot userSnap = await loadFullChild("$kUSERS_CHILD/$uid/$kUSER_PUBLIC_VARS");
+      DataSnapshot userSnap = await loadFullChild("$DatabaseConstants.kUSERS_CHILD/$uid/$DatabaseConstants.kUSER_PUBLIC_VARS");
 
       // Convert each user to a User object and add it to the map
       Database.userFromUid[uid] = User.fromSnapshot(uid: uid, snapshot: userSnap);
     }
 
     // Find me in the user data, and get private info as well
-    DataSnapshot meSnap = await loadFullChild("$kUSERS_CHILD/$myUid");
+    DataSnapshot meSnap = await loadFullChild("$DatabaseConstants.kUSERS_CHILD/$myUid");
     Database.me = Me.fromSnapshot(snapshot: meSnap);
 
     return Database.userFromUid.values;
@@ -207,7 +207,7 @@ class DatabaseReader {
 
   // Loads a list of all groups in the database (available to this user)
   static Future<List<String>> loadGroupNames() async {
-    DataSnapshot groupsSnap = await loadFullChild(kGROUPS_LIST_CHILD);
+    DataSnapshot groupsSnap = await loadFullChild(DatabaseConstants.kGROUPS_LIST_CHILD);
 
     Database.groupNames = scrapeSnapshotKeys(groupsSnap);
     return Database.groupNames;
@@ -245,20 +245,20 @@ class DatabaseReader {
 
   // Loads all admins from a group as a list of uids
   static Future<List<String>> loadAdmins(String groupName) async {
-    DataSnapshot adminsSnap = await loadFullChild("$kGROUPS_CHILD/$groupName/$kADMINS_CHILD");
+    DataSnapshot adminsSnap = await loadFullChild("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kADMINS_CHILD");
     return scrapeSnapshotKeys(adminsSnap);
   }
 
   // Loads all members from a group as a list of uids
   static Future<List<String>> loadMembers(String groupName) async {
-    DataSnapshot membersSnap = await loadFullChild("$kGROUPS_CHILD/$groupName/$kMEMBERS_CHILD");
+    DataSnapshot membersSnap = await loadFullChild("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kMEMBERS_CHILD");
     return scrapeSnapshotKeys(membersSnap);
   }
 
   // Loads all messages from a group as a list of MessageData objects
   // TODO: Load a chunk and stream others
   static Future<List<MessageData>> loadMessages(String groupName) async {
-    DataSnapshot messagesSnap = await loadFullChild("$kGROUPS_CHILD/$groupName/$kMESSAGES_CHILD", true);
+    DataSnapshot messagesSnap = await loadFullChild("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kMESSAGES_CHILD", true);
 
     List<MessageData> messages = [];
     for (var messageKey in messagesSnap.value.keys)
@@ -275,7 +275,7 @@ class DatabaseReader {
   Future<List<String>> loadUserUids([int chunk = 1]) async {
     print("Getting uids with chunk size $chunk");
     userUids = [];
-    Stream<List<Event>> chunkStream = chunkLoad(chunkSize: chunk, location: kUSERS_LIST_CHILD, clearFirst: true);
+    Stream<List<Event>> chunkStream = chunkLoad(chunkSize: chunk, location: DatabaseConstants.kUSERS_LIST_CHILD, clearFirst: true);
     chunkStream.listen((List<Event> recChunk){
       print("Rec chunk length: ${recChunk.length}");
       for (Event event in recChunk) {
@@ -293,7 +293,7 @@ class DatabaseReader {
       s.add(e.snapshot.key);
     print("Returning ${s.toString()}");
     return s;
-//    return scrapeSnapshotKeys(await loadFullChild(kUSERS_LIST_CHILD));
+//    return scrapeSnapshotKeys(await loadFullChild(DatabaseConstants.kUSERS_LIST_CHILD));
   }
 */
 
@@ -379,7 +379,7 @@ class DatabaseReader {
 /*
   Future<List<String>> loadUsers([Function(List<String>) callback, int chunk = 0]) async {
     users = [];
-    Stream<List<Event>> stream = chunkLoad(chunk, kUSERS_LIST_CHILD);
+    Stream<List<Event>> stream = chunkLoad(chunk, DatabaseConstants.kUSERS_LIST_CHILD);
 //    stream = stream.asBroadcastStream();
 //    stream.listen((List<Event> chunked) => chunked.forEach((Event event) => users.add(event.snapshot.value.toString())));
 //    List<Event> firstRes = await stream.first;

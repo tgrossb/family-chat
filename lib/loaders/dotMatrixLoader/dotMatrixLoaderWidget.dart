@@ -6,19 +6,22 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/loaders/loader.dart';
 import 'package:bodt_chat/loaders/dotMatrixLoader/dotMatrixLoaderAnimation.dart';
+import 'package:bodt_chat/loaders/dotMatrixLoader/dotMatrixFromContainerWidget.dart';
 
 class DotMatrixLoaderWidget extends StatefulWidget implements Loader {
   final double padding, diameter, hMult;
   final Color color;
-  final Duration _duration;
+  final Duration _duration, _fromContainerDuration;
 
   DotMatrixLoaderWidget({GlobalKey key,
     this.padding = DotConstants.kDOT_PADDING,
     this.diameter = DotConstants.kDOT_DIAMETER,
     this.color = DotConstants.kDOT_COLOR,
     this.hMult = DotConstants.kDOT_H_MULT,
-    Duration duration}):
+    Duration duration,
+    Duration fromContainerDuration}):
       _duration = duration ?? Duration(milliseconds: DotConstants.kDOT_DURATION),
+      _fromContainerDuration = fromContainerDuration ?? Duration(milliseconds: DotConstants.kDOT_FROM_CONTAINER_DURATION),
       super(key: key ?? GlobalKey());
 
   @override
@@ -40,13 +43,21 @@ class DotMatrixLoaderWidget extends StatefulWidget implements Loader {
   }
 
   @override
+  get hasAnimated => (super.key as GlobalKey).currentState == null ? false :
+  ((super.key as GlobalKey).currentState as DotMatrixLoaderWidgetState).hasAnimated;
+
+  @override
   State<StatefulWidget> createState() => DotMatrixLoaderWidgetState();
+
+  get fromContainerDuration => _fromContainerDuration;
 }
 
-class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with SingleTickerProviderStateMixin {
-  AnimationController controller;
-  Animation animation;
-  bool finishing = false;
+class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with TickerProviderStateMixin {
+  AnimationController fromContainerController, controller;
+  Animation dotRadiusAnimation, dotDiameterAnimation, animation;
+  bool finishing = false, hasAnimated = false;
+  GlobalKey fromContainerWidget = GlobalKey();
+  int loopCounter = 0;
 
   @override
   void initState() {
@@ -54,17 +65,25 @@ class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with Singl
     controller = AnimationController(vsync: this, duration: widget._duration);
     animation = Tween(begin: 0.0, end: math.pi * 2).animate(controller);
 
-    // Repeat the controller when it finishes
+    // Repeat the controller when it finishes and increment the counter
     controller.addStatusListener((AnimationStatus status){
-      if (status == AnimationStatus.completed && !finishing)
+      if (status == AnimationStatus.completed && !finishing) {
         controller.forward(from: 0.0);
+        setState(() {
+          loopCounter++;
+        });
+      }
     });
 
     super.initState();
   }
 
   void startLoadingAnimation() async {
-    controller.forward();
+    // First, show the animation going from the singleBaseContainer to the start state
+    while (fromContainerWidget.currentWidget == null){}
+
+    (fromContainerWidget.currentWidget as DotMatrixFromContainerWidget).startAnimation();
+    hasAnimated = true;
   }
 
   Future<int> finishLoadingAnimation() async {
@@ -79,7 +98,14 @@ class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with Singl
 
   @override
   Widget build(BuildContext context) {
-    return DotMatrixLoaderAnimation(animation: animation, widget: widget);
+    if (controller.status == AnimationStatus.forward)
+      return DotMatrixLoaderAnimation(animation: animation, widget: widget, loopCounter: loopCounter);
+
+    return DotMatrixFromContainerWidget(key: fromContainerWidget, loaderWidget: widget, finishedCallback: (){
+      setState(() {
+        controller.forward();
+      });
+    });
   }
 
   @override

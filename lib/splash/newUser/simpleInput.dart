@@ -59,6 +59,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
   // Not going to lie... I forgot what this variable is for
   String prefix = "";
   GlobalKey<FormFieldState> fieldKey;
+  bool valid = true;
 
   @override
   void initState(){
@@ -81,6 +82,15 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
     });
   }
 
+  String validate(String value){
+    param.value = prefix + value;
+    String validation = widget.validate(prefix + value, param, widget.isRequired, widget.label);
+//    setState(() {
+      valid = validation == null;
+//    });
+    return validation;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -92,7 +102,10 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
   Color getCurrentBorderColor(BuildContext context){
     Color defaultIconColor = Colors.black45;  // Found in Flutter source code (https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/input_decorator.dart, line 1630 ish)
     Color focusedIconColor = Theme.of(context).primaryColor;
-    return widget.focusNode.hasFocus ? focusedIconColor : defaultIconColor;
+    if (valid)
+      return widget.focusNode.hasFocus ? focusedIconColor : defaultIconColor;
+    else
+      return widget.focusNode.hasFocus ? Theme.of(context).inputDecorationTheme.errorStyle.color : Theme.of(context).inputDecorationTheme.errorStyle.color;
   }
 
   Widget buildSwitch(BuildContext context){
@@ -169,10 +182,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
                 ),
 
                 onSaved: (value) => param.value = value,
-                validator: (value){
-                  param.value = prefix + value;
-                  return widget.validate(prefix + value, param, widget.isRequired, widget.label);
-                },
+                validator: validate,
                 inputFormatters: widget.inputFormatters,
                 onFieldSubmitted: (String s){
                   fieldKey.currentState.validate();

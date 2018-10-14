@@ -11,4 +11,6 @@ abstract class Loader {
 
   // This marks the animation as needing to finish, and returns 0 once the animation finishes successfully
   Future<int> finishLoadingAnimation();
+
+  get hasAnimated;
 }
