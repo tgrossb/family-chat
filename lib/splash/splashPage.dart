@@ -17,13 +17,14 @@ import 'package:flutter/animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:bodt_chat/groupsList/groupsListScreen.dart';
-import 'package:bodt_chat/splash/loadingAnimationWidget.dart';
-import 'package:bodt_chat/splash/signInButton.dart';
+import 'package:bodt_chat/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart';
+import 'package:bodt_chat/widgetUtils/animatedLoadingButton.dart';
+//import 'package:bodt_chat/splash/signInButton.dart';
 import 'package:bodt_chat/splash/newUser/newUserPage.dart';
 import 'package:bodt_chat/widgetUtils/routes.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
-import 'package:bodt_chat/loaderTest.dart';
+//import 'package:bodt_chat/loaderTest.dart';
 
 
 class SplashPage extends StatefulWidget {
@@ -255,18 +256,22 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       body: new Container(
         color: Theme.of(context).accentColor,
         child: new Center(
-          child: loading || startFinishFlag || finishingStarted || finished ?
-          new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new LoadingAnimationWidget(animation: loadingAnimation, count: animationCount),
-            ],
-          ) :
-
-          new SignInButton(
-              controller: signInButtonToLoadingController,
-              startAnimation: () => signInButtonToLoadingController.forward()
-          ),
+//          child: loading || startFinishFlag || finishingStarted || finished ?
+//          new Column(
+//            mainAxisAlignment: MainAxisAlignment.center,
+//            children: <Widget>[
+//              new LoadingAnimationWidget(animation: loadingAnimation, count: animationCount),
+//            ],
+//          ) :
+//
+//          new SignInButton(
+//              controller: signInButtonToLoadingController,
+//              startAnimation: () => signInButtonToLoadingController.forward()
+//          ),
+          child: AnimatedLoadingButton(
+              text: Text("Sign in with Google", style: Theme.of(context).primaryTextTheme.title),
+              loaderAnimation: DotMatrixLoaderWidget(),
+              backgroundColor: Theme.of(context).primaryColor),
         ),
       ),
     );

@@ -92,11 +92,11 @@ class _NewUserFormState extends State<NewUserForm> {
     MaskedTextInputFormatter dobFormatter = NewUserForm.getDateMask();
 
     params = [
-      new UserParameter<String>(name: kUSER_NAME, value: widget.newUser.displayName?? "", private: false),
-      new UserParameter<String>(name: kUSER_EMAIL, value: widget.newUser.email?? "", private: false),
-      new UserParameter<String>(name: kUSER_CELLPHONE, value: widget.newUser.phoneNumber?? "", private: true),
-      new UserParameter<String>(name: kUSER_HOME_PHONE, value: "", private: true),
-      new UserParameter<String>(name: kUSER_DOB, value: "", private: true)
+      new UserParameter<String>(name: DatabaseConstants.kUSER_NAME, value: widget.newUser.displayName?? "", private: false),
+      new UserParameter<String>(name: DatabaseConstants.kUSER_EMAIL, value: widget.newUser.email?? "", private: false),
+      new UserParameter<String>(name: DatabaseConstants.kUSER_CELLPHONE, value: widget.newUser.phoneNumber?? "", private: true),
+      new UserParameter<String>(name: DatabaseConstants.kUSER_HOME_PHONE, value: "", private: true),
+      new UserParameter<String>(name: DatabaseConstants.kUSER_DOB, value: "", private: true)
     ];
 
     fieldsParams = [

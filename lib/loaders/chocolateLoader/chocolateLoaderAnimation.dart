@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/loaders/chocolateLoader/chocolateLoaderWidget.dart';
 import 'package:bodt_chat/loaders/chocolateLoader/barPainter.dart';
-import 'package:bodt_chat/constants.dart';
 
 class ChocolateLoaderAnimation extends AnimatedWidget {
   final ChocolateLoaderWidget widget;

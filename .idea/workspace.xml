@@ -6,12 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/lib/dataUtils/database.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/database.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/dialogs/countryPickerDialog.dart" afterPath="$PROJECT_DIR$/lib/dialogs/countryPickerDialog.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" afterPath="$PROJECT_DIR$/lib/main.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/searchablePopupMenu/show.dart" afterPath="$PROJECT_DIR$/lib/searchablePopupMenu/show.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/constants.dart" afterPath="$PROJECT_DIR$/lib/constants.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" afterPath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" afterPath="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/loaders/chocolateLoader/squarePainter.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/loaders/loader.dart" afterPath="$PROJECT_DIR$/lib/loaders/loader.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/splash/loadingAnimationWidget.dart" afterPath="$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/defInputs/emailInput.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/splash/newUser/defInputs/nameInput.dart" afterPath="" />
       <change beforePath="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" afterPath="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/widgetUtils/validators.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/validators.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/splash/splashPage.dart" afterPath="$PROJECT_DIR$/lib/splash/splashPage.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -26,12 +31,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="splashPage.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="splashPage.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/splash/splashPage.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-702">
-              <caret line="125" column="0" lean-forward="false" selection-start-line="125" selection-start-column="0" selection-end-line="125" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="264">
+              <caret line="274" column="0" lean-forward="false" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
+              <folding>
+                <element signature="e#347#367#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -49,41 +56,43 @@
       <file leaf-file-name="newUserPage.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1578">
-              <caret line="187" column="0" lean-forward="false" selection-start-line="187" selection-start-column="0" selection-end-line="187" selection-end-column="0" />
+            <state relative-caret-position="336">
+              <caret line="169" column="57" lean-forward="true" selection-start-line="169" selection-start-column="57" selection-end-line="169" selection-end-column="57" />
               <folding>
-                <element signature="e#0#9618#0" expanded="true" />
+                <element signature="e#0#9708#0" expanded="true" />
                 <element signature="e#347#367#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="show.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/searchablePopupMenu/show.dart">
+      <file leaf-file-name="constants.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/constants.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
-              <caret line="289" column="1" lean-forward="false" selection-start-line="289" selection-start-column="1" selection-end-line="289" selection-end-column="1" />
+            <state relative-caret-position="534">
+              <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="countryPickerButton.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/widgetUtils/countryPickerButton.dart">
+      <file leaf-file-name="animatedLoadingButton.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1242">
-              <caret line="72" column="3" lean-forward="false" selection-start-line="72" selection-start-column="3" selection-end-line="72" selection-end-column="3" />
-              <folding />
+            <state relative-caret-position="-468">
+              <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="countryPickerDialog.dart" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/lib/dialogs/countryPickerDialog.dart">
+      <file leaf-file-name="loader.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/loaders/loader.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="88" column="37" lean-forward="false" selection-start-line="88" selection-start-column="37" selection-end-line="88" selection-end-column="37" />
+            <state relative-caret-position="0">
+              <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -99,31 +108,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="searchablePopupMenuButton.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/searchablePopupMenu/searchablePopupMenuButton.dart">
+      <file leaf-file-name="dotMatrixLoaderWidget.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1422">
-              <caret line="80" column="30" lean-forward="false" selection-start-line="80" selection-start-column="30" selection-end-line="80" selection-end-column="30" />
-              <folding />
+            <state relative-caret-position="234">
+              <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="validators.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/widgetUtils/validators.dart">
+      <file leaf-file-name="signInButton.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/splash/signInButton.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="92" column="0" lean-forward="false" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="database.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/dataUtils/database.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18">
-              <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+            <state relative-caret-position="396">
+              <caret line="100" column="68" lean-forward="true" selection-start-line="100" selection-start-column="68" selection-end-line="100" selection-end-column="68" />
               <folding />
             </state>
           </provider>
@@ -134,16 +135,13 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Class" />
         <option value="Dart File" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Construc</find>
-      <find>data.dart</find>
-      <find>Data</find>
-      <find>GroupData</find>
       <find>sort</find>
       <find>DropdownButton</find>
       <find>Dropdown</find>
@@ -170,6 +168,10 @@
       <find>SimpleInput</find>
       <find>Search</find>
       <find>Icon</find>
+      <find>const</find>
+      <find>kLOADING_H_MULT</find>
+      <find>kLOADING_PADDING</find>
+      <find>textSpan</find>
     </findStrings>
     <replaceStrings>
       <replace>kLOADING_H_MULT</replace>
@@ -182,6 +184,12 @@
       <replace>MatrixLoaderWidget</replace>
       <replace>inset</replace>
       <replace>slope</replace>
+      <replace>static const</replace>
+      <replace>DotConstants.kLOADING</replace>
+      <replace>widget.hMult</replace>
+      <replace>widget.diameter</replace>
+      <replace>widget.padding</replace>
+      <replace>text</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -195,10 +203,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/lib/splash/newUser/nameInput.dart" />
-        <option value="$PROJECT_DIR$/lib/splash/newUser/emailInput.dart" />
-        <option value="$PROJECT_DIR$/lib/splash/newUser/defInputs/emailInput.dart" />
-        <option value="$PROJECT_DIR$/lib/splash/newUser/simpleDateInput.dart" />
         <option value="$PROJECT_DIR$/lib/splash/newUser/validators.dart" />
         <option value="$PROJECT_DIR$/lib/splash/newUser/maskedTextInputFormatter.dart" />
         <option value="$PROJECT_DIR$/lib/splash/newUser/simplePhoneInput.dart" />
@@ -217,35 +221,39 @@
         <option value="$PROJECT_DIR$/lib/splash/newUser/inputs/countrySelector.dart" />
         <option value="$PROJECT_DIR$/lib/splash/newUser/inputs/countrySelector/countryList.dart" />
         <option value="$PROJECT_DIR$/lib/dataUtils/countryList.dart" />
-        <option value="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/countryPickerButton.dart" />
         <option value="$PROJECT_DIR$/lib/dataUtils/user.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/animatedLoadingWidget.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/matrixLoader.dart" />
-        <option value="$PROJECT_DIR$/lib/loaders/loader.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/matrixLoaderWidget.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderWidgetBackup.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderAnimatedWidget.dart" />
-        <option value="$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart" />
         <option value="$PROJECT_DIR$/lib/loaderTest.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderWidget.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderAnimation.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/squarePainter.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/severedSquarePainter.dart" />
         <option value="$PROJECT_DIR$/lib/splash/splash_page.dart" />
-        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/barPainter.dart" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
-        <option value="$PROJECT_DIR$/lib/constants.dart" />
-        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" />
-        <option value="$PROJECT_DIR$/lib/splash/splashPage.dart" />
         <option value="$PROJECT_DIR$/lib/splash/newUser/simpleInput.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/validators.dart" />
         <option value="$PROJECT_DIR$/lib/dataUtils/database.dart" />
-        <option value="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" />
         <option value="$PROJECT_DIR$/lib/searchablePopupMenu/show.dart" />
         <option value="$PROJECT_DIR$/lib/main.dart" />
         <option value="$PROJECT_DIR$/lib/dialogs/countryPickerDialog.dart" />
+        <option value="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/dotMatrixLoader.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderAnimation.java" />
+        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderAnimation.dart" />
+        <option value="$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart" />
+        <option value="$PROJECT_DIR$/lib/constants.dart" />
+        <option value="$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/loader.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart" />
+        <option value="$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart" />
+        <option value="$PROJECT_DIR$/lib/splash/splashPage.dart" />
       </list>
     </option>
   </component>
@@ -294,18 +302,6 @@
               <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
               <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="dialogs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="groupsList" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
               <item name="loaders" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -313,13 +309,7 @@
               <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
               <item name="loaders" type="462c0819:PsiDirectoryNode" />
-              <item name="chocolateLoader" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
-              <item name="bodt_chat" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="searchablePopupMenu" type="462c0819:PsiDirectoryNode" />
+              <item name="dotMatrixLoader" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="bodt_chat" type="b2602c69:ProjectViewProjectNode" />
@@ -354,19 +344,19 @@
     <property name="dart.analysis.tool.window.force.activate" value="false" />
     <property name="show.migrate.to.gradle.popup" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
-    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/theo/Android/AndroidStudioProjects/bodt_chat/lib/main.dart&#10;Data&#9;null&#9;null&#10;GroupsListItem&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/theo/Android/AndroidStudioProjects/bodt_chat/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart&#10;Data&#9;null&#9;null&#10;GroupsListItem&#9;null&#9;null" />
     <property name="settings.editor.selected.configurable" value="flutter.settings" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/loaders/dotMatrixLoader" />
+      <recent name="$PROJECT_DIR$/lib/loaders" />
       <recent name="$PROJECT_DIR$/lib/loaders/chocolateLoader" />
       <recent name="$PROJECT_DIR$/lib/splash/newUser" />
       <recent name="$PROJECT_DIR$/lib/splash/newUser/inputs/countrySelector" />
-      <recent name="$PROJECT_DIR$/lib/dialogs" />
-      <recent name="$PROJECT_DIR$/lib/widgetUtils" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/lib" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -565,8 +555,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/lib/representativeDropdown/representativeDropdown.dart" />
-    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/alternateDropdown.dart" />
     <entry file="file://$USER_HOME$/computerScience/flutter/flutter/packages/flutter/lib/src/material/dropdown.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4368">
@@ -633,14 +621,6 @@
     <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/simplePhoneInput.dart" />
     <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/countrySelector/countryList.dart" />
     <entry file="file://$PROJECT_DIR$/assets/flags/CountryPicker.java" />
-    <entry file="file://$PROJECT_DIR$/lib/dataUtils/countryList.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4590">
-          <caret line="255" column="0" lean-forward="false" selection-start-line="255" selection-start-column="0" selection-end-line="255" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/groupsList/groupsListItem.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="304">
@@ -676,14 +656,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/dataUtils/dataBundles.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3816">
-          <caret line="216" column="0" lean-forward="false" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/dataUtils/user.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="552">
@@ -694,52 +666,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoaderAnimatedWidget.dart" />
     <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoaderWidgetBackup.dart" />
-    <entry file="file://$PROJECT_DIR$/lib/loaders/loader.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/signInButton.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1692">
-          <caret line="97" column="22" lean-forward="false" selection-start-line="97" selection-start-column="22" selection-end-line="97" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/squarePainter.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#39#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/loadingAnimationWidget.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="782">
-          <caret line="236" column="0" lean-forward="false" selection-start-line="236" selection-start-column="0" selection-end-line="236" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/computerScience/flutter/flutter/packages/flutter/lib/src/rendering/custom_paint.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="296">
           <caret line="179" column="7" lean-forward="false" selection-start-line="179" selection-start-column="7" selection-end-line="179" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="39" lean-forward="false" selection-start-line="0" selection-start-column="39" selection-end-line="0" selection-end-column="39" />
           <folding />
         </state>
       </provider>
@@ -773,40 +703,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="14" column="42" lean-forward="false" selection-start-line="14" selection-start-column="42" selection-end-line="14" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/constants.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="13" column="53" lean-forward="false" selection-start-line="13" selection-start-column="53" selection-end-line="13" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#39#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/splashPage.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-702">
-          <caret line="125" column="0" lean-forward="false" selection-start-line="125" selection-start-column="0" selection-end-line="125" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/widgetUtils/validators.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="282">
@@ -820,17 +716,6 @@
         <state relative-caret-position="18">
           <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1578">
-          <caret line="187" column="0" lean-forward="false" selection-start-line="187" selection-start-column="0" selection-end-line="187" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9618#0" expanded="true" />
-            <element signature="e#347#367#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -866,6 +751,93 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/lib/dialogs/countryPickerDialog.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/dataUtils/countryList.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4590">
+          <caret line="255" column="0" lean-forward="false" selection-start-line="255" selection-start-column="0" selection-end-line="255" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/dataUtils/dataBundles.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="358">
+          <caret line="214" column="64" lean-forward="false" selection-start-line="214" selection-start-column="64" selection-end-line="214" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/squarePainter.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderAnimation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderAnimation.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#39#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderAnimation.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#39#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/chocolateLoader/chocolateLoaderWidget.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="462">
+          <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#3618#0" expanded="true" />
+            <element signature="e#279#299#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/constants.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="534">
+          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/loader.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="552">
@@ -874,11 +846,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/dialogs/countryPickerDialog.dart">
+    <entry file="file://$PROJECT_DIR$/lib/widgetUtils/animatedLoadingButton.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="88" column="37" lean-forward="false" selection-start-line="88" selection-start-column="37" selection-end-line="88" selection-end-column="37" />
+        <state relative-caret-position="-468">
+          <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/splash/signInButton.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="100" column="68" lean-forward="true" selection-start-line="100" selection-start-column="68" selection-end-line="100" selection-end-column="68" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/splash/newUser/newUserPage.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="169" column="57" lean-forward="true" selection-start-line="169" selection-start-column="57" selection-end-line="169" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#9708#0" expanded="true" />
+            <element signature="e#347#367#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/splash/splashPage.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="274" column="0" lean-forward="false" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
+          <folding>
+            <element signature="e#347#367#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
