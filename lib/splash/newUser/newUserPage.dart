@@ -141,7 +141,8 @@ class _NewUserFormState extends State<NewUserForm> {
       homePhone: params[3],
       dob: params[4]
     );
-    await DatabaseWriter.registerNewUser(me: me);
+    bool successful = await DatabaseWriter.registerNewUser(me: me);
+    print("Registering new user successful? $successful");
   }
 
   Widget buildSubmitButton(BuildContext context){

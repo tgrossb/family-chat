@@ -43,13 +43,29 @@ class Database {
 }
 
 class DatabaseWriter {
-  static Future<void> registerNewUser({@required Me me}) async {
-    await Database.database.reference().child("$kUSERS_CHILD").set(me.toDatabaseChild()).catchError((e) => throw e);
-    await Database.database.reference().child("$kUSERS_LIST_CHILD").set({me.uid: "uid"}).catchError((e) => throw e);
+  static Future<bool> performCheckedOperation(String child, var value) async {
+    bool successful = true;
+    await Database.database.reference().child(child).set(value).catchError((e){
+      successful = false;
+      throw e;
+    });
+
+    return successful;
+  }
+
+  static Future<bool> registerNewUser({@required Me me}) async {
+    bool successful = await performCheckedOperation(kUSERS_CHILD, me.toDatabaseChild());
+    if (!successful)
+      return false;
+    successful = await performCheckedOperation(kUSERS_LIST_CHILD, {me.uid: "uid"});
+    if (!successful)
+      return false;
 
     // Update the database class to reflect this change
     Database.userUids.add(me.uid);
     Database.userFromUid[me.uid] = me;
+
+    return true;
   }
 
   // They must be a registered user as well, verified by database rules

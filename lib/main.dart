@@ -84,6 +84,8 @@ final ThemeData defaultTheme = new ThemeData(
 //  primaryIconTheme: IconThemeData(color: Colors.white70),
 //  brightness: Brightness.light,
 //  textTheme: Typography(platform: defaultTargetPlatform).white,
+
+  dialogBackgroundColor: Color(0xffeeeeee)
 );
 
 void main() {

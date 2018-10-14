@@ -90,8 +90,7 @@ class Validators {
     String onEmpty = "Please enter your ${label.toLowerCase()}";
     String onMismatch = "Please enter a valid ${label.toLowerCase()} number";
     value = RegExp(r"[0-9]").allMatches(value).map((m) => m[0]).join();
-    // TODO: The regex below needs to be 13 to 11 matches, but I need to check how to do that
-    return _validate(value, param, isRequired, onEmpty, onMismatch, RegExp(r"\d{13-11}"), save);
+    return _validate(value, param, isRequired, onEmpty, onMismatch, RegExp(r"\d{11,13}"), save);
   }
 
   // This doesn't work yet
