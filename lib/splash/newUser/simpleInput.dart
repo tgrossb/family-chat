@@ -85,9 +85,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
   String validate(String value){
     param.value = prefix + value;
     String validation = widget.validate(prefix + value, param, widget.isRequired, widget.label);
-//    setState(() {
-      valid = validation == null;
-//    });
+    valid = validation == null;
     return validation;
   }
 
@@ -105,7 +103,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
     if (valid)
       return widget.focusNode.hasFocus ? focusedIconColor : defaultIconColor;
     else
-      return widget.focusNode.hasFocus ? Theme.of(context).inputDecorationTheme.errorStyle.color : Theme.of(context).inputDecorationTheme.errorStyle.color;
+      return Theme.of(context).inputDecorationTheme.errorStyle.color;
   }
 
   Widget buildSwitch(BuildContext context){
