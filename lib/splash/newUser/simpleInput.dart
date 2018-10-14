@@ -192,4 +192,10 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
         )
     );
   }
+
+  @override
+  void dispose() {
+    backgroundController.dispose();
+    super.dispose();
+  }
 }

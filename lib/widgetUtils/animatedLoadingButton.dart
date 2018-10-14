@@ -18,7 +18,7 @@ class AnimatedLoadingButton<T extends Widget> extends StatefulWidget {
     this.padding = LoadingButtonConstants.kBUTTON_PADDING,
     this.onClick}):
       _morphDuration = morphDuration ?? Duration(milliseconds: LoadingButtonConstants.kBUTTON_MORPH_DURATION),
-      assert(loaderAnimation is Loader),
+      assert(loaderAnimation is Loader || loaderAnimation == null),
       super(key: key ?? GlobalKey());
 
   @override
@@ -51,21 +51,24 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
     totalHeight = textHeight + widget.padding.top + widget.padding.bottom;
     totalWidth = textWidth + widget.padding.left + widget.padding.right;
 
-    Container loaderContainer = (widget.loaderAnimation as Loader).getSingleBaseContainer();
+    Container loaderContainer = widget.loaderAnimation == null ? null :
+        (widget.loaderAnimation as Loader).getSingleBaseContainer();
 
-    double widthEnd = loaderContainer.constraints.maxWidth;
+    double widthEnd = loaderContainer == null ? totalWidth : loaderContainer.constraints.maxWidth;
     widthMorph = Tween(begin: totalWidth, end: widthEnd).animate(
         CurvedAnimation(parent: controller.view, curve: Curves.linear));
 
-    double heightEnd = loaderContainer.constraints.maxHeight;
+    double heightEnd = loaderContainer == null ? totalHeight : loaderContainer.constraints.maxHeight;
     heightMorph = Tween(begin: totalHeight, end: heightEnd).animate(
         CurvedAnimation(parent: controller.view, curve: Curves.linear));
 
-    BoxDecoration decoration = loaderContainer.decoration;
-    colorMorph = ColorTween(begin: widget.backgroundColor, end: decoration.color).animate(
+    BoxDecoration decoration = loaderContainer == null ? null : loaderContainer.decoration;
+    Color endColor = loaderContainer == null ? widget.backgroundColor : decoration.color;
+    colorMorph = ColorTween(begin: widget.backgroundColor, end: endColor).animate(
         CurvedAnimation(parent: controller.view, curve: Curves.linear));
 
-    radiusMorph = BorderRadiusTween(begin: BorderRadius.all(Radius.circular(totalHeight/2)), end: decoration.borderRadius).animate(
+    BorderRadius endRadius = loaderContainer == null ? BorderRadius.all(Radius.circular(totalHeight/2)) : decoration.borderRadius;
+    radiusMorph = BorderRadiusTween(begin: BorderRadius.all(Radius.circular(totalHeight/2)), end: endRadius).animate(
       CurvedAnimation(parent: controller.view, curve: Curves.linear));
 
 
@@ -85,7 +88,11 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
   }
 
   Future<int> finishAnimation() async {
-    return await ((widget.loaderAnimation.key as GlobalKey).currentWidget as Loader).finishLoadingAnimation();
+    if (widget.loaderAnimation != null && (widget.loaderAnimation.key as GlobalKey).currentWidget != null)
+      return await ((widget.loaderAnimation.key as GlobalKey).currentWidget as Loader).finishLoadingAnimation();
+    controller.reverse();
+    while (controller.value > 0){}
+    return 0;
   }
 
   Widget buildButton(BuildContext context, Widget child){
@@ -109,10 +116,10 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
 
   @override
   Widget build(BuildContext context) {
-    if (controller.status != AnimationStatus.completed) {
+    if (controller.status != AnimationStatus.completed || widget.loaderAnimation == null) {
       print(controller.value);
       return GestureDetector(
-        onTap: startAnimation,
+        onTap: controller.status == AnimationStatus.forward ? null : startAnimation,
         child: AnimatedBuilder(
             animation: controller,
             builder: buildButton

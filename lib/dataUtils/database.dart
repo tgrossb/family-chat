@@ -121,7 +121,7 @@ class DatabaseWriter {
   }
 
   static void removeGroup(String groupName){
-    Database.database.reference().child("$DatabaseConstants.kGROUPS_CHILD/$groupName").remove();
+    Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}/$groupName").remove();
 
     // Update the database class to reflect this change
     Database.groupNames.remove(groupName);
@@ -129,7 +129,7 @@ class DatabaseWriter {
   }
 
   static void addMessage({@required String groupName, @required MessageData message}) async {
-    Database.database.reference().child("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kMESSAGES_CHILD").set(
+    Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}/$groupName/${DatabaseConstants.kMESSAGES_CHILD}").set(
       {
         Utils.timeToKeyString(message.utcTime): {
           DatabaseConstants.kNAME_CHILD: message.name,
@@ -192,17 +192,18 @@ class DatabaseReader {
 
       // Query the public data of each user
       // Access is denied to private data, so this is not the only defense
-      DataSnapshot userSnap = await loadFullChild("$DatabaseConstants.kUSERS_CHILD/$uid/$DatabaseConstants.kUSER_PUBLIC_VARS");
+      DataSnapshot userSnap = await loadFullChild("${DatabaseConstants.kUSERS_CHILD}/$uid/${DatabaseConstants.kUSER_PUBLIC_VARS}");
 
       // Convert each user to a User object and add it to the map
       Database.userFromUid[uid] = User.fromSnapshot(uid: uid, snapshot: userSnap);
     }
 
     // Find me in the user data, and get private info as well
-    DataSnapshot meSnap = await loadFullChild("$DatabaseConstants.kUSERS_CHILD/$myUid");
-    Database.me = Me.fromSnapshot(snapshot: meSnap);
+    DataSnapshot privateSnap = await loadFullChild("${DatabaseConstants.kUSERS_CHILD}/$myUid/${DatabaseConstants.kUSER_PRIVATE_VARS}");
+    DataSnapshot publicSnap = await loadFullChild("${DatabaseConstants.kUSERS_CHILD}/$myUid/${DatabaseConstants.kUSER_PUBLIC_VARS}");
+    Database.me = Me.fromSnapshots(uid: myUid, private: privateSnap, public: publicSnap);
 
-    return Database.userFromUid.values;
+    return Database.userFromUid.values.toList();
   }
 
   // Loads a list of all groups in the database (available to this user)
@@ -245,20 +246,20 @@ class DatabaseReader {
 
   // Loads all admins from a group as a list of uids
   static Future<List<String>> loadAdmins(String groupName) async {
-    DataSnapshot adminsSnap = await loadFullChild("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kADMINS_CHILD");
+    DataSnapshot adminsSnap = await loadFullChild("${DatabaseConstants.kGROUPS_CHILD}/$groupName/${DatabaseConstants.kADMINS_CHILD}");
     return scrapeSnapshotKeys(adminsSnap);
   }
 
   // Loads all members from a group as a list of uids
   static Future<List<String>> loadMembers(String groupName) async {
-    DataSnapshot membersSnap = await loadFullChild("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kMEMBERS_CHILD");
+    DataSnapshot membersSnap = await loadFullChild("${DatabaseConstants.kGROUPS_CHILD}/$groupName/${DatabaseConstants.kMEMBERS_CHILD}");
     return scrapeSnapshotKeys(membersSnap);
   }
 
   // Loads all messages from a group as a list of MessageData objects
   // TODO: Load a chunk and stream others
   static Future<List<MessageData>> loadMessages(String groupName) async {
-    DataSnapshot messagesSnap = await loadFullChild("$DatabaseConstants.kGROUPS_CHILD/$groupName/$DatabaseConstants.kMESSAGES_CHILD", true);
+    DataSnapshot messagesSnap = await loadFullChild("${DatabaseConstants.kGROUPS_CHILD}/$groupName/${DatabaseConstants.kMESSAGES_CHILD}", true);
 
     List<MessageData> messages = [];
     for (var messageKey in messagesSnap.value.keys)

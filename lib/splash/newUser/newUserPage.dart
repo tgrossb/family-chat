@@ -16,7 +16,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bodt_chat/splash/newUser/simpleInput.dart';
 import 'package:bodt_chat/widgetUtils/validators.dart';
 import 'package:bodt_chat/widgetUtils/maskedTextInputFormatter.dart';
-import 'package:bodt_chat/widgetUtils/countryPickerButton.dart';
+import 'package:bodt_chat/widgetUtils/animatedLoadingButton.dart';
+import 'package:bodt_chat/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
@@ -74,6 +75,7 @@ class _NewUserFormState extends State<NewUserForm> {
   static double continueHeight, continueWidth;
 
   GlobalKey<FormState> formKey;
+  GlobalKey submitButtonKey = new GlobalKey();
   ScrollController scrollController;
   String address;
   List<UserParameter<String>> params;
@@ -133,6 +135,11 @@ class _NewUserFormState extends State<NewUserForm> {
   }
 
   void handleForm() async {
+    if (!formKey.currentState.validate()){
+//      (submitButtonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
+      return;
+    }
+
     Me me = Me.fromParams(
       uid: widget.newUser.uid,
       name: params[0],
@@ -141,46 +148,13 @@ class _NewUserFormState extends State<NewUserForm> {
       homePhone: params[3],
       dob: params[4]
     );
+
     bool successful = await DatabaseWriter.registerNewUser(me: me);
     print("Registering new user successful? $successful");
-  }
 
-  Widget buildSubmitButton(BuildContext context){
-    TextStyle buttonTextStyle = Theme.of(context).primaryTextTheme.title;
-    if (continueHeight == null || continueWidth == null){
-      TextPainter buttonText = TextPainter(text: TextSpan(text: "Continue", style: buttonTextStyle), textDirection: TextDirection.ltr);
-      buttonText.layout();
-      continueHeight = buttonText.height;
-      continueWidth = buttonText.width;
-    }
-
-    double horizontalPadding = 32.0;
-    double verticalPadding = 12.0;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Center(
-          child: new GestureDetector(
-            onTap: () {
-              if (formKey.currentState.validate())
-                handleForm();
-            },
-            child: new Container(
-              width: continueWidth + horizontalPadding*2,
-              height: continueHeight + verticalPadding*2,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
-                child: Text("Continue", style: buttonTextStyle),
-              ),
-              alignment: FractionalOffset.center,
-              decoration: new BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: new BorderRadius.all(Radius.circular(continueHeight/2 + verticalPadding)),
-              ),
-            ),
-          )
-      ),
-    );
+//    await (submitButtonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
+    print("About to pop");
+    Navigator.of(context).pop();
   }
 
   void requestNextFocus(int c) {
@@ -232,7 +206,18 @@ class _NewUserFormState extends State<NewUserForm> {
       child: Text("* Required", style: theme.textTheme.subhead.copyWith(color: theme.inputDecorationTheme.labelStyle.color)),
     ));
 
-    widgets.add(buildSubmitButton(context));
+    widgets.add(
+      Padding(
+        padding: EdgeInsets.only(top: 20.0),
+        child: AnimatedLoadingButton(
+          key: submitButtonKey,
+          text: Text("Continue", style: Theme.of(context).primaryTextTheme.title),
+          loaderAnimation: null,
+          backgroundColor: Theme.of(context).primaryColor,
+          onClick: handleForm,
+        )
+      )
+    );
     return widgets;
   }
   

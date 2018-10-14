@@ -104,23 +104,29 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   Future<void> loadInformation(FirebaseUser user) async {
-//    return;
+    print("Loading information for ${user.uid}");
     // Check if this is a new user
     if (!(await DatabaseReader.userExists()))
       // If it is a new user, register them
       await registerNewUser(user);
 
     // Load all user uids
-    DatabaseReader.loadUserUids();
+    await DatabaseReader.loadUserUids();
+    print("Successfully loaded user uids");
+
+    print(Database.userUids);
 
     // Load all user data (public)
-    DatabaseReader.loadUsers(user.uid);
+    await DatabaseReader.loadUsers(user.uid);
+    print("Successfully loaded user data");
 
     // Load all group names
-    DatabaseReader.loadGroupNames();
+    await DatabaseReader.loadGroupNames();
+    print("Successfully loaded group names");
 
     // Load all group data
-    DatabaseReader.loadGroups();
+    await DatabaseReader.loadGroups();
+    print("Successfully loaded group data");
 
     // If everything went well, finish the animation and navigate to the groups screen when that is done
     await (buttonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
@@ -136,9 +142,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           SnackBar(content: Text("Null newUser")));
     }
 
-    await Navigator.of(context).pushAndRemoveUntil(
-        new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)),
-        ModalRoute.withName("/"));
+    await Navigator.of(context).push(
+        new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)));
+//        ModalRoute.withName("/"));
 
     return 0;
   }

@@ -88,30 +88,27 @@ class Me extends User {
     super.fromValues(uid: uid, values: values);
 
   // The datasnapshot for Me includes public and private data
-  factory Me.fromSnapshot({@required DataSnapshot snapshot}){
-    // The uid it the root of the values
-    String uid = snapshot.value.keys[0];
-
+  factory Me.fromSnapshots({@required String uid, @required DataSnapshot public, @required DataSnapshot private}){
     // Flatten the snapshot to remove public and private distinction
     Map values = {};
-    values.addAll(snapshot.value[uid][DatabaseConstants.kUSER_PUBLIC_VARS]);
-    values.addAll(snapshot.value[uid][DatabaseConstants.kUSER_PRIVATE_VARS]);
+    values.addAll(public.value);
+    values.addAll(private.value);
 
     // Use the values and the uid to construct the user
     Me me =  Me.fromValues(uid: uid, values: values);
 
     // Set the proper public/private values
     // All are set to public by default, so check for existence in the private set
-    me.email.setPrivate(stripPrivate(DatabaseConstants.kUSER_EMAIL, uid, snapshot.value));
-    me.cellphone.setPrivate(stripPrivate(DatabaseConstants.kUSER_CELLPHONE, uid, snapshot.value));
-    me.homePhone.setPrivate(stripPrivate(DatabaseConstants.kUSER_HOME_PHONE, uid, snapshot.value));
-    me.dob.setPrivate(stripPrivate(DatabaseConstants.kUSER_DOB, uid, snapshot.value));
+    me._email.setPrivate(stripPrivate(DatabaseConstants.kUSER_EMAIL, uid, private.value));
+    me._cellphone.setPrivate(stripPrivate(DatabaseConstants.kUSER_CELLPHONE, uid, private.value));
+    me._homePhone.setPrivate(stripPrivate(DatabaseConstants.kUSER_HOME_PHONE, uid, private.value));
+    me._dob.setPrivate(stripPrivate(DatabaseConstants.kUSER_DOB, uid, private.value));
 
     return me;
   }
 
   static bool stripPrivate(String name, String uid, Map values){
-    return values[uid][DatabaseConstants.kUSER_PRIVATE_VARS].containsKey(name);
+    return values.containsKey(name);
   }
 
   Map toDatabaseChild(){
