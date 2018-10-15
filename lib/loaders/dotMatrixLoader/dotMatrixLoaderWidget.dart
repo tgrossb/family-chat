@@ -73,6 +73,9 @@ class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with Ticke
           loopCounter++;
         });
       }
+      if (status == AnimationStatus.completed){
+        print("Completed animation (finishing? $finishing)");
+      }
     });
 
     super.initState();
@@ -86,14 +89,10 @@ class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with Ticke
     hasAnimated = true;
   }
 
-  Future<int> finishLoadingAnimation() async {
+  void finishLoadingAnimation() async {
     setState(() {
       finishing = true;
     });
-
-    while (controller.status != AnimationStatus.completed){}
-
-    return 0;
   }
 
   @override

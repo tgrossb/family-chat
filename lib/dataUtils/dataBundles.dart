@@ -138,10 +138,9 @@ class MessageData extends Data {
     _registerObjectParam(this.utcTime, "utcTime");
   }
 
-  factory MessageData.fromSnapshotValue({@required Map message}){
-    String time = message.keys.first;
-    String name = message[time][DatabaseConstants.kNAME_CHILD];
-    String text = message[time][DatabaseConstants.kTEXT_CHILD];
+  factory MessageData.fromSnapshotValue({@required Map message, @required String time}){
+    String name = message[DatabaseConstants.kNAME_CHILD];
+    String text = message[DatabaseConstants.kTEXT_CHILD];
     return MessageData(text: text, name: name, utcTime: Utils.parseTime(time));
   }
 

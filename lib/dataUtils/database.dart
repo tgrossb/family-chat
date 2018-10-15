@@ -241,7 +241,7 @@ class DatabaseReader {
       Database.groupFromName[groupName] = groupData;
     }
 
-    return Database.groupFromName.values;
+    return Database.groupFromName.values.toList();
   }
 
   // Loads all admins from a group as a list of uids
@@ -263,7 +263,7 @@ class DatabaseReader {
 
     List<MessageData> messages = [];
     for (var messageKey in messagesSnap.value.keys)
-      messages.add(MessageData.fromSnapshotValue(message: messagesSnap.value[messageKey]));
+      messages.add(MessageData.fromSnapshotValue(message: messagesSnap.value[messageKey], time: messageKey));
 
     return messages;
   }

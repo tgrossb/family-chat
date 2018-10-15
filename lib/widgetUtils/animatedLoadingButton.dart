@@ -91,7 +91,7 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
     if (widget.loaderAnimation != null && (widget.loaderAnimation.key as GlobalKey).currentWidget != null)
       return await ((widget.loaderAnimation.key as GlobalKey).currentWidget as Loader).finishLoadingAnimation();
     controller.reverse();
-    while (controller.value > 0){}
+//    while (controller.value > 0){}
     return 0;
   }
 
