@@ -7,17 +7,17 @@ class AnimatedLoadingButton<T extends Widget> extends StatefulWidget {
   final Text text;
   final T loaderAnimation;
   final Color backgroundColor;
-  final Duration _morphDuration;
-  final double fadeTextPortion;
+  final Duration _morphDuration, _fadeTextDuration;
   final EdgeInsets padding;
   final Function onClick;
 
   AnimatedLoadingButton({GlobalKey key, @required this.text, @required this.loaderAnimation, @required this.backgroundColor,
     Duration morphDuration,
-    this.fadeTextPortion = LoadingButtonConstants.kBUTTON_FADE_TEXT_PORTION,
+    Duration fadeTextDuration,
     this.padding = LoadingButtonConstants.kBUTTON_PADDING,
     this.onClick}):
       _morphDuration = morphDuration ?? Duration(milliseconds: LoadingButtonConstants.kBUTTON_MORPH_DURATION),
+      _fadeTextDuration = fadeTextDuration ?? Duration(milliseconds: LoadingButtonConstants.kBUTTON_FADE_TEXT_DURATION),
       assert(loaderAnimation is Loader || loaderAnimation == null),
       super(key: key ?? GlobalKey());
 
@@ -38,8 +38,10 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
   void initState(){
     // Set up the animations that this has to take care of (morph and fade text)
     controller = AnimationController(vsync: this, duration: widget._morphDuration);
+
+    double fadeIntervalLength = widget._fadeTextDuration.inMilliseconds / widget._morphDuration.inMilliseconds;
     fadeText = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: controller.view, curve: Interval(0.0, widget.fadeTextPortion)));
+      CurvedAnimation(parent: controller.view, curve: Interval(0.0, fadeIntervalLength)));
 
     // These need the loader's container and the button's initial container
     TextSpan span = TextSpan(text: widget.text.data, style: widget.text.style);
@@ -90,26 +92,40 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
   Future<int> finishAnimation() async {
     if (widget.loaderAnimation != null && (widget.loaderAnimation.key as GlobalKey).currentWidget != null)
       return await ((widget.loaderAnimation.key as GlobalKey).currentWidget as Loader).finishLoadingAnimation();
-    controller.reverse();
-//    while (controller.value > 0){}
+
+    await controller.animateTo(0.0);
+
     return 0;
   }
 
   Widget buildButton(BuildContext context, Widget child){
     Color textColor = widget.text.style.color.withOpacity(fadeText.value);
-    Text fadedText = Text(widget.text.data, style: widget.text.style.copyWith(color: textColor));
 
-    return Container(
-      width: widthMorph.value,
-      height: heightMorph.value,
-      child: fadeText.value > 0 ? Padding(
-          padding: widget.padding,
-          child: Center(child: fadedText)
-      ) : null,
-      alignment: FractionalOffset.center,
-      decoration: new BoxDecoration(
-        color: colorMorph.value,
-        borderRadius: radiusMorph.value,
+    return GestureDetector(
+      onTap: controller.status == AnimationStatus.forward ? null : startAnimation,
+      child: Stack(
+        children: <Widget>[
+
+          Center(
+            child: Container(
+              width: widthMorph.value,
+              height: heightMorph.value,
+              decoration: new BoxDecoration(
+                color: colorMorph.value,
+                borderRadius: radiusMorph.value
+              ),
+            ),
+          ),
+
+          Center(
+            child: Text(
+              widget.text.data,
+              style: widget.text.style.copyWith(color: textColor),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+        ],
       ),
     );
   }
@@ -117,13 +133,9 @@ class AnimatedLoadingButtonState extends State<AnimatedLoadingButton> with Singl
   @override
   Widget build(BuildContext context) {
     if (controller.status != AnimationStatus.completed || widget.loaderAnimation == null) {
-      print(controller.value);
-      return GestureDetector(
-        onTap: controller.status == AnimationStatus.forward ? null : startAnimation,
-        child: AnimatedBuilder(
-            animation: controller,
-            builder: buildButton
-        ),
+      return AnimatedBuilder(
+        animation: controller,
+        builder: buildButton,
       );
     }
 

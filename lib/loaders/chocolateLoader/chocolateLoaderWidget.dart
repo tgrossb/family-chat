@@ -88,7 +88,7 @@ class ChocolateLoaderWidgetState extends State<ChocolateLoaderWidget> with Singl
       finishing = true;
     });
 
-    while (controller.status != AnimationStatus.completed){}
+    await controller.animateTo(1.0);
 
     return 0;
   }

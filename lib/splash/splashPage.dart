@@ -129,8 +129,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     print("Successfully loaded group data");
 
     // If everything went well, finish the animation and navigate to the groups screen when that is done
-    await (buttonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
-    navigateToGroups();
+//    await (buttonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
+//    navigateToGroups();
   }
 
   Future<int> registerNewUser(FirebaseUser newUser) async {

@@ -28,7 +28,11 @@ class DotMatrixLoaderWidget extends StatefulWidget implements Loader {
   Container getSingleBaseContainer() => Container(
     width: diameter * 3 + padding * 4,
     height: diameter * 3 + padding * 4,
-    color: color,
+
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.all(Radius.circular(diameter/2))
+    ),
   );
 
   @override
@@ -73,9 +77,6 @@ class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with Ticke
           loopCounter++;
         });
       }
-      if (status == AnimationStatus.completed){
-        print("Completed animation (finishing? $finishing)");
-      }
     });
 
     super.initState();
@@ -89,10 +90,14 @@ class DotMatrixLoaderWidgetState extends State<DotMatrixLoaderWidget> with Ticke
     hasAnimated = true;
   }
 
-  void finishLoadingAnimation() async {
+  Future<int> finishLoadingAnimation() async {
     setState(() {
       finishing = true;
     });
+
+    await controller.animateTo(1.0);
+
+    return 0;
   }
 
   @override

@@ -41,7 +41,7 @@ class DotConstants {
 // These are all for the generic animated loading button
 class LoadingButtonConstants {
   static const int kBUTTON_MORPH_DURATION = 500;
-  static const double kBUTTON_FADE_TEXT_PORTION = 0.5;
+  static const int kBUTTON_FADE_TEXT_DURATION = 100;
   static const EdgeInsets kBUTTON_PADDING = EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0);
 }
 
