@@ -40,27 +40,31 @@ class Data {
 }
 
 /*
- * This is the packaged data for the list of groups.
+ * This is the packaged data for a list of uids with responsibility.
  *
- * This screen is displayed after the splash page if the
- * user sign in is correct.
+ * That means that it contains a map of who added each uid to the list.
+ * The key is used for serialization to the database.
  */
-/* DON'T NEED ANYMORE
-class GroupsListData extends Data {
-  GroupsListData({@required this.user, @required this.groupsData}){
-    _registerObjectParam(this.user, "user");
-    _registerListParam(this.groupsData, "groupsData");
+class ResponsibleList extends Data {
+  String key;
+  Map<String, String> responsibleList;
+
+  ResponsibleList({@required this.key, Map<String, String> initialData}){
+    responsibleList = Map.of(initialData);
+    _registerStringParam(this.key, "key");
   }
 
-  // This is the user discovered from the sign in.
-  // TODO: Replace with a uuid
-  FirebaseUser user;
+  bool addEntry(String uid, String responsible){
+    if (responsibleList.containsKey(uid))
+      return false;
+    responsibleList[uid] = responsible;
+    return true;
+  }
 
-  // This is a list of data for groups that were discovered from the preload.
-  // This list has an uncertain length, and each element corresponds to a group
-  List<GroupData> groupsData;
+  Map toDatabaseChild(){
+    return {key: responsibleList};
+  }
 }
-*/
 
 /*
  * This is the packaged data for a single group.
@@ -69,65 +73,91 @@ class GroupsListData extends Data {
  * also used when a group is started and the group screen is displayed.
  */
 class GroupData extends Data {
-//  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.firstMessages});
-  GroupData({@required this.utcTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members, @required this.bubbleColor});
+  // This class bundles the group's uid, name, the time of the last message, a list of messages,
+  // a list of members and admins, and the group's theme data
+  String uid;
+  String name;
+  DateTime utcTime;
+  List<MessageData> messages;
+  ResponsibleList admins;
+  ResponsibleList members;
+  GroupThemeData groupThemeData;
 
-  GroupData.fromRawTime({@required String rawTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members, @required this.bubbleColor}):
-        this.utcTime = Utils.parseTime(rawTime) {
+  GroupData({@required this.utcTime, @required this.uid, @required this.name, @required this.messages,
+    @required this.admins, @required this.members, @required this.groupThemeData}){
+    _registerStringParam(this.uid, "uid");
     _registerStringParam(this.name, "name");
     _registerObjectParam(this.utcTime, "utcTime");
-    _registerListParam(this.firstMessages, "firstMessages");
-    _registerObjectParam(this.bubbleColor, "bubbleColor");
+    _registerListParam(this.messages, "messages");
+    _registerObjectParam(this.admins, "admins");
+    _registerObjectParam(this.members, "members");
+    _registerObjectParam(this.groupThemeData, "groupTheme");
   }
 
-  // This is the name of the group.
-  String name;
+//  factory GroupData.fromSnapshot({@required Map groupData}){
+//    return GroupData(utcTime: null, uid: null, name: null, messages: null, admins: null, members: null, groupThemeData: null);
+//  }
 
-  // This is the utc time of the last message.
-  DateTime utcTime;
+  Map toDatabaseChild(){
+    Map messagesMap = {};
+    for (MessageData message in messages)
+      messagesMap.addAll(message.toDatabaseChild());
 
-  // This is a list of the first messages in this group.
-  // This list has an unspecified length because as much data is preloaded as possible.
-  List<MessageData> firstMessages;
-
-  List<String> admins;
-  List<String> members;
-
-  Color bubbleColor;
+    return {
+      uid: {
+        DatabaseConstants.kGROUP_NAME_CHILD: name,
+        DatabaseConstants.kGROUP_ADMINS_CHILD: admins.toDatabaseChild().values,
+        DatabaseConstants.kGROUP_MEMBERS_CHILD: members.toDatabaseChild().values,
+        DatabaseConstants.kGROUP_MESSAGES_CHILD: messagesMap,
+        DatabaseConstants.kGROUP_THEME_DATA_CHILD: groupThemeData.toDatabaseChild().values
+      }
+    };
+  }
 
   @override
   String toString() {
-    return "[" + name + " @ " + utcTime.toString() + " with " + firstMessages.length.toString() + " init msgs]";
+    return "[GroupData $name @ $utcTime with ${messages.length} msgs]";
   }
 }
 
 /*
- * This is the packaged data for the specific implementation of a group.
+ * This is the packaged data for a group theme.
  *
- * These objects specify the behavior of the group, and do not contain
- * any group-specific data.
+ * The group theme contains information regarding the appearance of a group
+ * that persists across users.
  */
-class GroupImplementationData extends Data {
-  GroupImplementationData({this.start, this.delete, this.animationController}){
-    _registerObjectParam(this.start, "start");
-    _registerObjectParam(this.delete, "delete");
-    _registerObjectParam(this.animationController, "animationController");
+class GroupThemeData extends Data {
+  Color groupColor;
+  GroupThemeData({@required this.groupColor}){
+    _registerObjectParam(this.groupColor, "groupColor");
   }
 
-  // This is the function used to start the group.
-  // This is called when a group is clicked on, and triggers
-  // the transition to the group screen
-  Function start;
+  factory GroupThemeData.fromSnapshotValue({@required Map groupThemeData}){
+    int parsedColor = 0xff79baba;
+    try {
+      parsedColor = int.parse(groupThemeData[DatabaseConstants.kGROUP_COLOR_CHILD], radix: 16);
+    } catch (e){
+      // Allow this to fail quietly
+      print("Group color parsing has failed quietly");
+    }
+    
+    return GroupThemeData(groupColor: Color(parsedColor));
+  }
 
-  // This is the function used to delete the group.
-  // This is called when the delete group dialog is confirmed.
-  Function delete;
-
-  // This is the animation controller that controls the enter animation
-  // for the group.
-  // This is used for the bounce-in effect that groups list items have.
-  AnimationController animationController;
+  Map toDatabaseChild(){
+    return {
+      DatabaseConstants.kGROUP_THEME_DATA_CHILD: {
+        DatabaseConstants.kGROUP_COLOR_CHILD: groupColor.value
+      }
+    };
+  }
+  
+  @override
+  String toString() {
+    return "[GroupThemeData groupColor: $groupColor]";
+  }
 }
+
 
 /*
  * This is the packaged data for a message.
@@ -135,32 +165,35 @@ class GroupImplementationData extends Data {
  * This package contains the essential data to a message.
  */
 class MessageData extends Data {
-  MessageData({@required this.text, @required this.name, @required this.utcTime}) {
+  MessageData({@required this.text, @required this.senderUid, @required this.utcTime}) {
     _registerStringParam(this.text, "text");
-    _registerStringParam(this.name, "name");
+    _registerStringParam(this.senderUid, "senderUid");
     _registerObjectParam(this.utcTime, "utcTime");
   }
 
   factory MessageData.fromSnapshotValue({@required Map message, @required String time}){
-    String name = message[DatabaseConstants.kNAME_CHILD];
-    String text = message[DatabaseConstants.kTEXT_CHILD];
-    return MessageData(text: text, name: name, utcTime: Utils.parseTime(time));
+    String senderUid = message[DatabaseConstants.kMESSAGE_SENDER_UID_CHILD];
+    String text = message[DatabaseConstants.kMESSAGE_TEXT_CHILD];
+    return MessageData(text: text, senderUid: senderUid, utcTime: Utils.parseTime(time));
   }
 
-  // This is the actual text of the message.
   String text;
-
-  // This is the name of the user that sent the message.
-  // TODO: Add or replace with a uuid?
-  String name;
-
-  // This is the time at which the message was sent, in the UTC timezone
+  String senderUid;
   DateTime utcTime;
+
+  Map toDatabaseChild(){
+    return {
+      utcTime: {
+        DatabaseConstants.kMESSAGE_SENDER_UID_CHILD: senderUid,
+        DatabaseConstants.kMESSAGE_TEXT_CHILD: text
+      }
+    };
+  }
 
   @override
   bool operator ==(other) {
     MessageData otherData = other;
-    return text == otherData.text && name == otherData.name && utcTime.millisecondsSinceEpoch == otherData.utcTime.millisecondsSinceEpoch;
+    return text == otherData.text && senderUid == otherData.senderUid && utcTime.millisecondsSinceEpoch == otherData.utcTime.millisecondsSinceEpoch;
   }
 
   @override

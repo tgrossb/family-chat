@@ -45,7 +45,8 @@ class User {
     _dob = stripFromValues(DatabaseConstants.kUSER_DOB, values);
   }
 
-  User.fromSnapshot({@required String uid, @required DataSnapshot snapshot}): this.fromValues(uid: uid, values: snapshot.value[DatabaseConstants.kUSER_PUBLIC_VARS]);
+  User.fromSnapshot({@required String uid, @required DataSnapshot snapshot}):
+        this.fromValues(uid: uid, values: snapshot.value[DatabaseConstants.kUSER_PUBLIC_VARS]);
 
   @override
   bool operator ==(other) {

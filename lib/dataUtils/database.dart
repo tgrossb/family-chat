@@ -35,17 +35,18 @@ class Database {
   static List<String> userUids = List();
   static Map<String, User> userFromUid = {};
   static User me;
-  static List<String> groupNames = List();
-  static Map<String, GroupData> groupFromName = {};
+  static List<String> groupUids = List();
+  static Map<String, GroupData> groupFromUid = {};
 
 //  get groups => groupFromName.values;
 //  get users => userFromUid.values;
 }
 
 class DatabaseWriter {
-  static Future<bool> performCheckedOperation(String child, var value) async {
+  // Sets a database child's value and checks if the operation was successful
+  static Future<bool> performCheckedSet(String path, var value) async {
     bool successful = true;
-    await Database.database.reference().child(child).set(value).catchError((e){
+    await Database.database.reference().child(path).set(value).catchError((e){
       successful = false;
       throw e;
     });
@@ -53,11 +54,21 @@ class DatabaseWriter {
     return successful;
   }
 
+  // Adds the map definition of a child to the database at the supplied path
+  // Uses checked operations
+  static Future<bool> appendChild(String path, Map child) async {
+    // Ensure that the child only has one root key
+    assert(child.keys.length == 1);
+
+    String childRoot = child.keys.toList()[0];
+    return await performCheckedSet("$path/$childRoot", child[childRoot]);
+  }
+
   static Future<bool> registerNewUser({@required Me me}) async {
-    bool successful = await performCheckedOperation(DatabaseConstants.kUSERS_CHILD, me.toDatabaseChild());
+    bool successful = await appendChild(DatabaseConstants.kUSERS_CHILD, me.toDatabaseChild());
     if (!successful)
       return false;
-    successful = await performCheckedOperation(DatabaseConstants.kUSERS_LIST_CHILD, {me.uid: "uid"});
+    successful = await appendChild(DatabaseConstants.kUSERS_LIST_CHILD, {me.uid: "uid"});
     if (!successful)
       return false;
 
@@ -68,64 +79,79 @@ class DatabaseWriter {
     return true;
   }
 
-  // They must be a registered user as well, verified by database rules
-  static Future<void> registerNewSudoer({@required User user}) async {
-    await Database.database.reference().child(DatabaseConstants.kSUDOERS_CHILD).set({user.uid: "uid"});
+  // This user must be a registered user, and the current user must be a sudoer
+  // These stipulations are verified by database rules, so there's no need to check them here
+  static Future<bool> registerNewSudoer({@required User user}) async {
+    bool successful = await appendChild(DatabaseConstants.kSUDOERS_CHILD, {user.uid: "uid"});
+    if (!successful)
+      return false;
 
     // Update the database class to reflect this change
     Database.sudoerUids.add(user.uid);
+
+    return true;
   }
 
-  static Future<void> registerNewGroup({@required List<String> admins, @required List<String> members, @required String groupName}) async {
+  static Future<bool> registerNewGroup({@required List<String> admins, @required List<String> members,
+                                            @required String groupName, @required GroupThemeData groupThemeData}) async {
+    // Check that the group admins and members section contains me
     if (!admins.contains(Database.me.uid))
       admins.add(Database.me.uid);
-    if (!members.contains(Database.me))
+    if (!members.contains(Database.me.uid))
       members.add(Database.me.uid);
 
-    Map adminsMap = {};
+    // Construct responsible lists from the admins and members list with me being responsible for each
+    String responsible = Database.me.uid;
+    ResponsibleList adminsResList = ResponsibleList(key: DatabaseConstants.kGROUP_ADMINS_CHILD);
+    ResponsibleList membersResList = ResponsibleList(key: DatabaseConstants.kGROUP_MEMBERS_CHILD);
     for (String adminUid in admins)
-      adminsMap[adminUid] = "uid";
-
-    Map membersMap = {};
+      adminsResList.addEntry(adminUid, responsible);
     for (String memberUid in members)
-      membersMap[memberUid] = "uid";
+      membersResList.addEntry(memberUid, responsible);
 
-    Map group = {
-      groupName: {
-        DatabaseConstants.kADMINS_CHILD: adminsMap,
-        DatabaseConstants.kMEMBERS_CHILD: membersMap,
-        DatabaseConstants.kMESSAGES_CHILD: {
-          Utils.timeToKeyString(DateTime.now()): {
-            DatabaseConstants.kNAME_CHILD: "System",
-            DatabaseConstants.kTEXT_CHILD: "${Database.me.name} created the group $groupName"
-          }
-        }
-      }
-    };
-
-    Database.database.reference().child(DatabaseConstants.kGROUPS_CHILD).set(group);
-    Database.database.reference().child(DatabaseConstants.kGROUPS_LIST_CHILD).set({groupName: "group"});
-
-    // Update the database class to reflect this change
-    DateTime utcTime = group[groupName][DatabaseConstants.kMESSAGES_CHILD].keys[0];
+    DateTime utcTime = DateTime.now().toUtc();
+    // Give it a non-unique uid for now
+    // A real uid will be generated when it is pushed, and the uid will then be updated
     GroupData groupData = GroupData(
-        utcTime: utcTime,
-        name: groupName,
-        firstMessages: [MessageData.fromSnapshotValue(message: group[groupName][DatabaseConstants.kMESSAGES_CHILD][utcTime])],
-        admins: admins,
-        members: members
+      uid: "0",
+      utcTime: utcTime,
+      name: groupName,
+      admins: adminsResList,
+      members: membersResList,
+      groupThemeData: groupThemeData,
+      messages: [MessageData(text: "${Database.me.name} created the group $groupName", senderUid: "System", utcTime: utcTime)]
     );
 
-    Database.groupNames.add(groupName);
-    Database.groupFromName[groupName] = groupData;
-  }
+    bool successful = true;
+    DatabaseReference groupLoc = Database.database.reference().child(DatabaseConstants.kGROUPS_CHILD).push();
+    await groupLoc.set(groupData.toDatabaseChild().values).catchError((e){
+      successful = false;
+      throw e;
+    });
 
-  static void removeGroup(String groupName){
-    Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}/$groupName").remove();
+    if (!successful)
+      return false;
+
+    // Update the uid to be the generated uid
+    groupData.uid = groupLoc.key;
+    
+    successful = await appendChild(DatabaseConstants.kGROUPS_LIST_CHILD, {groupData.name: Database.me.uid});
+    if (!successful)
+      return false;
 
     // Update the database class to reflect this change
-    Database.groupNames.remove(groupName);
-    Database.groupFromName.removeWhere((String name, GroupData data) => name == groupName);
+    Database.groupUids.add(groupData.uid);
+    Database.groupFromUid[groupData.uid] = groupData;
+
+    return true;
+  }
+
+  static void removeGroup(String groupUid){
+    Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}/$groupUid").remove();
+
+    // Update the database class to reflect this change
+    Database.groupUids.remove(groupUid);
+    Database.groupFromUid.removeWhere((String uid, GroupData data) => uid == groupUid);
   }
 
   static void addMessage({@required String groupName, @required MessageData message}) async {
@@ -230,7 +256,13 @@ class DatabaseReader {
 
       List<MessageData> messages = await loadMessages(groupName);
 
-      Color bubbleColor = Color(int.parse(await loadBubbleColor(groupName), radix: 16));
+      int bubbleColorInt = 0xff79baba;
+      try {
+        bubbleColorInt = int.parse(await loadBubbleColor(groupName), radix: 16);
+      } catch (e) {
+        print("Failing bubble color silently for group $groupName");
+      }
+      Color bubbleColor = Color(bubbleColorInt);
 
       GroupData groupData = GroupData(
           utcTime: messages[0].utcTime,

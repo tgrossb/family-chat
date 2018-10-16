@@ -67,14 +67,15 @@ class DatabaseConstants {
   static const String kGROUPS_CHILD = "groups";
   static const String kGROUPS_LIST_CHILD = "groupsList";
 
-  static const String kADMINS_CHILD = "admins";
-  static const String kMEMBERS_CHILD = "members";
-  static const String kMESSAGES_CHILD = "messages";
-  static const String kTHEME_DATA_CHILD = "themeData";
-  static const String kBUBBLE_COLOR_CHILD = "bubbleColor";
+  static const String kGROUP_NAME_CHILD = "name";
+  static const String kGROUP_ADMINS_CHILD = "admins";
+  static const String kGROUP_MEMBERS_CHILD = "members";
+  static const String kGROUP_MESSAGES_CHILD = "messages";
+  static const String kGROUP_THEME_DATA_CHILD = "themeData";
+  static const String kGROUP_COLOR_CHILD = "groupColor";
 
-  static const String kTEXT_CHILD = "text";
-  static const String kNAME_CHILD = "name";
+  static const String kMESSAGE_TEXT_CHILD = "text";
+  static const String kMESSAGE_SENDER_UID_CHILD = "senderUid";
 }
 
 
