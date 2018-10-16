@@ -70,6 +70,8 @@ class DatabaseConstants {
   static const String kADMINS_CHILD = "admins";
   static const String kMEMBERS_CHILD = "members";
   static const String kMESSAGES_CHILD = "messages";
+  static const String kTHEME_DATA_CHILD = "themeData";
+  static const String kBUBBLE_COLOR_CHILD = "bubbleColor";
 
   static const String kTEXT_CHILD = "text";
   static const String kNAME_CHILD = "name";

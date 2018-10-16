@@ -70,13 +70,14 @@ class GroupsListData extends Data {
  */
 class GroupData extends Data {
 //  GroupData({this.rawTime, this.time, this.utcTime, this.name, this.firstMessages});
-  GroupData({@required this.utcTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members});
+  GroupData({@required this.utcTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members, @required this.bubbleColor});
 
-  GroupData.fromRawTime({@required String rawTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members}):
+  GroupData.fromRawTime({@required String rawTime, @required this.name, @required this.firstMessages, @required this.admins, @required this.members, @required this.bubbleColor}):
         this.utcTime = Utils.parseTime(rawTime) {
     _registerStringParam(this.name, "name");
     _registerObjectParam(this.utcTime, "utcTime");
     _registerListParam(this.firstMessages, "firstMessages");
+    _registerObjectParam(this.bubbleColor, "bubbleColor");
   }
 
   // This is the name of the group.
@@ -91,6 +92,8 @@ class GroupData extends Data {
 
   List<String> admins;
   List<String> members;
+
+  Color bubbleColor;
 
   @override
   String toString() {

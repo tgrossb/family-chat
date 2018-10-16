@@ -1,92 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:bodt_chat/splash/splashPage.dart';
+import 'package:bodt_chat/themes/defaultTheme.dart' as DefaultTheme;
 
-final ThemeData iosTheme = new ThemeData(
-  primarySwatch: Colors.orange,
-  primaryColor: Colors.grey[100],
-  primaryColorBrightness: Brightness.light,
-);
-
-final ThemeData defaultTheme = new ThemeData(
-  primaryColor: Color(0xff413c58),
-  accentColor: Color(0xff63a375),
-
-  textTheme: TextTheme(
-    body1: TextStyle(color: Colors.black),
-    body2: TextStyle(color: Colors.black),
-    button: TextStyle(color: Colors.black),
-    caption: TextStyle(color: Colors.black),
-    display1: TextStyle(color: Colors.black),
-    display2: TextStyle(color: Colors.black),
-    display3: TextStyle(color: Colors.black),
-    display4: TextStyle(color: Colors.black),
-    headline: TextStyle(color: Colors.black),
-
-    // Used for the form input text
-    subhead: TextStyle(color: Colors.white),
-
-    title: TextStyle(color: Colors.black),
-  ),
-
-  primaryTextTheme: TextTheme(
-    body1: TextStyle(color: Colors.black),
-    body2: TextStyle(color: Colors.black),
-    button: TextStyle(color: Colors.black),
-    caption: TextStyle(color: Colors.black),
-    display1: TextStyle(color: Colors.black),
-    display2: TextStyle(color: Colors.black),
-    display4: TextStyle(color: Colors.black),
-    headline: TextStyle(color: Colors.black),
-
-    // Used for the welcome on new user screen
-    display3: TextStyle(color: Colors.white),
-
-    // Used for the sign in button
-    title: TextStyle(color: Colors.white),
-    subhead: TextStyle(color: Colors.white),
-  ),
-
-  buttonTheme: ButtonThemeData(
-    textTheme: ButtonTextTheme.primary
-  ),
-
-  accentTextTheme: TextTheme(
-    body1: TextStyle(color: Colors.black),
-    body2: TextStyle(color: Colors.black),
-    button: TextStyle(color: Colors.black),
-    caption: TextStyle(color: Colors.black),
-    display1: TextStyle(color: Colors.black),
-    display2: TextStyle(color: Colors.black),
-    display3: TextStyle(color: Colors.black),
-    display4: TextStyle(color: Colors.black),
-    headline: TextStyle(color: Colors.black),
-    subhead: TextStyle(color: Colors.black),
-    title: TextStyle(color: Colors.black),
-  ),
-
-  // Used for the form
-  inputDecorationTheme: InputDecorationTheme(
-    labelStyle: TextStyle(color: Colors.white70),
-    hintStyle: TextStyle(color: Colors.white70),
-    errorStyle: TextStyle(color: Color(0xff8c0808)),
-    filled: true,
-    fillColor: Color(0x11000000),
-
-    // Found at https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/input_decorator.dart line 1849
-    // Explicitly defined instead of using defaults so that it can be used in calculations easily
-    contentPadding: EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0)
-//    prefixStyle: TextStyle(color: Colors.white)
-  ),
-
-  errorColor: Color(0xff8c0808),
-
-//  primaryIconTheme: IconThemeData(color: Colors.white70),
-//  brightness: Brightness.light,
-//  textTheme: Typography(platform: defaultTargetPlatform).white,
-
-  dialogBackgroundColor: Color(0xffeeeeee)
-);
 
 void main() {
   runApp(new BodtChatApp());
@@ -95,13 +11,16 @@ void main() {
 class BodtChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: defaultTargetPlatform == TargetPlatform.iOS ? iosTheme : defaultTheme,
+    return DynamicTheme(
+      data: (brightness) => DefaultTheme.splashTheme,
+      themedWidgetBuilder: (context, theme) => MaterialApp(
+        theme: theme,
 //      initialRoute: "/",
 //      routes: {
 //        "/": (context) => SplashPage()
 //      },
-      home: new SplashPage(),
+        home: new SplashPage(),
+      ),
     );
   }
 }

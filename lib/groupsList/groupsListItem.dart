@@ -104,7 +104,7 @@ class GroupsListItemState extends State<GroupsListItem> {
       margin: rightIn ? right : left,
       child: new CircleAvatar(
         child: new Text(data.name[0], style: theme.primaryTextTheme.headline),
-        backgroundColor: rightIn ? pcl : ac,
+        backgroundColor: data.bubbleColor,
       ),
     );
   }

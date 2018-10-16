@@ -10,22 +10,19 @@
  */
 
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:bodt_chat/groupsList/groupsListScreen.dart';
 import 'package:bodt_chat/loaders/dotMatrixLoader/dotMatrixLoaderWidget.dart';
 import 'package:bodt_chat/widgetUtils/animatedLoadingButton.dart';
-//import 'package:bodt_chat/splash/signInButton.dart';
 import 'package:bodt_chat/splash/newUser/newUserPage.dart';
 import 'package:bodt_chat/widgetUtils/routes.dart';
-import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
-//import 'package:bodt_chat/loaderTest.dart';
 
+import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:bodt_chat/themes/defaultTheme.dart' as DefaultTheme;
 
 class SplashPage extends StatefulWidget {
   @override
@@ -37,11 +34,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   final GoogleSignIn gSignIn = new GoogleSignIn();
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey buttonKey = new GlobalKey();
-//  bool loading = false, startFinishFlag = false, finishingStarted = false, finished = false;
-
-//  AnimationController loadingAnimationController, signInButtonToLoadingController;
-//  Animation<double> loadingAnimation;
-//  int animationCount = 0;
 
   @override
   void initState(){
@@ -60,14 +52,14 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     // Begin loading information if the silent sign in was successful
     if (user != null)
-      await loadInformation(user);
+      await loadInformationAndContinue(user);
 
     // If that fails, attempt a full on sign in
     user = await attemptCheckedSignIn(attemptSignIn);
 
     // Again, begin loading information if that sign in was successful
     if (user != null)
-      await loadInformation(user);
+      await loadInformationAndContinue(user);
 
     if (user == null) {
       // If neither of those worked, show a snack bar error and give up
@@ -86,7 +78,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     } on PlatformException catch(e){
       String snackBarMessage = "Error: " + e.code;
       if (e.code == "NETWORK_ERROR"){
-        // Show connection error dialog, but for now, just add a snack bar
+        // TODO: Show connection error dialog, but for now, just add a snack bar
         snackBarMessage = "Network error signing you in";
       } else {
         snackBarMessage = "${e.code} (Unknown)";
@@ -103,8 +95,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     return user;
   }
 
-  Future<void> loadInformation(FirebaseUser user) async {
-    print("Loading information for ${user.uid}");
+  Future<void> loadInformationAndContinue(FirebaseUser user) async {
     // Check if this is a new user
     if (!(await DatabaseReader.userExists()))
       // If it is a new user, register them
@@ -129,13 +120,15 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     print("Successfully loaded group data");
 
     // If everything went well, finish the animation and navigate to the groups screen when that is done
-//    await (buttonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
-//    navigateToGroups();
+    await (buttonKey.currentWidget as AnimatedLoadingButton).finishAnimation();
+
+    // Before moving to the app proper, set the theme
+    DynamicTheme.of(context).setThemeData(DefaultTheme.appTheme);
+
+    Navigator.of(context).pushReplacement(new InstantRoute(widget: new GroupsListScreen()));
   }
 
   Future<int> registerNewUser(FirebaseUser newUser) async {
-    print("Needs to be registered");
-
     if (newUser == null) {
       print("Null new user");
       scaffoldKey.currentState.showSnackBar(
@@ -144,13 +137,11 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     await Navigator.of(context).push(
         new SlideLeftRoute(widget: new NewUserPage(newUser: newUser)));
-//        ModalRoute.withName("/"));
 
     return 0;
   }
 
   void navigateToGroups(){
-    Navigator.of(context).pushReplacement(new InstantRoute(widget: new GroupsListScreen()));
   }
 
   Future<FirebaseUser> attemptSilentSignIn() async {

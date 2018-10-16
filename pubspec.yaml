@@ -12,6 +12,10 @@ dependencies:
   google_sign_in: ^3.0.4
   firebase_database: ^1.0.2
 
+  dynamic_theme:
+    git:
+      url: git://github.com/Norbert515/dynamic_theme.git
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

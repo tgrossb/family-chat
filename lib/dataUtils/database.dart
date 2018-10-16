@@ -230,12 +230,15 @@ class DatabaseReader {
 
       List<MessageData> messages = await loadMessages(groupName);
 
+      Color bubbleColor = Color(int.parse(await loadBubbleColor(groupName), radix: 16));
+
       GroupData groupData = GroupData(
           utcTime: messages[0].utcTime,
           name: groupName,
           firstMessages: messages,
           admins: admins,
-          members: members
+          members: members,
+          bubbleColor: bubbleColor
       );
 
       Database.groupFromName[groupName] = groupData;
@@ -266,6 +269,12 @@ class DatabaseReader {
       messages.add(MessageData.fromSnapshotValue(message: messagesSnap.value[messageKey], time: messageKey));
 
     return messages;
+  }
+
+  static Future<String> loadBubbleColor(String groupName) async {
+    DataSnapshot bubbleSnap = await loadFullChild("${DatabaseConstants.kGROUPS_CHILD}/$groupName/"
+        "${DatabaseConstants.kTHEME_DATA_CHILD}/${DatabaseConstants.kBUBBLE_COLOR_CHILD}");
+    return bubbleSnap.value;
   }
 
   // TODO: Doesn't work yet

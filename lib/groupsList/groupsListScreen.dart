@@ -11,8 +11,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
+import 'package:bodt_chat/themes/defaultTheme.dart' as DefaultTheme;
 
 class GroupsListScreen extends StatefulWidget {
   GroupsListScreen();
@@ -33,15 +35,10 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   AnimationController fadeController;
   Animation fadeInAnimation;
 
-  GroupsListScreenState() {
-    this.groupsData = Database.groupFromName.values;
-  }
-
   @override
   void initState() {
-    super.initState();
-
-    // First, order the groupsData based on last message time
+    // Order the groupsData based on last message time
+    groupsData = Database.groupFromName.values.toList();
     groupsData.sort((GroupData d1, GroupData d2) => d1.utcTime.difference(d2.utcTime).inMilliseconds);
 
     // Go through received data and add each group
@@ -71,6 +68,8 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
             end: Color.fromARGB(0, 0, 0, 0))
         .animate(fadeController);
     fadeController.forward();
+
+    super.initState();
   }
 
   void addGroupFromData(GroupData data, int animationOffset) {
