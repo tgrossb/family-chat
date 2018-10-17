@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/constants.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 
 class Data {
@@ -40,6 +41,35 @@ class Data {
 }
 
 /*
+ * TODO: Banish this class from existence
+ * This is the packaged data for the specific implementation of a group.
+ *
+ * These objects specify the behavior of the group, and do not contain
+ * any group-specific data.
+ */
+class GroupImplementationData extends Data {
+  GroupImplementationData({this.start, this.delete, this.animationController}){
+    _registerObjectParam(this.start, "start");
+    _registerObjectParam(this.delete, "delete");
+    _registerObjectParam(this.animationController, "animationController");
+  }
+
+  // This is the function used to start the group.
+  // This is called when a group is clicked on, and triggers
+  // the transition to the group screen
+  Function start;
+
+  // This is the function used to delete the group.
+  // This is called when the delete group dialog is confirmed.
+  Function delete;
+
+  // This is the animation controller that controls the enter animation
+  // for the group.
+  // This is used for the bounce-in effect that groups list items have.
+  AnimationController animationController;
+}
+
+/*
  * This is the packaged data for a list of uids with responsibility.
  *
  * That means that it contains a map of who added each uid to the list.
@@ -54,10 +84,33 @@ class ResponsibleList extends Data {
     _registerStringParam(this.key, "key");
   }
 
+  /*
+   * Assume that data takes the form
+   * {
+   *   key: {
+   *     uid1: responsible1,
+   *     uid2: responsible2,
+   *   }
+   * }
+   */
+  factory ResponsibleList.fromSnapshot({@required DataSnapshot snapshot}){
+    String key = snapshot.key;
+    Map<String, String> initialData = {};
+    snapshot.value.forEach((uid, responsible) => (initialData[uid] = responsible));
+    return ResponsibleList(key: key, initialData: initialData);
+  }
+
   bool addEntry(String uid, String responsible){
     if (responsibleList.containsKey(uid))
       return false;
     responsibleList[uid] = responsible;
+    return true;
+  }
+
+  bool removeEntry(String uid){
+    if (!responsibleList.containsKey(uid))
+      return false;
+    responsibleList.remove(uid);
     return true;
   }
 
@@ -132,10 +185,10 @@ class GroupThemeData extends Data {
     _registerObjectParam(this.groupColor, "groupColor");
   }
 
-  factory GroupThemeData.fromSnapshotValue({@required Map groupThemeData}){
+  factory GroupThemeData.fromSnapshot({@required DataSnapshot snapshot}){
     int parsedColor = 0xff79baba;
     try {
-      parsedColor = int.parse(groupThemeData[DatabaseConstants.kGROUP_COLOR_CHILD], radix: 16);
+      parsedColor = int.parse(snapshot.value[DatabaseConstants.kGROUP_COLOR_CHILD], radix: 16);
     } catch (e){
       // Allow this to fail quietly
       print("Group color parsing has failed quietly");
@@ -183,7 +236,7 @@ class MessageData extends Data {
 
   Map toDatabaseChild(){
     return {
-      utcTime: {
+      Utils.timeToKeyString(utcTime): {
         DatabaseConstants.kMESSAGE_SENDER_UID_CHILD: senderUid,
         DatabaseConstants.kMESSAGE_TEXT_CHILD: text
       }

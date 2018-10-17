@@ -32,8 +32,8 @@ class GroupsListItem extends StatefulWidget {
   GroupsListItem({this.key, @required DateTime utcTime, @required String name,
                     @required Function start, @required Function delete, @required AnimationController animationController,
                     List<MessageData> firstMessages = const []}):
-        data = new GroupData(utcTime: utcTime, name: name, firstMessages: firstMessages),
-        impData = new GroupImplementationData(start: start, delete: delete, animationController: animationController),
+//        data = new GroupData(utcTime: utcTime, name: name, firstMessages: firstMessages),
+//        impData = new GroupImplementationData(start: start, delete: delete, animationController: animationController),
         super(key: key);
 
   GroupsListItem.fromData({this.key, @required this.data, @required this.impData}):
@@ -104,7 +104,7 @@ class GroupsListItemState extends State<GroupsListItem> {
       margin: rightIn ? right : left,
       child: new CircleAvatar(
         child: new Text(data.name[0], style: theme.primaryTextTheme.headline),
-        backgroundColor: data.bubbleColor,
+        backgroundColor: data.groupThemeData.groupColor,
       ),
     );
   }

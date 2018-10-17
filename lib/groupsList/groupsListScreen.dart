@@ -38,7 +38,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   @override
   void initState() {
     // Order the groupsData based on last message time
-    groupsData = Database.groupFromName.values.toList();
+    groupsData = Database.groupFromUid.values.toList();
     groupsData.sort((GroupData d1, GroupData d2) => d1.utcTime.difference(d2.utcTime).inMilliseconds);
 
     // Go through received data and add each group
@@ -185,14 +185,14 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   Future<GroupData> getGroupData(String groupName) async {
     Event event = await mainRef
         .child(groupName)
-        .child(DatabaseConstants.kMESSAGES_CHILD)
+        .child(DatabaseConstants.kGROUP_MESSAGES_CHILD)
         .limitToLast(1)
         .onChildAdded
         .first;
 
     print("Raw time: " + event.snapshot.key);
     // TODO: Start loading the messages of the group
-    return new GroupData.fromRawTime(rawTime: event.snapshot.key, name: groupName, firstMessages: null);
+    return new GroupData(utcTime: Utils.parseTime(event.snapshot.key), name: groupName, messages: []);
   }
 
 /*
