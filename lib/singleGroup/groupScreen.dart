@@ -23,26 +23,23 @@ import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
 
 class GroupScreen extends StatefulWidget {
-  GroupScreen({this.user, this.groupName, this.firstMessages});
-  final FirebaseUser user;
-  final String groupName;
-  final List<MessageData> firstMessages;
+  GroupScreen({@required this.data});
+  final GroupData data;
 
   @override
-  State createState() => new GroupScreenState(groupName: groupName);
+  State createState() => new GroupScreenState(data: data);
 }
 
 class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin {
-  String groupName;
+  GroupData data;
   DatabaseReference mainRef;
   StreamSubscription<Event> mainRefSubscription;
 
-  final List<GroupMessage> _messageSaves = [];
   final TextEditingController _textController = new TextEditingController();
   bool _isWriting = false;
 
-  // Requires the name, and gets the rest from the Database statics
-  GroupScreenState({@required this.groupName});
+  // Requires the loaded data and sets up a subscription to get new data
+  GroupScreenState({@required this.data});
 
   // Get the reference to the database for this group
   // Also, put preloaded messages into _messageSaves and start their
@@ -53,7 +50,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(DatabaseConstants.kGROUPS_CHILD).child(groupName).child(DatabaseConstants.kMESSAGES_CHILD);
+    mainRef = db.reference().child(DatabaseConstants.kGROUPS_CHILD).child(data.uid);
     mainRef.keepSynced(true);
     mainRefSubscription = mainRef.onChildAdded.listen(_onMessageAdded);
 

@@ -287,6 +287,51 @@ class DatabaseReader {
     return Database.groupUids;
   }
 
+  // Loads the data for a single group from its uid
+  static Future<GroupData> loadSingleGroup(String groupUid) async {
+    String name = await loadGroupName(groupUid);
+    if (name == null){
+      print("Group $groupUid null name");
+      return null;
+    }
+
+    ResponsibleList admins = await loadGroupAdmins(groupUid);
+    if (admins == null){
+      print("Group $groupUid null admins");
+      return null;
+    }
+
+    ResponsibleList members = await loadGroupMembers(groupUid);
+    if (members == null){
+      print("Group $groupUid null members");
+      return null;
+    }
+
+    List<MessageData> messages = await loadGroupMessages(groupUid);
+    if (messages == null){
+      print("Group $groupUid null messages");
+      return null;
+    }
+
+    GroupThemeData themeData = await loadGroupThemeData(groupUid);
+    if (themeData == null){
+      print("Group $groupUid null themeData");
+      return null;
+    }
+
+    GroupData groupData = GroupData(
+        uid: groupUid,
+        utcTime: messages[0].utcTime,
+        name: name,
+        messages: messages,
+        admins: admins,
+        members: members,
+        groupThemeData: themeData
+    );
+
+    return groupData;
+  }
+
   // Loads the group data from all available groups
   // Requires the groupUids list to query specific groups
   static Future<List<GroupData>> loadGroups() async {
@@ -298,46 +343,9 @@ class DatabaseReader {
 
     // Now, query each group to get the data
     for (String groupUid in Database.groupUids.responsibleList.keys){
-      String name = await loadGroupName(groupUid);
-      if (name == null){
-        print("Group $groupUid null name");
+      GroupData groupData = await loadSingleGroup(groupUid);
+      if (groupData == null)
         return null;
-      }
-
-      ResponsibleList admins = await loadGroupAdmins(groupUid);
-      if (admins == null){
-        print("Group $groupUid null admins");
-        return null;
-      }
-
-      ResponsibleList members = await loadGroupMembers(groupUid);
-      if (members == null){
-        print("Group $groupUid null members");
-        return null;
-      }
-
-      List<MessageData> messages = await loadGroupMessages(groupUid);
-      if (messages == null){
-        print("Group $groupUid null messages");
-        return null;
-      }
-
-      GroupThemeData themeData = await loadGroupThemeData(groupUid);
-      if (themeData == null){
-        print("Group $groupUid null themeData");
-        return null;
-      }
-
-      GroupData groupData = GroupData(
-          uid: groupUid,
-          utcTime: messages[0].utcTime,
-          name: name,
-          messages: messages,
-          admins: admins,
-          members: members,
-          groupThemeData: themeData
-      );
-
       Database.groupFromUid[groupUid] = groupData;
     }
 

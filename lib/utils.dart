@@ -1,9 +1,18 @@
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:bodt_chat/constants.dart';
 import 'package:intl/intl.dart' as intl;
 
 class Utils {
+  static Color mixRandomColor(Color mix){
+    var rand = math.Random();
+    int red = ((rand.nextInt(256) + mix.red)/2).round();
+    int blue = ((rand.nextInt(256) + mix.blue)/2).round();
+    int green = ((rand.nextInt(256) + mix.green)/2).round();
+    return Color.fromRGBO(red, green, blue, 1.0);
+  }
+
   static String getNewGroupText(String groupName){
     // TODO: Use the proper user when global users exist
     return "Theo created the group $groupName";

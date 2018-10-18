@@ -7,7 +7,6 @@ import 'package:bodt_chat/groupsList/groupsListItem.dart';
 import 'package:bodt_chat/dialogs/newGroupDialog.dart';
 import 'package:bodt_chat/widgetUtils/routes.dart';
 import 'package:bodt_chat/utils.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -54,14 +53,15 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
+    // You cant listen to the groups child on its own, as read access is limited
     mainRef = db.reference().child(DatabaseConstants.kGROUPS_LIST_CHILD);
     mainRef.keepSynced(true);
     addSub = mainRef.onChildAdded
-        .listen((Event event) => _onGroupAdded(event.snapshot));
+        .listen((Event event) => _onGroupAdded(event.snapshot.key));
     deleteSub = mainRef.onChildRemoved
-        .listen((Event event) => _onGroupDeleted(event.snapshot));
+        .listen((Event event) => _onGroupDeleted(event.snapshot.key));
     changeSub = mainRef.onChildChanged
-        .listen((Event event) => _onGroupChanged(event.snapshot));
+        .listen((Event event) => _onGroupChanged(event.snapshot.key));
 
     fadeController = new AnimationController(
         vsync: this, duration: new Duration(milliseconds: 100));
@@ -94,8 +94,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     item.startAnimation(msOffset: animationOffset);
   }
 
-  void _onGroupChanged(DataSnapshot snap) async {
-    String groupUid = snap.key;
+  void _onGroupChanged(String groupUid) async {
     print("Begin changing group $groupUid");
 
     GlobalKey stateKey = _groupStateKeys[groupUid];
@@ -105,7 +104,8 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     // This will be changed once the new data is loaded
     item.disable();
 
-    GroupData data = GroupData.fromSnapshot(snap: snap);
+    GroupData data = await DatabaseReader.loadSingleGroup(groupUid);
+
     // Restore functionality, update the data, and redo the animation
     item.setData(data);
     item.startAnimation();
@@ -114,8 +114,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     print("Finished changing group $groupUid");
   }
 
-  void _onGroupDeleted(DataSnapshot snap) async {
-    String groupUid = snap.key;
+  void _onGroupDeleted(String groupUid) async {
     var group = _groupStateKeys[groupUid].currentState;
 
     group.controller.addStatusListener((AnimationStatus status) {
@@ -131,72 +130,34 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     group.controller.reverse();
   }
 
-  void _onGroupAdded(DataSnapshot snap) async {
-    String groupName = snap.key;
-    if (_groupStateKeys.containsKey(groupName)) {
-      print("Rediscovered group: " + groupName + ", skipping");
+  void _onGroupAdded(String groupUid) async {
+    if (_groupStateKeys.containsKey(groupUid)) {
+      print("Rediscovered group: " + groupUid + ", skipping");
       return;
     }
-    Map v = snapshot.value;
-    print("Length: " + v.length.toString());
-    print("Chat added");
+
     var stateKey = new GlobalKey<GroupsListItemState>();
-    GroupData data = await getGroupData(groupName);
+    GroupData data = await DatabaseReader.loadSingleGroup(groupUid);
     GroupsListItem item = new GroupsListItem.fromData(
       key: stateKey,
       data: data,
-      impData: new GroupImplementationData(
-        start: startGroup,
-        delete: deleteGroup,
-        animationController: new AnimationController(
-            duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
-            vsync: this
-        ),
+      onClick: startGroup,
+      onDelete: deleteGroup,
+      controller: new AnimationController(
+          duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
+          vsync: this
       ),
     );
 
     setState(() {
-      _groupStateKeys.putIfAbsent(groupName, () => stateKey);
-      _groups.insert(0, item);
-      groupsData.insert(0, data);
+      _groupStateKeys[groupUid] = stateKey;
+      _groupData[groupUid] = data;
+      _groups[groupUid] = item;
+      _groupUids.insert(0, groupUid);
     });
 
-    item.impData.animationController.forward();
+    item.startAnimation();
   }
-/*
-  void _handleGroupAdd(GlobalKey<GroupsListItemState> stateKey,
-      String groupName, GroupsListItem item) async {
-    GroupData data = await getGroupData(groupName, false);
-    if (stateKey.currentState != null)
-      stateKey.currentState.updateFromData(
-          data: data,
-          impData: new GroupImplementationData(
-              start: startGroup, delete: deleteGroup));
-    else
-      // Mark this group as one that needs updating
-      _toUpdate[stateKey] = data;
-
-    print("Add finished");
-  }
-*/
-
-/*
-  void updateStates() {
-    print("Updating states (length: " + _toUpdate.length.toString() + ")");
-    _toUpdate.forEach((var stateKey, var data) {
-      if (stateKey.currentState != null) {
-        stateKey.currentState.updateFromData(
-            data: data,
-            impData: new GroupImplementationData(
-                start: startGroup, delete: deleteGroup));
-        print("Finishing " + stateKey.currentState.name);
-      } else {
-        print("Skipping 1 from null check");
-      }
-    });
-    _toUpdate.clear();
-  }
-*/
 
   @override
   Widget build(BuildContext context) {
@@ -260,19 +221,13 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   }
 
   Widget buildGroup(BuildContext context, int index) {
-    print("Constructing " +
-        index.toString() +
-        " from length " +
-        _groupStateKeys.length.toString() +
-        ", " +
-        _groups.length.toString());
     return new Column(
-        children: index == _groupStateKeys.length - 1
-            ? <Widget>[_groups[index]]
-            : <Widget>[_groups[index], new Divider(height: 1.0)]);
+        children: index == _groupUids.length - 1
+            ? <Widget>[_groups[_groupUids[index]]]
+            : <Widget>[_groups[_groupUids[index]], new Divider(height: 1.0)]);
   }
 
-  void startGroup(BuildContext context, String name) async {
+  void startGroup(BuildContext context, GroupData data) async {
     addSub.pause();
     deleteSub.pause();
     changeSub.pause();
@@ -281,12 +236,8 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
     // TODO: I don't know how i did this
     await Navigator.of(context).push(new SlideLeftRoute(
-        widget: new GroupScreen(
-            groupName: name,
-            firstMessages: groupsData
-                .firstWhere((data) => data.name == name)
-                .firstMessages)
-/*        new ChatScreen(user: user, chatName: name)*/));
+        widget: new GroupScreen(data: data)
+      /*        new ChatScreen(user: user, chatName: name)*/));
 
     addSub.resume();
     deleteSub.resume();
@@ -296,8 +247,13 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 //    _onGroupAdded(name);
   }
 
+
+  // TODO: Update this and dialog for new group params
   void _addNewGroup(String groupName) {
-    DatabaseWriter.registerNewGroup(admins: [Database.me.uid], members: [Database.me.uid], groupName: groupName);
+    // For now, generate a random pastel color
+    Color groupColor = Utils.mixRandomColor(Colors.white);
+    GroupThemeData themeData = GroupThemeData(groupColor: groupColor);
+    DatabaseWriter.registerNewGroup(admins: [Database.me.uid], members: [Database.me.uid], groupName: groupName, groupThemeData: themeData);
   }
 
   void deleteGroup(BuildContext context, GroupsListItemState group) {
@@ -307,7 +263,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
           group: group,
 
           // This will trigger the onChildDelete listener which will handle the rest
-          deleteGroup: (GroupsListItemState group) => DatabaseWriter.removeGroup(group.data.name)),
+          deleteGroup: (GroupsListItemState group) => DatabaseWriter.removeGroup(group.data.uid)),
     );
   }
 
@@ -316,10 +272,6 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     addSub.cancel();
     deleteSub.cancel();
     changeSub.cancel();
-    for (GlobalKey<GroupsListItemState> stateKey in _groupStateKeys.values) {
-      stateKey.currentState.impData.animationController.dispose();
-      stateKey.currentState.dispose();
-    }
     super.dispose();
   }
 }
