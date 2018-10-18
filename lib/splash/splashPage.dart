@@ -112,8 +112,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     print("Successfully loaded user data");
 
     // Load all group names
-    await DatabaseReader.loadGroupNames();
-    print("Successfully loaded group names");
+    await DatabaseReader.loadGroupUids();
+    print("Successfully loaded group uids");
 
     // Load all group data
     await DatabaseReader.loadGroups();

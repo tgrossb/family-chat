@@ -32,60 +32,59 @@ class GroupScreen extends StatefulWidget {
 
 class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin {
   GroupData data;
-  DatabaseReference mainRef;
-  StreamSubscription<Event> mainRefSubscription;
+  StreamSubscription<Event> messageAddedSub, messageDeletedSub;
+  StreamSubscription<Event> nameChangedSub;
+  StreamSubscription<Event> themeChangedSub;
+  List<GroupMessage> _messages;
 
   final TextEditingController _textController = new TextEditingController();
   bool _isWriting = false;
 
-  // Requires the loaded data and sets up a subscription to get new data
   GroupScreenState({@required this.data});
 
-  // Get the reference to the database for this group
-  // Also, put preloaded messages into _messageSaves and start their
-  // animations while older messages load.
   @override
   void initState(){
-    super.initState();
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(DatabaseConstants.kGROUPS_CHILD).child(data.uid);
-    mainRef.keepSynced(true);
-    mainRefSubscription = mainRef.onChildAdded.listen(_onMessageAdded);
+    // Set up the message added and deleted subs
+    DatabaseReference groupRef = Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}.${data.uid}");
+    messageAddedSub = groupRef.child(DatabaseConstants.kGROUP_MESSAGES_CHILD).onChildAdded.listen(onMessageAdded);
+    messageDeletedSub = groupRef.child(DatabaseConstants.kGROUP_MESSAGES_CHILD).onChildRemoved.listen(onMessageDeleted);
 
-    for (MessageData data in Database.groupFromName[groupName].firstMessages) {
+    // Set up the name changed sub
+    nameChangedSub = groupRef.child(DatabaseConstants.kGROUP_NAME_CHILD).onChildChanged.listen(onNameChanged);
+
+    // Set up the theme changed sub
+    themeChangedSub = groupRef.child(DatabaseConstants.kGROUP_THEME_DATA_CHILD).onChildChanged.listen(onThemeChanged);
+
+    for (MessageData data in data.messages) {
       GroupMessage message = new GroupMessage.fromData(
           data: data,
-          myName: Database.me.name,
           animationController: new AnimationController(
               vsync: this,
-              duration: new Duration(
-                  milliseconds: kMESSAGE_GROW_ANIMATION_DURATION)
+              duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION)
           )
       );
-      _messageSaves.insert(0, message);
+      _messages.insert(0, message);
       message.animationController.forward();
     }
+
+    super.initState();
   }
 
   // Handles the gui side of a new message being added to the database.
   // Parses the event snapshot into the necessary message data and stores it,
   // as well as starting the animation.
-  void _onMessageAdded(Event event){
-    MessageData data = new MessageData(
-      text: event.snapshot.value['text'],
-      name: event.snapshot.value['name'],
-      utcTime: Utils.parseTime(event.snapshot.key)
-    );
+  void onMessageAdded(Event event) async {
+    MessageData data = MessageData.fromSnapshot(snap: event.snapshot);
 
     // If this message has already been handled (preloaded), skip over it
-    if (_messageSaves.any((message) => message.data == data))
+    if (_messages.any((message) => message.data == data))
       return;
 
     GroupMessage message = new GroupMessage.fromData(
       data: data,
-      myName: Database.me.name,
       animationController: new AnimationController(
         duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
         vsync: this
@@ -94,21 +93,40 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
 
     // Insert the message at the front of the array
     setState(() {
-      _messageSaves.insert(0, message);
+      _messages.insert(0, message);
     });
 
     // Start the enter animation for the message
-    // TODO: Change GroupMessage to an AnimatedWidget?
     message.animationController.forward();
+  }
+
+  void onMessageDeleted(Event event) async {
+    String messageTime = event.snapshot.key;
+    setState(() {
+      _messages.removeWhere((message) => Utils.timeToKeyString(message.data.utcTime) == messageTime);
+    });
+  }
+
+  void onNameChanged(Event event) async {
+    setState(() {
+      data.name = event.snapshot.value;
+    });
+  }
+
+  void onThemeChanged(Event event) async {
+    setState(() {
+      data.groupThemeData = GroupThemeData.fromSnapshot(snapshot: event.snapshot);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text(groupName),
+          title: new Text(data.name),
           // No elevation if its on ios
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+          backgroundColor: data.groupThemeData.groupColor,
         ),
         body: new Container(
             child: new Column(
@@ -117,8 +135,8 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
                    child: new ListView.builder(
                      padding: new EdgeInsets.all(8.0),
                      reverse: true,
-                     itemBuilder: (_, int index) => _messageSaves[index],
-                     itemCount: _messageSaves.length,
+                     itemBuilder: (_, int index) => _messages[index],
+                     itemCount: _messages.length,
                    ),
                  ),
 
@@ -191,8 +209,8 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     });
 
     DatabaseWriter.addMessage(
-        groupName: groupName,
-        message: MessageData(text: text, name: Database.me.name, utcTime: DateTime.now()));
+        groupUid: data.uid,
+        message: MessageData(text: text, senderUid: Database.me.uid, utcTime: DateTime.now()));
 
 
     // DO NOT ADD TO _messageSaves OR START THE ANIMATION
@@ -203,9 +221,10 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
   // Cancel all subscriptions and dispose of all animation controllers
   @override
   void dispose() {
-    mainRefSubscription.cancel();
-    for (GroupMessage message in _messageSaves)
-      message.animationController.dispose();
+    messageAddedSub.cancel();
+    messageDeletedSub.cancel();
+    nameChangedSub.cancel();
+    themeChangedSub.cancel();
     super.dispose();
   }
 }

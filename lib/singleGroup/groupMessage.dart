@@ -16,20 +16,11 @@
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
+import 'package:bodt_chat/dataUtils/database.dart';
 
 class GroupMessage extends StatelessWidget {
-  GroupMessage({@required String text, @required String name, @required DateTime time, @required String myName, @required this.animationController}):
-      this.data = new MessageData(
-          text: text,
-          name: name,
-          utcTime: time),
-      this.myMessage = (myName == name) {
-    if (data.hasEmpty)
-      throw ArgumentError.notNull(data.stringEmpties);
-  }
-
-  GroupMessage.fromData({this.data, myName, this.animationController}):
-      this.myMessage = (myName == data.name) {
+  GroupMessage.fromData({this.data, this.animationController}):
+      this.myMessage = (data.senderUid == Database.me.uid) {
     if (this.data.hasEmpty)
       throw ArgumentError.notNull(this.data.stringEmpties);
   }
@@ -72,7 +63,7 @@ class GroupMessage extends StatelessWidget {
     return new Container(
       margin: rightIn ? right : left,
       child: new CircleAvatar(
-          child: new Text(data.name[0], style: theme.primaryTextTheme.body1),
+          child: new Text(data.senderUid[0], style: theme.primaryTextTheme.body1),
           backgroundColor: rightIn ? pcl : ac,
       ),
     );
@@ -83,7 +74,7 @@ class GroupMessage extends StatelessWidget {
       child: new Column(
         crossAxisAlignment: caa,
         children: <Widget>[
-          new Text(myMessage ? "You" : data.name, style: Theme.of(context).primaryTextTheme.caption),
+          new Text(myMessage ? "You" : data.senderUid, style: Theme.of(context).primaryTextTheme.caption),
           new Container(
             margin: const EdgeInsets.only(top: 5.0),
             child: new Text(data.text),

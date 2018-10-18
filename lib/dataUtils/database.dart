@@ -16,7 +16,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bodt_chat/constants.dart';
-import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 
@@ -388,7 +387,7 @@ class DatabaseReader {
 
     List<MessageData> messages = [];
     for (var messageKey in messagesSnap.value.keys)
-      messages.add(MessageData.fromSnapshotValue(message: messagesSnap.value[messageKey], time: messageKey));
+      messages.add(MessageData.fromMap(map: messagesSnap.value[messageKey], time: messageKey));
 
     return messages;
   }

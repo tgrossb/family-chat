@@ -7,7 +7,6 @@ import 'package:firebase_database/firebase_database.dart';
 
 
 class Data {
-
   static final bool reportRegisters = false;
 
   List<String> _empties = [];
@@ -147,6 +146,16 @@ class GroupData extends Data {
   }
 
   @override
+  bool operator ==(other) {
+    if (!(other is GroupData))
+      return false;
+    return uid == other.uid;
+  }
+
+  @override
+  int get hashCode => uid.hashCode;
+
+  @override
   String toString() {
     return "[GroupData $name @ $utcTime with ${messages.length} msgs]";
   }
@@ -183,7 +192,17 @@ class GroupThemeData extends Data {
       }
     };
   }
-  
+
+  @override
+  bool operator ==(other) {
+    if (!(other is GroupThemeData))
+      return false;
+    return hashCode == other.hashCode;
+  }
+
+  @override
+  int get hashCode => groupColor.value;
+
   @override
   String toString() {
     return "[GroupThemeData groupColor: $groupColor]";
@@ -203,10 +222,14 @@ class MessageData extends Data {
     _registerObjectParam(this.utcTime, "utcTime");
   }
 
-  factory MessageData.fromSnapshotValue({@required Map message, @required String time}){
-    String senderUid = message[DatabaseConstants.kMESSAGE_SENDER_UID_CHILD];
-    String text = message[DatabaseConstants.kMESSAGE_TEXT_CHILD];
+  factory MessageData.fromMap({@required Map map, @required String time}){
+    String senderUid = map[DatabaseConstants.kMESSAGE_SENDER_UID_CHILD];
+    String text = map[DatabaseConstants.kMESSAGE_TEXT_CHILD];
     return MessageData(text: text, senderUid: senderUid, utcTime: Utils.parseTime(time));
+  }
+
+  factory MessageData.fromSnapshot({@required DataSnapshot snap}){
+    return MessageData.fromMap(map: snap.value, time: snap.key);
   }
 
   String text;
@@ -224,16 +247,13 @@ class MessageData extends Data {
 
   @override
   bool operator ==(other) {
-    MessageData otherData = other;
-    return text == otherData.text && senderUid == otherData.senderUid && utcTime.millisecondsSinceEpoch == otherData.utcTime.millisecondsSinceEpoch;
+    if (!(other is MessageData))
+      return false;
+    return utcTime.millisecondsSinceEpoch == other.utcTime.millisecondsSinceEpoch;
   }
 
   @override
-  // TODO: Don't think this will be used, but could break
-  int get hashCode {
-    print("This shouldn't happen, but it did (hashCode was used for messageData)");
-    return utcTime.millisecondsSinceEpoch;
-  }
+  int get hashCode => utcTime.millisecondsSinceEpoch;
 }
 
 /*
