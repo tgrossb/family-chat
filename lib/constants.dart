@@ -77,6 +77,9 @@ class DatabaseConstants {
 
   static const String kMESSAGE_TEXT_CHILD = "text";
   static const String kMESSAGE_SENDER_UID_CHILD = "senderUid";
+
+  // Keepers are used to make sure that a child is never empty
+  static const String kKEEPER_KEY = "keeper";
 }
 
 

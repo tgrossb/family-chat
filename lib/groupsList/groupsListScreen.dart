@@ -39,6 +39,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   void initState() {
     // Order the groups by their last message timestamp
     _groupData = Map.of(Database.groupFromUid);
+    _groupUids = _groupData.keys.toList();
     _groupUids.sort((String d1, String d2) => _groupData[d1].utcTime.difference(_groupData[d2].utcTime).inMilliseconds);
 
     // Go through received data and add each group
@@ -131,6 +132,10 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   }
 
   void _onGroupAdded(String groupUid) async {
+    // Skip over any keeper keys
+    if (groupUid == DatabaseConstants.kKEEPER_KEY)
+      return;
+
     if (_groupStateKeys.containsKey(groupUid)) {
       print("Rediscovered group: " + groupUid + ", skipping");
       return;

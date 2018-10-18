@@ -48,9 +48,12 @@ class Data {
 class ResponsibleList extends Data {
   String key;
   Map<String, String> responsibleList;
+  bool ignoreKeepers;
 
-  ResponsibleList({@required this.key, Map<String, String> initialData}){
-    responsibleList = Map.of(initialData);
+  ResponsibleList({@required this.key, Map<String, String> initialData, this.ignoreKeepers = false}){
+    responsibleList = initialData == null ? Map() : Map.of(initialData);
+    if (ignoreKeepers && responsibleList.containsKey(DatabaseConstants.kKEEPER_KEY))
+      responsibleList.remove(DatabaseConstants.kKEEPER_KEY);
     _registerStringParam(this.key, "key");
   }
 
@@ -63,15 +66,17 @@ class ResponsibleList extends Data {
    *   }
    * }
    */
-  factory ResponsibleList.fromSnapshot({@required DataSnapshot snapshot}){
+  factory ResponsibleList.fromSnapshot({@required DataSnapshot snapshot, bool ignoreKeepers = false}){
     String key = snapshot.key;
     Map<String, String> initialData = {};
     snapshot.value.forEach((uid, responsible) => (initialData[uid] = responsible));
-    return ResponsibleList(key: key, initialData: initialData);
+    return ResponsibleList(key: key, initialData: initialData, ignoreKeepers: ignoreKeepers);
   }
 
   bool addEntry(String uid, String responsible){
     if (responsibleList.containsKey(uid))
+      return false;
+    if (ignoreKeepers && uid == DatabaseConstants.kKEEPER_KEY)
       return false;
     responsibleList[uid] = responsible;
     return true;
@@ -86,6 +91,11 @@ class ResponsibleList extends Data {
 
   Map toDatabaseChild(){
     return {key: responsibleList};
+  }
+
+  @override
+  String toString() {
+    return responsibleList.toString();
   }
 }
 

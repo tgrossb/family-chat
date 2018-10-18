@@ -105,7 +105,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     await DatabaseReader.loadUserUids();
     print("Successfully loaded user uids");
 
-    print(Database.userUids);
 
     // Load all user data (public)
     await DatabaseReader.loadUsers(user.uid);

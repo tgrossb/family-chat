@@ -125,7 +125,8 @@ class DatabaseWriter {
 
     bool successful = true;
     DatabaseReference groupLoc = Database.database.reference().child(DatabaseConstants.kGROUPS_CHILD).push();
-    await groupLoc.set(groupData.toDatabaseChild().values).catchError((e){
+    // This is giving me problems
+    await groupLoc.set(groupData.toDatabaseChild()["0"]).catchError((e){
       successful = false;
       throw e;
     });
@@ -282,7 +283,8 @@ class DatabaseReader {
       return null;
     }
 
-    Database.groupUids = ResponsibleList.fromSnapshot(snapshot: groupsSnap);
+    // Make sure the responsible list ignores the keeper
+    Database.groupUids = ResponsibleList.fromSnapshot(snapshot: groupsSnap, ignoreKeepers: true);
     return Database.groupUids;
   }
 
@@ -342,6 +344,9 @@ class DatabaseReader {
 
     // Now, query each group to get the data
     for (String groupUid in Database.groupUids.responsibleList.keys){
+      // Skip over any keepers in the groups
+      if (groupUid == DatabaseConstants.kKEEPER_KEY)
+        continue;
       GroupData groupData = await loadSingleGroup(groupUid);
       if (groupData == null)
         return null;
