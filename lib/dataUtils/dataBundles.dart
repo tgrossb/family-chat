@@ -41,35 +41,6 @@ class Data {
 }
 
 /*
- * TODO: Banish this class from existence
- * This is the packaged data for the specific implementation of a group.
- *
- * These objects specify the behavior of the group, and do not contain
- * any group-specific data.
- */
-class GroupImplementationData extends Data {
-  GroupImplementationData({this.start, this.delete, this.animationController}){
-    _registerObjectParam(this.start, "start");
-    _registerObjectParam(this.delete, "delete");
-    _registerObjectParam(this.animationController, "animationController");
-  }
-
-  // This is the function used to start the group.
-  // This is called when a group is clicked on, and triggers
-  // the transition to the group screen
-  Function start;
-
-  // This is the function used to delete the group.
-  // This is called when the delete group dialog is confirmed.
-  Function delete;
-
-  // This is the animation controller that controls the enter animation
-  // for the group.
-  // This is used for the bounce-in effect that groups list items have.
-  AnimationController animationController;
-}
-
-/*
  * This is the packaged data for a list of uids with responsibility.
  *
  * That means that it contains a map of who added each uid to the list.
@@ -147,9 +118,17 @@ class GroupData extends Data {
     _registerObjectParam(this.groupThemeData, "groupTheme");
   }
 
-//  factory GroupData.fromSnapshot({@required Map groupData}){
-//    return GroupData(utcTime: null, uid: null, name: null, messages: null, admins: null, members: null, groupThemeData: null);
-//  }
+  factory GroupData.fromSnapshot({@required DataSnapshot snap}){
+    return GroupData(
+        utcTime: null,
+        uid: null,
+        name: null,
+        messages: null,
+        admins: null,
+        members: null,
+        groupThemeData: null
+    );
+  }
 
   Map toDatabaseChild(){
     Map messagesMap = {};

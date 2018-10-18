@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
 
 const Color kSPLASH_SCREEN_BUTTON_COLOR = Color(0xff413c58);
 const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
@@ -79,6 +80,7 @@ class DatabaseConstants {
 }
 
 
+var kDAY_MONTH_YEAR_FORMAT = intl.DateFormat("MMM d, yyyy");
 const int kLOADING_FINISH = -1;
 
 

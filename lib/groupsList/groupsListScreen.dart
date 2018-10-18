@@ -11,10 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
-import 'package:bodt_chat/themes/defaultTheme.dart' as DefaultTheme;
 
 class GroupsListScreen extends StatefulWidget {
   GroupsListScreen();
@@ -28,38 +26,42 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
   StreamSubscription<Event> addSub, deleteSub, changeSub;
   bool canSub = false;
 
-  List<GroupData> groupsData;
+  // This list holds the order for map keys
+  List<String> _groupUids;
+
+  Map<String, GroupData> _groupData;
   Map<String, GlobalKey<GroupsListItemState>> _groupStateKeys = {};
-  List<GroupsListItem> _groups = [];
+  Map<String, GroupsListItem> _groups = {};
 
   AnimationController fadeController;
   Animation fadeInAnimation;
 
   @override
   void initState() {
-    // Order the groupsData based on last message time
-    groupsData = Database.groupFromUid.values.toList();
-    groupsData.sort((GroupData d1, GroupData d2) => d1.utcTime.difference(d2.utcTime).inMilliseconds);
+    // Order the groups by their last message timestamp
+    _groupData = Map.of(Database.groupFromUid);
+    _groupUids.sort((String d1, String d2) => _groupData[d1].utcTime.difference(_groupData[d2].utcTime).inMilliseconds);
 
     // Go through received data and add each group
     int c = 0;
-    for (GroupData groupData in groupsData) {
-      print("Recieved group data: " + groupData.toString());
-      int groupPosition = groupsData.length - ++c;
-      addGroupFromData(groupData, groupPosition * kGROUPS_LIST_ITEM_ANIMATION_OFFSET);
+    for (String groupUid in _groupUids) {
+      GroupData data = _groupData[groupUid];
+      print("Recieved group data: " + data.toString());
+      int groupPosition = _groupUids.length - ++c;
+      addGroupFromData(data, groupPosition * kGROUPS_LIST_ITEM_ANIMATION_OFFSET);
     }
 
     FirebaseDatabase db = FirebaseDatabase.instance;
     db.setPersistenceEnabled(true);
 
-    mainRef = db.reference().child(DatabaseConstants.kGROUPS_CHILD);
+    mainRef = db.reference().child(DatabaseConstants.kGROUPS_LIST_CHILD);
     mainRef.keepSynced(true);
     addSub = mainRef.onChildAdded
         .listen((Event event) => _onGroupAdded(event.snapshot));
     deleteSub = mainRef.onChildRemoved
-        .listen((Event event) => _onGroupDeleted(event.snapshot.key));
+        .listen((Event event) => _onGroupDeleted(event.snapshot));
     changeSub = mainRef.onChildChanged
-        .listen((Event event) => _onGroupChanged(event.snapshot.key));
+        .listen((Event event) => _onGroupChanged(event.snapshot));
 
     fadeController = new AnimationController(
         vsync: this, duration: new Duration(milliseconds: 100));
@@ -72,70 +74,65 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     super.initState();
   }
 
+  // The group should already be present in the _groupData map and the _groupUids list
   void addGroupFromData(GroupData data, int animationOffset) {
     var stateKey = new GlobalKey<GroupsListItemState>();
     GroupsListItem item = new GroupsListItem.fromData(
       key: stateKey,
       data: data,
-      impData: new GroupImplementationData(
-          start: startGroup,
-          delete: deleteGroup,
-          animationController: new AnimationController(
-            vsync: this,
-            duration:
-                new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
-          )),
+      onClick: startGroup,
+      onDelete: deleteGroup,
+      controller: new AnimationController(
+       vsync: this,
+       duration:
+         new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
+      )
     );
 
-    _groupStateKeys.putIfAbsent(data.name, () => stateKey);
-    _groups.insert(0, item);
+    _groupStateKeys[data.uid] = stateKey;
+    _groups[data.uid] = item;
     item.startAnimation(msOffset: animationOffset);
   }
 
-  void _onGroupChanged(String groupName) async {
-    print("Begin changing group '$groupName'");
+  void _onGroupChanged(DataSnapshot snap) async {
+    String groupUid = snap.key;
+    print("Begin changing group $groupUid");
 
-    var stateKey = _groupStateKeys[groupName];
-    stateKey.currentState.setState(() {
-      // Make clicks do nothing while loading new data
-      // This will be changed once the new data is loaded
-      stateKey.currentState
-        ..impData.start = (){}
-        ..impData.delete = (){};
-    });
+    GlobalKey stateKey = _groupStateKeys[groupUid];
+    GroupsListItem item = stateKey.currentWidget;
 
-    GroupData data = await getGroupData(groupName);
-    stateKey.currentState.setState((){
-      // Restore functionality, update the data, and redo the animation
-      stateKey.currentState
-          ..data.utcTime = data.utcTime
-          ..data.name = data.name
-          ..impData.start = startGroup
-          ..impData.delete = deleteGroup
-          ..impData.animationController.forward(from: 0.0);
-    });
+    // Make clicks do nothing while loading new data
+    // This will be changed once the new data is loaded
+    item.disable();
 
-    print("Finished changing group '$groupName'");
+    GroupData data = GroupData.fromSnapshot(snap: snap);
+    // Restore functionality, update the data, and redo the animation
+    item.setData(data);
+    item.startAnimation();
+    item.enable();
+
+    print("Finished changing group $groupUid");
   }
 
-  void _onGroupDeleted(String groupName) async {
-    var group = _groupStateKeys[groupName].currentState;
+  void _onGroupDeleted(DataSnapshot snap) async {
+    String groupUid = snap.key;
+    var group = _groupStateKeys[groupUid].currentState;
 
-    group.impData.animationController.addStatusListener((AnimationStatus status) {
+    group.controller.addStatusListener((AnimationStatus status) {
       if (status == AnimationStatus.dismissed)
         setState(() {
-          group.impData.animationController.dispose();
           group.dispose();
-          _groups.removeWhere(
-              (GroupsListItem item) => item.key.currentState.data.name == groupName);
-          _groupStateKeys.remove(groupName);
+          _groupUids.remove(groupUid);
+          _groupData.remove(groupUid);
+          _groups.remove(groupUid);
+          _groupStateKeys.remove(groupUid);
         });
     });
-    group.impData.animationController.reverse();
+    group.controller.reverse();
   }
 
-  void _onGroupAdded(DataSnapshot snapshot) async {
-    String groupName = snapshot.key;
+  void _onGroupAdded(DataSnapshot snap) async {
+    String groupName = snap.key;
     if (_groupStateKeys.containsKey(groupName)) {
       print("Rediscovered group: " + groupName + ", skipping");
       return;
@@ -182,18 +179,6 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     print("Add finished");
   }
 */
-  Future<GroupData> getGroupData(String groupName) async {
-    Event event = await mainRef
-        .child(groupName)
-        .child(DatabaseConstants.kGROUP_MESSAGES_CHILD)
-        .limitToLast(1)
-        .onChildAdded
-        .first;
-
-    print("Raw time: " + event.snapshot.key);
-    // TODO: Start loading the messages of the group
-    return new GroupData(utcTime: Utils.parseTime(event.snapshot.key), name: groupName, messages: []);
-  }
 
 /*
   void updateStates() {
