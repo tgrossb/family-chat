@@ -37,6 +37,13 @@ class Data {
     if (value == null || (objIsEmpty != null && objIsEmpty(value)))
       _empties.add(paramName);
   }
+
+  // Many inherited classes present the method toDatabaseChild, and this is useful for that method
+  Map orphanable(Map m, bool orphan){
+    if (orphan)
+      return Utils.stripParent(m);
+    return m;
+  }
 }
 
 /*
@@ -89,8 +96,8 @@ class ResponsibleList extends Data {
     return true;
   }
 
-  Map toDatabaseChild(){
-    return {key: responsibleList};
+  Map toDatabaseChild({bool orphan = false}){
+    return orphanable({key: responsibleList}, orphan);
   }
 
   @override
@@ -110,49 +117,37 @@ class GroupData extends Data {
   // a list of members and admins, and the group's theme data
   String uid;
   String name;
-  DateTime utcTime;
   List<MessageData> messages;
   ResponsibleList admins;
   ResponsibleList members;
   GroupThemeData groupThemeData;
 
-  GroupData({@required this.utcTime, @required this.uid, @required this.name, @required this.messages,
+  DateTime get utcTime => messages[messages.length-1].utcTime;
+
+  GroupData({@required this.uid, @required this.name, @required this.messages,
     @required this.admins, @required this.members, @required this.groupThemeData}){
     _registerStringParam(this.uid, "uid");
     _registerStringParam(this.name, "name");
-    _registerObjectParam(this.utcTime, "utcTime");
     _registerListParam(this.messages, "messages");
     _registerObjectParam(this.admins, "admins");
     _registerObjectParam(this.members, "members");
     _registerObjectParam(this.groupThemeData, "groupTheme");
   }
 
-  factory GroupData.fromSnapshot({@required DataSnapshot snap}){
-    return GroupData(
-        utcTime: null,
-        uid: null,
-        name: null,
-        messages: null,
-        admins: null,
-        members: null,
-        groupThemeData: null
-    );
-  }
-
-  Map toDatabaseChild(){
+  Map toDatabaseChild({bool orphan = false}){
     Map messagesMap = {};
     for (MessageData message in messages)
       messagesMap.addAll(message.toDatabaseChild());
 
-    return {
+    return orphanable({
       uid: {
         DatabaseConstants.kGROUP_NAME_CHILD: name,
-        DatabaseConstants.kGROUP_ADMINS_CHILD: admins.toDatabaseChild().values,
-        DatabaseConstants.kGROUP_MEMBERS_CHILD: members.toDatabaseChild().values,
+        DatabaseConstants.kGROUP_ADMINS_CHILD: admins.toDatabaseChild(orphan: true),
+        DatabaseConstants.kGROUP_MEMBERS_CHILD: members.toDatabaseChild(orphan: true),
         DatabaseConstants.kGROUP_MESSAGES_CHILD: messagesMap,
-        DatabaseConstants.kGROUP_THEME_DATA_CHILD: groupThemeData.toDatabaseChild().values
+        DatabaseConstants.kGROUP_THEME_DATA_CHILD: groupThemeData.toDatabaseChild(orphan: true)
       }
-    };
+    }, orphan);
   }
 
   @override
@@ -178,29 +173,44 @@ class GroupData extends Data {
  * that persists across users.
  */
 class GroupThemeData extends Data {
-  Color groupColor;
-  GroupThemeData({@required this.groupColor}){
-    _registerObjectParam(this.groupColor, "groupColor");
+  Color accentColor, backgroundColor;
+  GroupThemeData({@required this.accentColor, @required this.backgroundColor}){
+    _registerObjectParam(this.accentColor, "accentColor");
+    _registerObjectParam(this.backgroundColor, "backgroundColor");
   }
 
   factory GroupThemeData.fromSnapshot({@required DataSnapshot snapshot}){
-    int parsedColor = 0xff79baba;
-    try {
-      parsedColor = int.parse(snapshot.value[DatabaseConstants.kGROUP_COLOR_CHILD], radix: 16);
-    } catch (e){
-      // Allow this to fail quietly
-      print("Group color parsing has failed quietly");
-    }
-    
-    return GroupThemeData(groupColor: Color(parsedColor));
+    String accentString = snapshot.value[DatabaseConstants.kGROUP_ACCENT_COLOR_CHILD];
+    Color accentColor = Utils.stringToColor(accentString, DatabaseConstants.kGROUP_ACCENT_COLOR_DEFAULT);
+
+    String backgroundString = snapshot.value[DatabaseConstants.kGROUP_BACKGROUND_COLOR_CHILD];
+    Color backgroundColor = Utils.stringToColor(backgroundString, DatabaseConstants.kGROUP_BACKGROUND_COLOR_DEFAULT);
+    return GroupThemeData(accentColor: accentColor, backgroundColor: backgroundColor);
   }
 
-  Map toDatabaseChild(){
-    return {
+  void updateFromChangeSnapshot(DataSnapshot snapshot){
+    if (snapshot.key == DatabaseConstants.kGROUP_ACCENT_COLOR_CHILD)
+      accentColor = Utils.stringToColor(snapshot.value, DatabaseConstants.kGROUP_ACCENT_COLOR_DEFAULT);
+
+    else if (snapshot.key == DatabaseConstants.kGROUP_BACKGROUND_COLOR_CHILD)
+      backgroundColor = Utils.stringToColor(snapshot.value, DatabaseConstants.kGROUP_BACKGROUND_COLOR_DEFAULT);
+
+    else if (snapshot.key == DatabaseConstants.kGROUP_THEME_DATA_CHILD)
+      copyFrom(GroupThemeData.fromSnapshot(snapshot: snapshot));
+  }
+
+  void copyFrom(GroupThemeData other){
+    accentColor = other.accentColor;
+    backgroundColor = other.backgroundColor;
+  }
+
+  Map toDatabaseChild({bool orphan = false}){
+    return orphanable({
       DatabaseConstants.kGROUP_THEME_DATA_CHILD: {
-        DatabaseConstants.kGROUP_COLOR_CHILD: groupColor.value
+        DatabaseConstants.kGROUP_ACCENT_COLOR_CHILD: Utils.colorToString(accentColor),
+        DatabaseConstants.kGROUP_BACKGROUND_COLOR_CHILD: Utils.colorToString(backgroundColor)
       }
-    };
+    }, orphan);
   }
 
   @override
@@ -211,11 +221,11 @@ class GroupThemeData extends Data {
   }
 
   @override
-  int get hashCode => groupColor.value;
+  int get hashCode => accentColor.value;
 
   @override
   String toString() {
-    return "[GroupThemeData groupColor: $groupColor]";
+    return "[GroupThemeData accentColor: $accentColor]";
   }
 }
 
@@ -246,13 +256,13 @@ class MessageData extends Data {
   String senderUid;
   DateTime utcTime;
 
-  Map toDatabaseChild(){
-    return {
+  Map toDatabaseChild({bool orphan = false}){
+    return orphanable({
       Utils.timeToKeyString(utcTime): {
         DatabaseConstants.kMESSAGE_SENDER_UID_CHILD: senderUid,
         DatabaseConstants.kMESSAGE_TEXT_CHILD: text
       }
-    };
+    }, orphan);
   }
 
   @override
@@ -264,6 +274,12 @@ class MessageData extends Data {
 
   @override
   int get hashCode => utcTime.millisecondsSinceEpoch;
+
+  @override
+  String toString() {
+    String excerpt = text.substring(0, text.length > 10 ? 10 : text.length);
+    return "[MessageData senderUid: $senderUid  time: $utcTime  text: $excerpt]";
+  }
 }
 
 /*

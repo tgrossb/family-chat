@@ -16,6 +16,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:bodt_chat/constants.dart';
+import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataUtils/user.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 
@@ -45,9 +46,12 @@ class Database {
 
 class DatabaseWriter {
   // Sets a database child's value and checks if the operation was successful
-  static Future<bool> performCheckedSet(String path, var value) async {
+  static Future<bool> performCheckedSet(var value, {DatabaseReference ref, String path}) async {
+    assert(ref != null || path != null);
     bool successful = true;
-    await Database.database.reference().child(path).set(value).catchError((e){
+    if (ref == null)
+      ref = Database.database.reference().child(path);
+    await ref.set(value).catchError((e){
       successful = false;
       throw e;
     });
@@ -57,25 +61,36 @@ class DatabaseWriter {
 
   // Adds the map definition of a child to the database at the supplied path
   // Uses checked operations
-  static Future<bool> appendChild(String path, Map child) async {
+  static Future<bool> appendChild(Map child, {DatabaseReference ref, String path}) async {
     // Ensure that the child only has one root key
     assert(child.keys.length == 1);
+    assert(ref != null || path != null);
 
-    String childRoot = child.keys.toList()[0];
-    return await performCheckedSet("$path/$childRoot", child[childRoot]);
+    // Strip the root from the child (remove the parent)
+    var orphan = Utils.stripParent(child);
+    String root = Utils.getRoot(child);
+
+    if (ref == null)
+      return await performCheckedSet(orphan, path: "$path/$root");
+
+    return await performCheckedSet(orphan, ref: ref.child(root));
   }
 
   static Future<bool> registerNewUser({@required Me me}) async {
-    bool successful = await appendChild(DatabaseConstants.kUSERS_CHILD, me.toDatabaseChild());
+    // Add me to the users data section
+    bool successful = await appendChild(me.toDatabaseChild(), path: DatabaseConstants.kUSERS_CHILD);
     if (!successful)
       return false;
-    successful = await appendChild(DatabaseConstants.kUSERS_LIST_CHILD, {me.uid: "uid"});
+
+    // Add me to the user list
+    successful = await appendChild({me.uid: "uid"}, path: DatabaseConstants.kUSERS_LIST_CHILD);
     if (!successful)
       return false;
 
     // Update the database class to reflect this change
     Database.userUids.add(me.uid);
     Database.userFromUid[me.uid] = me;
+    Database.me = me;
 
     return true;
   }
@@ -83,7 +98,8 @@ class DatabaseWriter {
   // This user must be a registered user, and the current user must be a sudoer
   // These stipulations are verified by database rules, so there's no need to check them here
   static Future<bool> registerNewSudoer({@required User user}) async {
-    bool successful = await appendChild(DatabaseConstants.kSUDOERS_CHILD, {user.uid: Database.me.uid});
+    // Register the user as a sudoer along with my uid (for responsibility)
+    bool successful = await appendChild({user.uid: Database.me.uid}, path: DatabaseConstants.kSUDOERS_CHILD);
     if (!successful)
       return false;
 
@@ -93,7 +109,7 @@ class DatabaseWriter {
     return true;
   }
 
-  static Future<bool> registerNewGroup({@required List<String> admins, @required List<String> members,
+  static Future<GroupData> registerNewGroup({@required List<String> admins, @required List<String> members,
                                             @required String groupName, @required GroupThemeData groupThemeData}) async {
     // Check that the group admins and members section contains me
     if (!admins.contains(Database.me.uid))
@@ -115,7 +131,6 @@ class DatabaseWriter {
     // A real uid will be generated when it is pushed, and the uid will then be updated
     GroupData groupData = GroupData(
       uid: "0",
-      utcTime: utcTime,
       name: groupName,
       admins: adminsResList,
       members: membersResList,
@@ -123,29 +138,26 @@ class DatabaseWriter {
       messages: [MessageData(text: "${Database.me.name} created the group $groupName", senderUid: "System", utcTime: utcTime)]
     );
 
-    bool successful = true;
     DatabaseReference groupLoc = Database.database.reference().child(DatabaseConstants.kGROUPS_CHILD).push();
-    // This is giving me problems
-    await groupLoc.set(groupData.toDatabaseChild()["0"]).catchError((e){
-      successful = false;
-      throw e;
-    });
-
-    if (!successful)
-      return false;
 
     // Update the uid to be the generated uid
     groupData.uid = groupLoc.key;
-    
-    successful = await appendChild(DatabaseConstants.kGROUPS_LIST_CHILD, {groupData.name: Database.me.uid});
+
+    // Write the data to the group data section
+    bool successful = await performCheckedSet(Utils.stripParent(groupData.toDatabaseChild()), ref: groupLoc);
     if (!successful)
-      return false;
+      return null;
+
+    // Add this group to the groups list (with responsibility)
+    successful = await appendChild({groupData.uid: Database.me.uid}, path: DatabaseConstants.kGROUPS_LIST_CHILD);
+    if (!successful)
+      return null;
 
     // Update the database class to reflect this change
     Database.groupUids.addEntry(groupData.uid, Database.me.uid);
     Database.groupFromUid[groupData.uid] = groupData;
 
-    return true;
+    return groupData;
   }
 
   static Future<bool> removeGroup(String groupUid) async {
@@ -167,12 +179,12 @@ class DatabaseWriter {
 
   static Future<bool> addMessage({@required String groupUid, @required MessageData message}) async {
     String path = "${DatabaseConstants.kGROUPS_CHILD}/$groupUid/${DatabaseConstants.kGROUP_MESSAGES_CHILD}";
-    bool successful = await appendChild(path, message.toDatabaseChild());
+    bool successful = await appendChild(message.toDatabaseChild(), path: path);
     if (!successful)
       return false;
 
     // Update the database class to reflect this change
-    Database.groupFromUid[groupUid].messages.insert(0, message);
+    Database.groupFromUid[groupUid].messages.add(message);
 
     return true;
   }
@@ -180,7 +192,7 @@ class DatabaseWriter {
 
 class DatabaseReader {
   // Loads a child from the database, and returns null if an error is encountered
-  static Future<DataSnapshot> loadChild([String location, bool order = false]) async {
+  static Future<DataSnapshot> loadChild(String location) async {
     DatabaseReference ref = Database.database.reference().child(location);
     DataSnapshot snap;
 
@@ -190,11 +202,7 @@ class DatabaseReader {
       throw e;
     };
 
-    if (order)
-      snap = await ref.orderByKey().once().catchError(onError);
-    else
-      snap = await ref.once().catchError(onError);
-    return snap;
+    return await ref.once().catchError(onError);
   }
 
   // Gets all of the keys from a datasnapshot's values
@@ -322,7 +330,6 @@ class DatabaseReader {
 
     GroupData groupData = GroupData(
         uid: groupUid,
-        utcTime: messages[0].utcTime,
         name: name,
         messages: messages,
         admins: admins,
@@ -386,13 +393,15 @@ class DatabaseReader {
   // Loads all messages from a group as a list of MessageData objects
   // TODO: Load a chunk and stream others
   static Future<List<MessageData>> loadGroupMessages(String groupUid) async {
-    DataSnapshot messagesSnap = await loadChild("${DatabaseConstants.kGROUPS_CHILD}/$groupUid/${DatabaseConstants.kGROUP_MESSAGES_CHILD}", true);
+    DataSnapshot messagesSnap = await loadChild("${DatabaseConstants.kGROUPS_CHILD}/$groupUid/${DatabaseConstants.kGROUP_MESSAGES_CHILD}");
     if (messagesSnap == null)
       return null;
 
     List<MessageData> messages = [];
     for (var messageKey in messagesSnap.value.keys)
       messages.add(MessageData.fromMap(map: messagesSnap.value[messageKey], time: messageKey));
+
+    messages.sort((m1, m2) => m1.utcTime.difference(m2.utcTime).inMilliseconds);
 
     return messages;
   }

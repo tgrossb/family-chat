@@ -2,8 +2,9 @@ import 'dart:math' as math;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
-import 'package:intl/intl.dart' as intl;
-import 'package:bodt_chat/constants.dart' as Constants;
+import 'package:bodt_chat/utils.dart';
+import 'package:bodt_chat/widgetUtils/animatedIconSwitch.dart';
+import 'package:bodt_chat/widgetUtils/maxHeight.dart';
 
 class EaseIn extends Tween<Offset> {
   EaseIn(): super(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0));
@@ -38,19 +39,23 @@ class GroupsListItem extends StatefulWidget {
   @override
   State createState() => new GroupsListItemState(onClick: onClick, onDelete: onDelete, controller: controller, data: data);
 
-  void startAnimation({double from = 0.0, int msOffset = 0}) async {
+  Future<void> startAnimation({double from = 0.0, int msOffset = 0}) async {
+    while ((super.key as GlobalKey).currentState == null){}
     ((super.key as GlobalKey).currentState as GroupsListItemState).startAnimation(from: from, msOffset: msOffset);
   }
 
   void disable() async {
+    while ((super.key as GlobalKey).currentState == null){}
     ((super.key as GlobalKey).currentState as GroupsListItemState).disable();
   }
 
   void enable() async {
+    while ((super.key as GlobalKey).currentState == null){}
     ((super.key as GlobalKey).currentState as GroupsListItemState).enable();
   }
 
   void setData(GroupData data) async {
+    while ((super.key as GlobalKey).currentState == null){}
     ((super.key as GlobalKey).currentState as GroupsListItemState).setData(data);
   }
 }
@@ -60,87 +65,100 @@ class GroupsListItemState extends State<GroupsListItem> {
   GroupData data;
   AnimationController controller;
   bool enabled = true;
+  Timer timer;
+  String dateTimeString;
 
   GroupsListItemState({@required this.onClick, @required this.onDelete, @required this.data, @required this.controller});
 
   @override
+  void initState() {
+    // Set up a reoccurring timer to update the time on the messages each minute
+    timer = Timer.periodic(Duration(minutes: 1), (t) => setState((){
+      dateTimeString = Utils.timeToReadableString(data.utcTime, short: true);
+    }));
+    dateTimeString = Utils.timeToReadableString(data.utcTime, short: true);
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return controller == null ? normalMessage(context) : new SlideTransition(
+    return controller == null ? normalMessage(context) :
+      SlideTransition(
         position: new EaseIn().animate(controller),
         child: normalMessage(context)
-    );
+      );
   }
 
   Widget normalMessage(BuildContext context){
-    return GestureDetector(
-      onTap: enabled ? () => onClick(context, data.uid) : null,
-      child: new Container(
-        color: Colors.transparent,
-        alignment: Alignment(1.0, 0.0),
-        margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            profilePic(context, true),
-            message(context, CrossAxisAlignment.start),
-
-            new IconButton(
-              icon: new Icon(Icons.delete),
-              onPressed: enabled ? () => onDelete(context, data.uid) : null,
+    ThemeData theme = Theme.of(context);
+    return MaxHeight(
+      children: <Widget>[
+        Expanded(
+          child: GestureDetector(
+            onTap: () => onClick(context, data),
+            child: MaxHeight(
+              children: <Widget>[
+                buildGroupIcon(context, theme),
+                buildNameAndLastMsg(context, theme)
+              ],
             ),
-          ]
+          ),
         ),
-      )
+
+        buildTimeAndBell(context, theme)
+      ],
     );
   }
 
-  Widget profilePic(BuildContext context, bool rightIn){
-    EdgeInsets right = const EdgeInsets.only(right: 16.0);
-    EdgeInsets left = const EdgeInsets.only(left: 16.0);
-    ThemeData theme = Theme.of(context);
-
-    return new Container(
-      margin: rightIn ? right : left,
-      child: new CircleAvatar(
-        child: new Text(data.name[0], style: theme.primaryTextTheme.headline),
-        backgroundColor: data.groupThemeData.groupColor,
+  Widget buildGroupIcon(BuildContext context, ThemeData theme){
+    return Container(
+      color: Colors.transparent,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: CircleAvatar(
+          child: Text(data.name[0], style: theme.primaryTextTheme.headline),
+          backgroundColor: data.groupThemeData.accentColor,
+        ),
       ),
     );
   }
 
-  Widget message(BuildContext context, CrossAxisAlignment caa){
-    var format;
-    DateTime now = DateTime.now();
-    DateTime lastLocalTime = data.utcTime.toLocal();
-    DateTime midnight = DateTime(now.year, now.month, now.day);
-    DateTime sixDaysAgo = now.subtract(Duration(days: 6));
-    DateTime jan1 = DateTime(now.year);
+  Widget buildNameAndLastMsg(BuildContext context, ThemeData theme){
+    FontWeight read = FontWeight.normal;
+    TextStyle nameStyle = theme.primaryTextTheme.title.copyWith(fontWeight: read);
+    TextStyle lastMsgStyle = theme.primaryTextTheme.body1.copyWith(fontWeight: read);
 
-    // Use the time if the last message occurred today
-    if (lastLocalTime.isAfter(midnight))
-      format = intl.DateFormat("h:mm a");
-    // Use the day if the last message occurred within the past six days
-    else if (lastLocalTime.isAfter(sixDaysAgo))
-      format = intl.DateFormat("EEE");
-    // Use the month and day of month if the last message occurred within this year
-    else if (lastLocalTime.isAfter(jan1))
-      format = intl.DateFormat("MMM d");
-    // Use the full month day, year if else
-    else
-      format = Constants.kDAY_MONTH_YEAR_FORMAT;
+    return Expanded(
+      child: Container(
+        color: Colors.transparent,
+        padding: EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(bottom: 5.0),
+              child: Text(data.name, style: nameStyle, overflow: TextOverflow.ellipsis),
+            ),
 
-    String dateString = format.format(lastLocalTime);
+            Text(data.messages[data.messages.length-1].text, style: lastMsgStyle, overflow: TextOverflow.ellipsis)
+          ],
+        ),
+      ),
+    );
+  }
 
-    return new Expanded(
-      child: new Column(
-        crossAxisAlignment: caa,
-        children: <Widget>[
-          new Container(
-            margin: const EdgeInsets.only(top: 5.0),
-            child: new Text(data.name, style: Theme.of(context).primaryTextTheme.title.copyWith(fontWeight: FontWeight.normal)),
-          ),
-          new Text(dateString, style: Theme.of(context).primaryTextTheme.body2.copyWith(fontWeight: FontWeight.normal)),
-        ],
+  Widget buildTimeAndBell(BuildContext context, ThemeData theme){
+    TextStyle timeStampStyle = theme.primaryTextTheme.caption;
+
+    return Container(
+      color: Colors.transparent,
+      child: AnimatedIconSwitch(
+        unselected: Icons.notifications_off,
+        selected: Icons.notifications,
+        top: Text(dateTimeString, style: timeStampStyle),
+        duration: Duration(milliseconds: 200),
+        onPressed: (selected){},
       ),
     );
   }
@@ -199,6 +217,7 @@ class GroupsListItemState extends State<GroupsListItem> {
   @override
   void dispose() {
     controller.dispose();
+    timer.cancel();
     super.dispose();
   }
 }

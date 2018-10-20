@@ -5,17 +5,37 @@ import 'package:bodt_chat/constants.dart';
 import 'package:intl/intl.dart' as intl;
 
 class Utils {
+  static dynamic stripParent(Map m){
+    assert(m.keys.length == 1);
+    return m[getRoot(m)];
+  }
+
+  static dynamic getRoot(Map m){
+    assert(m.keys.length == 1);
+    return m.keys.toList()[0];
+  }
+
+  static Color stringToColor(String hexString, int defaultValue){
+    int parsedValue = defaultValue;
+    try {
+      parsedValue = int.parse(hexString, radix: 16);
+    } catch (e){
+      print("Letting parseColor fail silently");
+    }
+
+    return Color(parsedValue);
+  }
+
+  static String colorToString(Color color){
+    return color.value.toRadixString(16);
+  }
+
   static Color mixRandomColor(Color mix){
     var rand = math.Random();
     int red = ((rand.nextInt(256) + mix.red)/2).round();
     int blue = ((rand.nextInt(256) + mix.blue)/2).round();
     int green = ((rand.nextInt(256) + mix.green)/2).round();
     return Color.fromRGBO(red, green, blue, 1.0);
-  }
-
-  static String getNewGroupText(String groupName){
-    // TODO: Use the proper user when global users exist
-    return "Theo created the group $groupName";
   }
 
   static DateTime parseTime(String rawTime) {
@@ -34,9 +54,56 @@ class Utils {
     return format.format(time.toLocal());
   }
 
-  static String timeToReadableString(DateTime time){
-    var format = new intl.DateFormat("h:mm a, EEE, MMM d, yyyy");
-    return format.format(time.toLocal());
+  static String timeToReadableString(DateTime time, {bool short = true}){
+    DateTime now = DateTime.now();
+    DateTime lastLocalTime = time.toLocal();
+    Duration diff = now.difference(lastLocalTime).abs();
+
+    // Use now if the difference is less than a minute
+    if (diff < Duration(minutes: 1))
+      return "Now";
+
+    // Use the minutes since if the difference is less than an hour
+    if (diff < Duration(hours: 1))
+      return "${diff.inMinutes} min";
+
+
+    // Use the clock time if the time is still today
+    // TODO: Short?
+    DateTime midnight = DateTime(now.year, now.month, now.day);
+    if (lastLocalTime.isAfter(midnight))
+      return intl.DateFormat(preferredTimeFormat()).format(lastLocalTime);
+
+    // Use the day of the week if the time is within the past six days
+    // Include the time if it is not short
+    DateTime sixDaysAgo = now.subtract(Duration(days: 6));
+    if (lastLocalTime.isAfter(sixDaysAgo))
+      return intl.DateFormat(short ? "EEE" : preferredTimeFormat("EEE ")).format(lastLocalTime);
+
+    // Use the month and day of month if the last message occurred within this year
+    // Include the time if it is not short
+    DateTime jan1 = DateTime(now.year);
+    if (lastLocalTime.isAfter(jan1))
+      return intl.DateFormat(short ? "MMM d" : preferredTimeFormat("MMM d, ")).format(lastLocalTime);
+
+    // Default is to just use the full month day year
+    // Include the time if it is not short
+    // Use the correct order based on the constants
+    String formatter = kDAY_MONTH_YEAR_ORDER.join("/")
+                        ..replaceAll("m", kPREFERRED_MONTH_NUM)
+                        ..replaceAll("d", kPREFERRED_DAY_NUM)
+                        ..replaceAll("y", kPREFERRED_YEAR);
+    return intl.DateFormat(short ? formatter : preferredTimeFormat(formatter + " ")).format(lastLocalTime);
+  }
+
+  static String preferredTimeFormat([String prefix = ""]){
+    String form = "$prefix$kPREFERRED_HOUR:mm";
+    if (kPREFERRED_USE_SECONDS)
+      form += ":ss";
+
+    if (kPREFERRED_HOUR.substring(0, 1) == "h")
+      form += " a";
+    return form;
   }
 
   static String timeToAbsoluteString(DateTime time){

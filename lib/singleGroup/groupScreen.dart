@@ -48,7 +48,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     db.setPersistenceEnabled(true);
 
     // Set up the message added and deleted subs
-    DatabaseReference groupRef = Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}.${data.uid}");
+    DatabaseReference groupRef = Database.database.reference().child("${DatabaseConstants.kGROUPS_CHILD}/${data.uid}");
     messageAddedSub = groupRef.child(DatabaseConstants.kGROUP_MESSAGES_CHILD).onChildAdded.listen(onMessageAdded);
     messageDeletedSub = groupRef.child(DatabaseConstants.kGROUP_MESSAGES_CHILD).onChildRemoved.listen(onMessageDeleted);
 
@@ -58,15 +58,17 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     // Set up the theme changed sub
     themeChangedSub = groupRef.child(DatabaseConstants.kGROUP_THEME_DATA_CHILD).onChildChanged.listen(onThemeChanged);
 
+    _messages = [];
     for (MessageData data in data.messages) {
       GroupMessage message = new GroupMessage.fromData(
-          data: data,
-          animationController: new AnimationController(
-              vsync: this,
-              duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION)
-          )
+        data: data,
+        animationController: new AnimationController(
+          vsync: this,
+          duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION)
+        ),
+        themeData: this.data.groupThemeData,
       );
-      _messages.insert(0, message);
+      _messages.add(message);
       message.animationController.forward();
     }
 
@@ -80,8 +82,11 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
     MessageData data = MessageData.fromSnapshot(snap: event.snapshot);
 
     // If this message has already been handled (preloaded), skip over it
-    if (_messages.any((message) => message.data == data))
+    if (_messages.any((message) => message.data == data)) {
+      print("Skipping ${event.snapshot.key}");
       return;
+    }
+    print("Handling ${event.snapshot.key}");
 
     GroupMessage message = new GroupMessage.fromData(
       data: data,
@@ -89,11 +94,12 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
         duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
         vsync: this
       ),
+      themeData: this.data.groupThemeData,
     );
 
     // Insert the message at the front of the array
     setState(() {
-      _messages.insert(0, message);
+      _messages.add(message);
     });
 
     // Start the enter animation for the message
@@ -115,7 +121,9 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
 
   void onThemeChanged(Event event) async {
     setState(() {
-      data.groupThemeData = GroupThemeData.fromSnapshot(snapshot: event.snapshot);
+      data.groupThemeData.updateFromChangeSnapshot(event.snapshot);
+      for (GroupMessage message in _messages)
+        message.setThemeData(data.groupThemeData);
     });
   }
 
@@ -126,7 +134,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
           title: new Text(data.name),
           // No elevation if its on ios
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-          backgroundColor: data.groupThemeData.groupColor,
+          backgroundColor: data.groupThemeData.accentColor,
         ),
         body: new Container(
             child: new Column(
@@ -135,7 +143,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
                    child: new ListView.builder(
                      padding: new EdgeInsets.all(8.0),
                      reverse: true,
-                     itemBuilder: (_, int index) => _messages[index],
+                     itemBuilder: (_, int index) => _messages[_messages.length - 1 - index],
                      itemCount: _messages.length,
                    ),
                  ),

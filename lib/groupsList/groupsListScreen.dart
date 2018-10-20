@@ -40,7 +40,7 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     // Order the groups by their last message timestamp
     _groupData = Map.of(Database.groupFromUid);
     _groupUids = _groupData.keys.toList();
-    _groupUids.sort((String d1, String d2) => _groupData[d1].utcTime.difference(_groupData[d2].utcTime).inMilliseconds);
+    _groupUids.sort((d1, d2) => _groupData[d1].utcTime.difference(_groupData[d2].utcTime).inMilliseconds);
 
     // Go through received data and add each group
     int c = 0;
@@ -73,6 +73,12 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     fadeController.forward();
 
     super.initState();
+  }
+
+  void sortGroupsList(){
+    setState(() {
+      _groupUids.sort((g1, g2) => _groupData[g1].utcTime.difference(_groupData[g2].utcTime).inMilliseconds);
+    });
   }
 
   // The group should already be present in the _groupData map and the _groupUids list
@@ -141,15 +147,17 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
       return;
     }
 
+    print("Discovered new group $groupUid");
+
     var stateKey = new GlobalKey<GroupsListItemState>();
     GroupData data = await DatabaseReader.loadSingleGroup(groupUid);
-    GroupsListItem item = new GroupsListItem.fromData(
+    GroupsListItem item = GroupsListItem.fromData(
       key: stateKey,
       data: data,
       onClick: startGroup,
       onDelete: deleteGroup,
-      controller: new AnimationController(
-          duration: new Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
+      controller: AnimationController(
+          duration: Duration(milliseconds: kMESSAGE_GROW_ANIMATION_DURATION),
           vsync: this
       ),
     );
@@ -158,10 +166,9 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
       _groupStateKeys[groupUid] = stateKey;
       _groupData[groupUid] = data;
       _groups[groupUid] = item;
-      _groupUids.insert(0, groupUid);
+      _groupUids.add(groupUid);
+      item.controller.forward();
     });
-
-    item.startAnimation();
   }
 
   @override
@@ -169,36 +176,31 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Groups"),
-        // No elevation if its on ios
         elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
       ),
+
       body: new Container(
-          child: new Stack(
-        children: <Widget>[
-          _groups.length > 0
-              ? new ListView.builder(
-                  padding: new EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  reverse: false,
-                  itemBuilder: (_, int index) => buildGroup(context, index),
-                  itemCount: _groups.length,
-                )
-              : new Container(
-                  alignment: Alignment.center,
-                  child: new Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      new Text("No groups :(",
-                          style: Theme.of(context).primaryTextTheme.title),
-                      new Text("Lets get it started by creating one!",
-                          style: Theme.of(context).primaryTextTheme.title)
-                    ],
-                  ),
-                  decoration: Theme.of(context).platform == TargetPlatform.iOS
-                      ? new BoxDecoration(
-                          border: new Border(
-                              top: new BorderSide(color: Colors.grey[200])))
-                      : null,
-                ),
+        child: new Stack(
+          children: <Widget>[
+            _groups.length > 0 ? ListView.builder(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+              reverse: false,
+              itemBuilder: (_, int index) => buildGroup(context, index),
+              itemCount: _groups.length,
+            ) : Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("No groups :(", style: Theme.of(context).primaryTextTheme.title),
+                  Text("Lets get it started by creating one!", style: Theme.of(context).primaryTextTheme.title)
+                ],
+              ),
+
+              decoration: Theme.of(context).platform == TargetPlatform.iOS ? BoxDecoration(
+                border: Border(top: new BorderSide(color: Colors.grey[200]))) : null,
+              ),
+
           // TODO: Fix the flex thing
 /*
           new Flex(
@@ -214,51 +216,70 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 */
         ],
       )),
+
       floatingActionButton: new FloatingActionButton(
         backgroundColor: Theme.of(context).accentColor,
-        child: new Icon(Icons.add),
+        child: Icon(Icons.add),
         onPressed: () => showDialog(
-            context: context,
-            builder: (BuildContext context) => new NewGroupDialog(
-                groups: _groupStateKeys, addNewGroup: _addNewGroup)),
+          context: context,
+          builder: (BuildContext context) => NewGroupDialog(groups: _groupStateKeys, addNewGroup: _addNewGroup)),
       ),
     );
   }
 
   Widget buildGroup(BuildContext context, int index) {
-    return new Column(
-        children: index == _groupUids.length - 1
-            ? <Widget>[_groups[_groupUids[index]]]
-            : <Widget>[_groups[_groupUids[index]], new Divider(height: 1.0)]);
+    return Column(
+      children: index == _groupUids.length - 1 ?
+        <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.0),
+            child: _groups[_groupUids[_groupUids.length - index - 1]],
+          )
+        ] :
+
+        <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.0),
+            child: _groups[_groupUids[_groupUids.length - index - 1]],
+          ),
+          Divider(height: 1.0)
+        ]
+    );
   }
 
   void startGroup(BuildContext context, GroupData data) async {
     addSub.pause();
     deleteSub.pause();
     changeSub.pause();
-//    await Navigator.of(context).push(new ListToGroupRoute(
-//        builder: (context) => new ChatScreen(user: user, chatName: name)));
 
-    // TODO: I don't know how i did this
-    await Navigator.of(context).push(new SlideLeftRoute(
-        widget: new GroupScreen(data: data)
-      /*        new ChatScreen(user: user, chatName: name)*/));
+    await Navigator.of(context).push(
+      SlideLeftRoute(
+       widget: GroupScreen(data: data)
+      )
+    );
+
+    // It may not always be safe (date wise) to put the returned from group at the top
+    // so, resort the group uids
+    sortGroupsList();
 
     addSub.resume();
     deleteSub.resume();
     changeSub.resume();
-
-    // _onGroupChanged should be triggered, so we don't need this
-//    _onGroupAdded(name);
   }
 
 
   // TODO: Update this and dialog for new group params
-  void _addNewGroup(String groupName) {
+  void _addNewGroup(String groupName) async {
     // For now, generate a random pastel color
-    Color groupColor = Utils.mixRandomColor(Colors.white);
-    GroupThemeData themeData = GroupThemeData(groupColor: groupColor);
-    DatabaseWriter.registerNewGroup(admins: [Database.me.uid], members: [Database.me.uid], groupName: groupName, groupThemeData: themeData);
+    Color accentColor = Utils.mixRandomColor(Colors.white);
+    GroupThemeData themeData = GroupThemeData(accentColor: accentColor, backgroundColor: Color(0xffffffff));
+    DatabaseWriter.registerNewGroup(
+        admins: [Database.me.uid],
+        members: [Database.me.uid],
+        groupName: groupName,
+        groupThemeData: themeData);
+
+    // The onGroupAddded listener should handle it from here
   }
 
   void deleteGroup(BuildContext context, GroupsListItemState group) {

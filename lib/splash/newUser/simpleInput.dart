@@ -111,8 +111,7 @@ class SimpleInputState extends State<SimpleInput> with SingleTickerProviderState
       initiallySelected: !param.private,
       unselected: Icons.lock,
       selected: globeIcon,
-      duration: Duration(milliseconds: 300),
-      onPressed: widget.switchValue == null ? () =>
+      onPressed: widget.switchValue == null ? (selected) =>
           setState((){
             param.setPrivate(!param.private);
           }) : null,

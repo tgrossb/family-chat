@@ -1,7 +1,4 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 
 const Color kSPLASH_SCREEN_BUTTON_COLOR = Color(0xff413c58);
 const Color kSPLASH_SCREEN_LOADING_COLOR = Colors.white;
@@ -73,7 +70,10 @@ class DatabaseConstants {
   static const String kGROUP_MEMBERS_CHILD = "members";
   static const String kGROUP_MESSAGES_CHILD = "messages";
   static const String kGROUP_THEME_DATA_CHILD = "themeData";
-  static const String kGROUP_COLOR_CHILD = "groupColor";
+  static const String kGROUP_ACCENT_COLOR_CHILD = "accentColor";
+  static const String kGROUP_BACKGROUND_COLOR_CHILD = "backgroundColor";
+  static const int kGROUP_ACCENT_COLOR_DEFAULT = 0xff79baba;
+  static const int kGROUP_BACKGROUND_COLOR_DEFAULT = 0xffffffff;
 
   static const String kMESSAGE_TEXT_CHILD = "text";
   static const String kMESSAGE_SENDER_UID_CHILD = "senderUid";
@@ -83,7 +83,14 @@ class DatabaseConstants {
 }
 
 
-var kDAY_MONTH_YEAR_FORMAT = intl.DateFormat("MMM d, yyyy");
+const List kDAY_MONTH_YEAR_ORDER = ["m", "d", "y"];
+
+const String kPREFERRED_DAY_NUM = "d";  // Don't 0 pad day
+const String kPREFERRED_MONTH_NUM = "m";  // Don't 0 pad month
+const String kPREFERRED_YEAR = "yyyy";  // Use full year
+const String kPREFERRED_HOUR = "h";  // Use 12 hour and don't 0 pad
+const bool kPREFERRED_USE_SECONDS = false;
+
 const int kLOADING_FINISH = -1;
 
 
