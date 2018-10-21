@@ -4,7 +4,9 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="" />
+    <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/lib/utils.dart" afterPath="$PROJECT_DIR$/lib/utils.dart" />
+    </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
     <ignored path="$PROJECT_DIR$/.pub/" />
@@ -33,17 +35,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="groupScreen.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="groupScreen.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/singleGroup/groupScreen.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="78" column="0" lean-forward="false" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
+            <state relative-caret-position="306">
+              <caret line="133" column="35" lean-forward="false" selection-start-line="133" selection-start-column="35" selection-end-line="133" selection-end-column="35" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="groupsListItem.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="groupsListItem.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/groupsList/groupsListItem.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="450">
@@ -103,21 +105,11 @@
       <file leaf-file-name="utils.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/utils.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="354">
-              <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+            <state relative-caret-position="246">
+              <caret line="22" column="24" lean-forward="false" selection-start-line="22" selection-start-column="24" selection-end-line="22" selection-end-column="24" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="constants.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/constants.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="72" column="57" lean-forward="false" selection-start-line="72" selection-start-column="57" selection-end-line="72" selection-end-column="57" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -245,13 +237,13 @@
         <option value="$PROJECT_DIR$/lib/widgetUtils/animatedIconSwitch.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/MaxHeight.dart" />
         <option value="$PROJECT_DIR$/lib/constants.dart" />
-        <option value="$PROJECT_DIR$/lib/utils.dart" />
         <option value="$PROJECT_DIR$/lib/dataUtils/database.dart" />
-        <option value="$PROJECT_DIR$/lib/singleGroup/groupScreen.dart" />
         <option value="$PROJECT_DIR$/lib/dataUtils/dataBundles.dart" />
         <option value="$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart" />
         <option value="$PROJECT_DIR$/lib/singleGroup/groupMessage.dart" />
         <option value="$PROJECT_DIR$/lib/groupsList/groupsListItem.dart" />
+        <option value="$PROJECT_DIR$/lib/utils.dart" />
+        <option value="$PROJECT_DIR$/lib/singleGroup/groupScreen.dart" />
       </list>
     </option>
   </component>
@@ -768,6 +760,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="552">
+          <caret line="49" column="0" lean-forward="false" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/constants.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -778,20 +780,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/utils.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="354">
-          <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        <state relative-caret-position="246">
+          <caret line="22" column="24" lean-forward="false" selection-start-line="22" selection-start-column="24" selection-end-line="22" selection-end-column="24" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
-          <caret line="49" column="0" lean-forward="false" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -835,18 +827,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/singleGroup/groupScreen.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="78" column="0" lean-forward="false" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/groupsList/groupsListItem.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="450">
           <caret line="79" column="0" lean-forward="true" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/singleGroup/groupScreen.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="133" column="35" lean-forward="false" selection-start-line="133" selection-start-column="35" selection-end-line="133" selection-end-column="35" />
           <folding />
         </state>
       </provider>

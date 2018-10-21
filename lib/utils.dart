@@ -15,6 +15,14 @@ class Utils {
     return m.keys.toList()[0];
   }
 
+  static Color pickTextColor(Color background){
+    // Uses perspective luminance (the human eye favors green)
+    double luminance = (0.299 * background.red + 0.587 * background.green + 0.144 * background.blue) / 255;
+    if (luminance < 0.5)
+      return Colors.black;
+    return Colors.white;
+  }
+
   static Color stringToColor(String hexString, int defaultValue){
     int parsedValue = defaultValue;
     try {
