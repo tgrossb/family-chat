@@ -111,7 +111,7 @@ class GroupMessageState extends State<GroupMessage> {
             textAlign: myMessage ? TextAlign.end : TextAlign.left
           ),
           CircleAvatar(
-            child: Text(data.senderUid[0], style: theme.primaryTextTheme.body1),
+            child: Text(data.senderUid[0], style: theme.primaryTextTheme.body1.copyWith(color: Utils.pickTextColor(bubbleColor))),
             backgroundColor: bubbleColor,
           ),
         ],

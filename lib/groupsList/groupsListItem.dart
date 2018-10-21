@@ -117,7 +117,7 @@ class GroupsListItemState extends State<GroupsListItem> {
       child: FittedBox(
         fit: BoxFit.contain,
         child: CircleAvatar(
-          child: Text(data.name[0], style: theme.primaryTextTheme.headline),
+          child: Text(data.name[0], style: theme.primaryTextTheme.headline.copyWith(color: Utils.pickTextColor(data.groupThemeData.accentColor))),
           backgroundColor: data.groupThemeData.accentColor,
         ),
       ),

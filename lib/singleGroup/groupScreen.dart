@@ -131,7 +131,7 @@ class GroupScreenState extends State<GroupScreen> with TickerProviderStateMixin 
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text(data.name),
+          title: new Text(data.name, style: Theme.of(context).primaryTextTheme.title.copyWith(color: Utils.pickTextColor(data.groupThemeData.accentColor)),),
           // No elevation if its on ios
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
           backgroundColor: data.groupThemeData.accentColor,
