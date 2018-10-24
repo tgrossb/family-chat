@@ -272,6 +272,7 @@ class DatabaseReader {
       }
 
       // Convert each user to a User object and add it to the map
+      print("Adding user from snap: ${userSnap.key}: ${userSnap.value}");
       Database.userFromUid[uid] = User.fromSnapshot(uid: uid, snapshot: userSnap);
     }
 

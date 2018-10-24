@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/singleGroup/groupScreen.dart';
+import 'package:bodt_chat/singleGroup/groupSettingsScreen.dart';
 import 'package:bodt_chat/dialogs/confirmDeleteDialog.dart';
 import 'package:bodt_chat/groupsList/groupsListItem.dart';
 import 'package:bodt_chat/dialogs/newGroupDialog.dart';
@@ -254,7 +255,8 @@ class GroupsListScreenState extends State<GroupsListScreen> with TickerProviderS
 
     await Navigator.of(context).push(
       SlideLeftRoute(
-       widget: GroupScreen(data: data)
+//       widget: GroupScreen(data: data)
+      widget: GroupSettingsScreen(data: data)
       )
     );
 

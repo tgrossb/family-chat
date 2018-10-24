@@ -11,6 +11,7 @@ dependencies:
   firebase_auth: ^0.5.12
   google_sign_in: ^3.0.4
   firebase_database: ^1.0.2
+  flutter_colorpicker: any
 
   dynamic_theme:
     git:
