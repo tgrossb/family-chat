@@ -188,6 +188,18 @@ class DatabaseWriter {
 
     return true;
   }
+
+  static Future<bool> setGroupTheme({@required String groupUid, @required GroupThemeData themeData}) async {
+    String path = "${DatabaseConstants.kGROUPS_CHILD}/$groupUid/${DatabaseConstants.kGROUP_THEME_DATA_CHILD}";
+    bool successful = await performCheckedSet(themeData.toDatabaseChild(orphan: true), path: path);
+    if (!successful)
+      return false;
+
+    // Update the database class to reflect this change
+    Database.groupFromUid[groupUid].groupThemeData = themeData;
+
+    return true;
+  }
 }
 
 class DatabaseReader {

@@ -22,6 +22,7 @@ import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
 import 'package:bodt_chat/widgetUtils/colorPickerButton.dart';
+import 'package:bodt_chat/widgetUtils/animatedIconSwitch.dart';
 
 class GroupSettingsScreen extends StatefulWidget {
   GroupSettingsScreen({@required this.data});
@@ -54,18 +55,35 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
           children: <Widget>[
             ListTile(
               title: Text("Theme", style: Theme.of(context).primaryTextTheme.title),
+              leading: AnimatedIconSwitch(
+                unselected: Icons.arrow_drop_down,
+                selected: Icons.arrow_drop_up
+              ),
             ),
 
             Divider(),
 
             ListTile(
               title: Text("Accent Color"),
-              trailing: ColorPickerButton(initialColor: accentColor, onColorConfirmed: (c) => setState(() => accentColor = c)),
+              trailing: ColorPickerButton(
+                initialColor: accentColor,
+                onColorConfirmed: (c) => setState(() => accentColor = c)
+              ),
             ),
+
+            Divider(),
+
             ListTile(
               title: Text("Background Color"),
-              trailing: ColorPickerButton(initialColor: backgroundColor, onColorConfirmed: (c) => setState(() => backgroundColor = c)),
+              trailing: ColorPickerButton(
+                initialColor: backgroundColor,
+                onColorConfirmed: (c) => setState(() => backgroundColor = c),
+                borderWidth: 2.5,
+                borderColor: Utils.pickTextColor(backgroundColor),
+              ),
             ),
+
+            Divider(),
           ],
         ),
         bottomNavigationBar: Row(
@@ -74,6 +92,7 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
             FlatButton(
               child: Text("Reset"),
               onPressed: () => setConfigsToDefaults(),
+              textColor: Colors.redAccent,
             ),
             FlatButton(
               child: Text("Confirm"),
@@ -84,15 +103,22 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
     );
   }
 
-  void finalizeConfigs(){
+  void finalizeConfigs() async {
     data.groupThemeData.accentColor = accentColor;
     data.groupThemeData.backgroundColor = backgroundColor;
-    Navigator.of(context).pop();
+
+    bool successful = await DatabaseWriter.setGroupTheme(groupUid: data.uid, themeData: data.groupThemeData);
+
+    if (successful)
+      Navigator.of(context).pop();
   }
 
-  void setConfigsToDefaults(){
-    accentColor = data.groupThemeData.accentColor;
-    backgroundColor = data.groupThemeData.backgroundColor;
+  void setConfigsToDefaults() {
+    setState((){
+      accentColor = data.groupThemeData.accentColor;
+      backgroundColor = data.groupThemeData.backgroundColor;
+    });
+    print("Finished resetting configs");
   }
 
   @override

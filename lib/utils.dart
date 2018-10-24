@@ -19,8 +19,8 @@ class Utils {
     // Uses perspective luminance (the human eye favors green)
     double luminance = (0.299 * background.red + 0.587 * background.green + 0.144 * background.blue) / 255;
     if (luminance < 0.5)
-      return Colors.black;
-    return Colors.white;
+      return Colors.white;
+    return Colors.black;
   }
 
   static Color stringToColor(String hexString, int defaultValue){
