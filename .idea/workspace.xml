@@ -5,10 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/singleGroup/groupSettingsScreen.dart" />
       <change beforePath="$PROJECT_DIR$/lib/dataUtils/database.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/database.dart" />
       <change beforePath="$PROJECT_DIR$/lib/dataUtils/user.dart" afterPath="$PROJECT_DIR$/lib/dataUtils/user.dart" />
       <change beforePath="$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart" afterPath="$PROJECT_DIR$/lib/groupsList/groupsListScreen.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/singleGroup/groupSettingsScreen.dart" afterPath="$PROJECT_DIR$/lib/singleGroup/groupSettingsScreen.dart" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" afterPath="$PROJECT_DIR$/pubspec.yaml" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
@@ -109,8 +109,8 @@
       <file leaf-file-name="groupSettingsScreen.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/singleGroup/groupSettingsScreen.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="414">
-              <caret line="66" column="127" lean-forward="true" selection-start-line="66" selection-start-column="127" selection-end-line="66" selection-end-column="127" />
+            <state relative-caret-position="286">
+              <caret line="89" column="32" lean-forward="false" selection-start-line="89" selection-start-column="32" selection-end-line="89" selection-end-column="32" />
               <folding>
                 <element signature="e#413#433#0" expanded="true" />
               </folding>
@@ -890,8 +890,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/singleGroup/groupSettingsScreen.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="66" column="127" lean-forward="true" selection-start-line="66" selection-start-column="127" selection-end-line="66" selection-end-column="127" />
+        <state relative-caret-position="286">
+          <caret line="89" column="32" lean-forward="false" selection-start-line="89" selection-start-column="32" selection-end-line="89" selection-end-column="32" />
           <folding>
             <element signature="e#413#433#0" expanded="true" />
           </folding>

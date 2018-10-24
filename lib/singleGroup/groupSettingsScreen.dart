@@ -33,17 +33,13 @@ class GroupSettingsScreen extends StatefulWidget {
 
 class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerProviderStateMixin {
   GroupData data;
-  Color accentColor;
-  Color currentPickerColor;
-  var configOptions;
+  Color accentColor, backgroundColor;
 
   GroupSettingsScreenState({@required this.data});
 
   @override
   void initState(){
-    accentColor = data.groupThemeData.accentColor;
-    currentPickerColor = accentColor;
-    configOptions = [];
+    setConfigsToDefaults();
     super.initState();
   }
 
@@ -57,7 +53,7 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
         body: new ListView(
           children: <Widget>[
             ListTile(
-              title: Text("Theme"),
+              title: Text("Theme", style: Theme.of(context).primaryTextTheme.title),
             ),
 
             Divider(),
@@ -65,13 +61,39 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
             ListTile(
               title: Text("Accent Color"),
               trailing: ColorPickerButton(initialColor: accentColor, onColorConfirmed: (c) => setState(() => accentColor = c)),
+            ),
+            ListTile(
+              title: Text("Background Color"),
+              trailing: ColorPickerButton(initialColor: backgroundColor, onColorConfirmed: (c) => setState(() => backgroundColor = c)),
+            ),
+          ],
+        ),
+        bottomNavigationBar: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            FlatButton(
+              child: Text("Reset"),
+              onPressed: () => setConfigsToDefaults(),
+            ),
+            FlatButton(
+              child: Text("Confirm"),
+              onPressed: () => finalizeConfigs(),
             )
           ],
-        )
+        ),
     );
   }
 
+  void finalizeConfigs(){
+    data.groupThemeData.accentColor = accentColor;
+    data.groupThemeData.backgroundColor = backgroundColor;
+    Navigator.of(context).pop();
+  }
 
+  void setConfigsToDefaults(){
+    accentColor = data.groupThemeData.accentColor;
+    backgroundColor = data.groupThemeData.backgroundColor;
+  }
 
   @override
   void dispose() {
