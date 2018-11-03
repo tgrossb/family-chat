@@ -63,7 +63,7 @@ class AnimatedIconSwitchState extends State<AnimatedIconSwitch> with SingleTicke
     widget.onPressed(isSelected);
   }
 
-  Widget buildButtonAnimation(BuildContext context, Widget parent){
+  Widget buildAnimatedIcon(BuildContext context){
     IconThemeData base = Theme.of(context).iconTheme;
     Color baseColor = widget.color ?? base.color;
 
@@ -75,6 +75,35 @@ class AnimatedIconSwitchState extends State<AnimatedIconSwitch> with SingleTicke
     if (widget.onPressed == null)
       selectedOpacity = isSelected ? base.opacity ?? 1.0 : 0.0;
 
+    return Center(
+      child: Stack(
+        children: <Widget>[
+          Transform.rotate(
+            angle: unselectedRotate.value,
+            child: Opacity(
+              opacity: unselectedOpacity,
+              child: Icon(
+                widget.unselected,
+                color: widget.onPressed == null ? Theme.of(context).disabledColor : baseColor,
+              ),
+            ),
+          ),
+          Transform.rotate(
+            angle: selectedRotate.value,
+            child: Opacity(
+              opacity: selectedOpacity,
+              child: Icon(
+                widget.selected,
+                color: widget.onPressed == null ? Theme.of(context).disabledColor : baseColor,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildButtonAnimation(BuildContext context, Widget parent){
     return GestureDetector(
         onTap: onPressed,
         child: Container (
@@ -83,36 +112,9 @@ class AnimatedIconSwitchState extends State<AnimatedIconSwitch> with SingleTicke
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
-            children: <Widget>[
-              widget.top,
-
-              Center(
-                child: Stack(
-                  children: <Widget>[
-                    Transform.rotate(
-                      angle: unselectedRotate.value,
-                      child: Opacity(
-                        opacity: unselectedOpacity,
-                        child: Icon(
-                          widget.unselected,
-                          color: widget.onPressed == null ? Theme.of(context).disabledColor : baseColor,
-                        ),
-                      ),
-                    ),
-                    Transform.rotate(
-                      angle: selectedRotate.value,
-                      child: Opacity(
-                        opacity: selectedOpacity,
-                        child: Icon(
-                          widget.selected,
-                          color: widget.onPressed == null ? Theme.of(context).disabledColor : baseColor,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
+            children: widget.top == null ?
+                <Widget>[buildAnimatedIcon(context)] :
+                <Widget>[widget.top, buildAnimatedIcon(context)]
           )
         )
     );

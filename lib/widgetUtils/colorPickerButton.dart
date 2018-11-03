@@ -7,16 +7,21 @@ class ColorPickerButton extends StatefulWidget {
   final double borderWidth;
   final double totalRadius;     // Defaults the the minimum clickable size for a button
   final Function(Color) onColorConfirmed;
+  final Duration fadeDuration;
 
   ColorPickerButton({@required this.initialColor, @required this.onColorConfirmed,
-    this.borderColor = Colors.black, this.borderWidth = 0.0, this.totalRadius = 24.0}):
+    this.borderColor = Colors.black, this.borderWidth = 0.0, this.totalRadius = 24.0, Duration fadeDuration}):
+      fadeDuration = fadeDuration ?? Duration(milliseconds: 200),
       assert(totalRadius > 0);
 
   @override
   State<StatefulWidget> createState() => ColorPickerButtonState();
 }
 
-class ColorPickerButtonState extends State<ColorPickerButton> {
+class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerProviderStateMixin {
+  AnimationController colorFader;
+  Animation<Color> colorAnimation;
+
   Color pickedColor;
   Color currentColor;
 
@@ -24,12 +29,20 @@ class ColorPickerButtonState extends State<ColorPickerButton> {
   void initState(){
     pickedColor = widget.initialColor;
     currentColor = pickedColor;
+
+    colorFader = AnimationController(vsync: this, duration: widget.fadeDuration)
+        ..addListener(() => setState((){}));
+    colorAnimation = ColorTween(begin: pickedColor, end: pickedColor).animate(colorFader);
+    colorFader.forward();
+
     super.initState();
   }
 
   void pickColor() async {
     setState(() {
+      colorAnimation = ColorTween(begin: pickedColor, end: currentColor).animate(colorFader);
       pickedColor = currentColor;
+      colorFader.forward(from: 0.0);
     });
     widget.onColorConfirmed(pickedColor);
   }
@@ -42,7 +55,7 @@ class ColorPickerButtonState extends State<ColorPickerButton> {
     );
 
     CircleAvatar color = CircleAvatar(
-      backgroundColor: pickedColor,
+      backgroundColor: colorAnimation.value,
       radius: widget.totalRadius - widget.borderWidth,
     );
 
@@ -89,5 +102,12 @@ class ColorPickerButtonState extends State<ColorPickerButton> {
           ],
         )
     );
+  }
+
+  @override
+  void dispose() {
+    colorFader.dispose();
+
+    super.dispose();
   }
 }

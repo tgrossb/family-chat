@@ -56,6 +56,7 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
             ListTile(
               title: Text("Theme", style: Theme.of(context).primaryTextTheme.title),
               leading: AnimatedIconSwitch(
+                onPressed: (){},
                 unselected: Icons.arrow_drop_down,
                 selected: Icons.arrow_drop_up
               ),
