@@ -32,26 +32,38 @@ class GroupSettingsScreen extends StatefulWidget {
   State createState() => new GroupSettingsScreenState(data: data);
 }
 
+class ConfigOption {
+  static const int COLOR_PICKER = 0;
+  int trailingType;
+  String name;
+  Function onChange;
+  Function onReset;
+
+  ConfigOption({this.trailingType, this.name, this.onChange, this.onReset});
+}
+
 class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerProviderStateMixin {
   GroupData data;
   Color accentColor, backgroundColor;
+  List<ConfigOption> options;
 
   GroupSettingsScreenState({@required this.data});
 
   @override
   void initState(){
     setConfigsToDefaults();
+
+    options = [
+      ConfigOption(trailingType: 0, name: "Accent Color", onChange: (c) => setState(() => accentColor = c), onReset: (){}),
+      ConfigOption(trailingType: 0, name: "Background Color", onChange: (c) => setState(() => backgroundColor = c), onReset: (){}),
+    ];
+
     super.initState();
   }
 
   Widget build(BuildContext context){
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text(data.name, style: Theme.of(context).primaryTextTheme.title.copyWith(color: Utils.pickTextColor(data.groupThemeData.accentColor))),
-          elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-          backgroundColor: data.groupThemeData.accentColor,
-        ),
-        body: new ListView(
+    /*
+    new ListView(
           children: <Widget>[
             ListTile(
               title: Text("Theme", style: Theme.of(context).primaryTextTheme.title),
@@ -86,6 +98,39 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
 
             Divider(),
           ],
+        )
+    */
+
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text(data.name, style: Theme.of(context).primaryTextTheme.title.copyWith(color: Utils.pickTextColor(data.groupThemeData.accentColor))),
+          elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+          backgroundColor: data.groupThemeData.accentColor,
+        ),
+        body: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.color_lens),
+                title: Text("Accent Color"),
+                trailing: ColorPickerButton(
+                  initialColor: accentColor,
+                  onColorConfirmed: (c) => setState(() => accentColor = c),
+                )
+              ),
+
+              Divider(),
+
+              ListTile(
+                leading: Icon(Icons.color_lens),
+                trailing: ColorPickerButton(
+                  initialColor: backgroundColor,
+                  onColorConfirmed: (c) => setState(() => backgroundColor = c),
+                ),
+              )
+            ],
+          ),
         ),
         bottomNavigationBar: Row(
           mainAxisAlignment: MainAxisAlignment.end,
