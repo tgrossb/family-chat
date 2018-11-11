@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f3bed1c-22b4-42f3-b185-3601148ba839" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/lib/widgetUtils/appendableListenable.dart" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/widgetUtils/colorPickerButton.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/colorPickerButton.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/widgetUtils/resettableTile.dart" afterPath="$PROJECT_DIR$/lib/widgetUtils/resettableTile.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart" afterPath="$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -65,7 +62,7 @@
         <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/groupSettingsScreen.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="18">
-              <caret line="44" column="17" lean-forward="true" selection-start-line="44" selection-start-column="17" selection-end-line="44" selection-end-column="17" />
+              <caret line="44" column="17" lean-forward="false" selection-start-line="44" selection-start-column="17" selection-end-line="44" selection-end-column="17" />
               <folding>
                 <element signature="e#413#433#0" expanded="true" />
               </folding>
@@ -76,8 +73,8 @@
       <file leaf-file-name="colorsConfigs.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="50" column="2" lean-forward="false" selection-start-line="50" selection-start-column="2" selection-end-line="50" selection-end-column="2" />
+            <state relative-caret-position="162">
+              <caret line="65" column="68" lean-forward="true" selection-start-line="65" selection-start-column="68" selection-end-line="65" selection-end-column="68" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -85,11 +82,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="resettableTile.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="testResettable.dart" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/testResettable.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="156">
+              <caret line="61" column="27" lean-forward="true" selection-start-line="61" selection-start-column="27" selection-end-line="61" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="resettableTile.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/widgetUtils/resettableTile.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="37" column="0" lean-forward="true" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+            <state relative-caret-position="-6">
+              <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -208,7 +215,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderWidgetBackup.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderAnimatedWidget.dart" />
         <option value="$PROJECT_DIR$/lib/loaderTest.dart" />
         <option value="$PROJECT_DIR$/lib/loaders/chocolateLoaderWidget.dart" />
@@ -256,9 +262,10 @@
         <option value="$PROJECT_DIR$/lib/widgetUtils/appendableListenable.dart" />
         <option value="$PROJECT_DIR$/lib/singleGroup/groupSettingsScreen.dart" />
         <option value="$PROJECT_DIR$/lib/singleGroup/settings/groupSettingsScreen.dart" />
-        <option value="$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/colorPickerButton.dart" />
         <option value="$PROJECT_DIR$/lib/widgetUtils/resettableTile.dart" />
+        <option value="$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart" />
+        <option value="$PROJECT_DIR$/lib/singleGroup/settings/testResettable.dart" />
       </list>
     </option>
   </component>
@@ -497,7 +504,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Dart Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Flutter Outline" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -565,7 +572,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/assets/flags/CountryPicker.java" />
     <entry file="file://$PROJECT_DIR$/lib/splash/newUser/inputs/countrySelector.dart" />
     <entry file="file://$PROJECT_DIR$/lib/dialogs/confirmDeleteDialog.dart">
       <provider selected="true" editor-type-id="text-editor">
@@ -872,7 +878,7 @@
     <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/groupSettingsScreen.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
-          <caret line="44" column="17" lean-forward="true" selection-start-line="44" selection-start-column="17" selection-end-line="44" selection-end-column="17" />
+          <caret line="44" column="17" lean-forward="false" selection-start-line="44" selection-start-column="17" selection-end-line="44" selection-end-column="17" />
           <folding>
             <element signature="e#413#433#0" expanded="true" />
           </folding>
@@ -884,16 +890,6 @@
         <state relative-caret-position="18">
           <caret line="1" column="32" lean-forward="false" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="32" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="50" column="2" lean-forward="false" selection-start-line="50" selection-start-column="2" selection-end-line="50" selection-end-column="2" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -909,8 +905,26 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/widgetUtils/resettableTile.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="37" column="0" lean-forward="true" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+        <state relative-caret-position="-6">
+          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/colorsConfigs.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="65" column="68" lean-forward="true" selection-start-line="65" selection-start-column="68" selection-end-line="65" selection-end-column="68" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/singleGroup/settings/testResettable.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="61" column="27" lean-forward="true" selection-start-line="61" selection-start-column="27" selection-end-line="61" selection-end-column="27" />
           <folding />
         </state>
       </provider>
