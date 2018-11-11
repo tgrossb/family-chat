@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:bodt_chat/widgetUtils/appendableListenable.dart';
 
 class ResettableTile extends StatefulWidget {
-  Widget leading, trailing, title;
-  Function onReset, onTap, onLongPress;
-  Duration duration;
+  final Widget leading, title;
+  final AppendableListenable trailing;
+  final Function onReset, onTap, onLongPress;
+  final Duration duration;
+  final bool initiallyResettable, canReset;
   
-  ResettableTile({GlobalKey key, this.leading, this.trailing, this.title, this.onReset, Duration duration, this.onTap, this.onLongPress}):
-      duration = duration ?? Duration(milliseconds: 200),
+  ResettableTile({GlobalKey key, this.leading, @required this.trailing, this.title,
+    @required this.onReset, @required this.canReset, Duration duration,
+    this.onTap, this.onLongPress, this.initiallyResettable}):
+      duration = duration ?? Duration(milliseconds: 1000),
+      assert(trailing is Widget),
       super(key: key ?? GlobalKey());
 
   @override
   State<StatefulWidget> createState() => ResettableTileState();
-
-  void valueChanged(bool canReset) async {
-    State currentState = (super.key as GlobalKey).currentState;
-    if (currentState == null)
-      return;
-
-    (currentState as State<ResettableTile>).widget.valueChanged(canReset);
-  }
 }
 
 class ResettableTileState extends State<ResettableTile> with SingleTickerProviderStateMixin {
@@ -29,52 +27,57 @@ class ResettableTileState extends State<ResettableTile> with SingleTickerProvide
   @override
   void initState() {
     growFadeAnimationController = AnimationController(vsync: this, duration: widget.duration);
-    growFadeAnimation = CurvedAnimation(parent: growFadeAnimation, curve: Curves.elasticOut);
+    growFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: growFadeAnimationController, curve: Curves.ease));
 
-    resetShowing = false;
+    growFadeAnimationController.addStatusListener((status){
+      if (status == AnimationStatus.dismissed)
+        widget.onReset(widget.trailing);
+    });
+
+
+    if (widget.canReset)
+      growFadeAnimationController.forward();
 
     super.initState();
   }
 
-  void valueChanged(bool canReset) async {
-    if (canReset && !resetShowing)
-      growFadeAnimationController.forward();
-    else if (!canReset && resetShowing)
-      growFadeAnimationController.reverse();
-
-    setState((){
-      resetShowing = canReset;
-    });
-  }
-
   @override
   Widget build(BuildContext context){
-    return ListTile(
-        leading: widget.leading,
-        trailing: widget.trailing,
-        title: widget.title,
-        onTap: widget.onTap,
-        onLongPress: widget.onLongPress,
-
-        subtitle: SizeTransition(
-          sizeFactor: growFadeAnimation,
-          child: Opacity(
-            opacity: growFadeAnimation.value,
-            child: ButtonTheme.bar(
-              child: FlatButton(
-                onPressed: widget.onReset,
-                child: Text("Reset"),
-                textColor: Colors.red,
-              ),
-            ),
-          )
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
+          leading: widget.leading,
+          trailing: widget.trailing as Widget,
+          title: widget.title,
+          onTap: widget.onTap,
+          onLongPress: widget.onLongPress,
         ),
+
+        SizeTransition(
+          sizeFactor: growFadeAnimation,
+            child: FadeTransition(
+              opacity: growFadeAnimation,
+              child: ButtonTheme.bar(
+                child: FlatButton(
+                  onPressed: (){
+                    growFadeAnimationController.reverse();
+                  },
+                  child: Text("Reset"),
+                  textColor: Colors.red,
+                ),
+              ),
+            )
+          ),
+      ],
     );
   }
 
   @override
   void dispose() {
     growFadeAnimationController.dispose();
+    print("Disposed");
     super.dispose();
   }
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/singleGroup/groupScreen.dart';
-import 'package:bodt_chat/singleGroup/groupSettingsScreen.dart';
+import 'package:bodt_chat/singleGroup/settings/groupSettingsScreen.dart';
 import 'package:bodt_chat/dialogs/confirmDeleteDialog.dart';
 import 'package:bodt_chat/groupsList/groupsListItem.dart';
 import 'package:bodt_chat/dialogs/newGroupDialog.dart';

@@ -21,8 +21,7 @@ import 'package:bodt_chat/constants.dart';
 import 'package:bodt_chat/utils.dart';
 import 'package:bodt_chat/dataUtils/dataBundles.dart';
 import 'package:bodt_chat/dataUtils/database.dart';
-import 'package:bodt_chat/widgetUtils/colorPickerButton.dart';
-import 'package:bodt_chat/widgetUtils/animatedIconSwitch.dart';
+import 'package:bodt_chat/singleGroup/settings/colorsConfigs.dart';
 
 class GroupSettingsScreen extends StatefulWidget {
   GroupSettingsScreen({@required this.data});
@@ -42,7 +41,7 @@ class ConfigOption {
   ConfigOption({this.trailingType, this.name, this.onChange, this.onReset});
 }
 
-class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerProviderStateMixin {
+class GroupSettingsScreenState extends State<GroupSettingsScreen> {
   GroupData data;
   Color accentColor, backgroundColor;
   List<ConfigOption> options;
@@ -62,76 +61,19 @@ class GroupSettingsScreenState extends State<GroupSettingsScreen> with TickerPro
   }
 
   Widget build(BuildContext context){
-    /*
-    new ListView(
-          children: <Widget>[
-            ListTile(
-              title: Text("Theme", style: Theme.of(context).primaryTextTheme.title),
-              leading: AnimatedIconSwitch(
-                onPressed: (){},
-                unselected: Icons.arrow_drop_down,
-                selected: Icons.arrow_drop_up
-              ),
-            ),
-
-            Divider(),
-
-            ListTile(
-              title: Text("Accent Color"),
-              trailing: ColorPickerButton(
-                initialColor: accentColor,
-                onColorConfirmed: (c) => setState(() => accentColor = c)
-              ),
-            ),
-
-            Divider(),
-
-            ListTile(
-              title: Text("Background Color"),
-              trailing: ColorPickerButton(
-                initialColor: backgroundColor,
-                onColorConfirmed: (c) => setState(() => backgroundColor = c),
-                borderWidth: 2.5,
-                borderColor: Utils.pickTextColor(backgroundColor),
-              ),
-            ),
-
-            Divider(),
-          ],
-        )
-    */
-
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text(data.name, style: Theme.of(context).primaryTextTheme.title.copyWith(color: Utils.pickTextColor(data.groupThemeData.accentColor))),
+          title: new Text(
+              data.name,
+              style: Theme.of(context).primaryTextTheme.title.copyWith(color: Utils.pickTextColor(data.groupThemeData.accentColor))
+          ),
+
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
           backgroundColor: data.groupThemeData.accentColor,
         ),
-        body: Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.color_lens),
-                title: Text("Accent Color"),
-                trailing: ColorPickerButton(
-                  initialColor: accentColor,
-                  onColorConfirmed: (c) => setState(() => accentColor = c),
-                )
-              ),
 
-              Divider(),
+        body: ColorsConfig(themeData: data.groupThemeData),
 
-              ListTile(
-                leading: Icon(Icons.color_lens),
-                trailing: ColorPickerButton(
-                  initialColor: backgroundColor,
-                  onColorConfirmed: (c) => setState(() => backgroundColor = c),
-                ),
-              )
-            ],
-          ),
-        ),
         bottomNavigationBar: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[

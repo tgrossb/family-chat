@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:bodt_chat/widgetUtils/appendableListenable.dart';
 
-class ColorPickerButton extends StatefulWidget {
+class ColorPickerButton extends StatefulWidget implements AppendableListenable {
   final Color initialColor;
   final Color borderColor;
   final double borderWidth;
@@ -9,13 +10,38 @@ class ColorPickerButton extends StatefulWidget {
   final Function(Color) onColorConfirmed;
   final Duration fadeDuration;
 
-  ColorPickerButton({@required this.initialColor, @required this.onColorConfirmed,
+  ColorPickerButton({GlobalKey key, @required this.initialColor, @required this.onColorConfirmed,
     this.borderColor = Colors.black, this.borderWidth = 0.0, this.totalRadius = 24.0, Duration fadeDuration}):
       fadeDuration = fadeDuration ?? Duration(milliseconds: 200),
-      assert(totalRadius > 0);
+      assert(totalRadius > 0),
+      super(key: key ?? GlobalKey());
 
   @override
   State<StatefulWidget> createState() => ColorPickerButtonState();
+
+  void addListener(Function onConfirmed) async {
+    State state = (super.key as GlobalKey).currentState;
+    if (state == null)
+      return;
+
+    (state as ColorPickerButtonState).addListener(onConfirmed);
+  }
+
+  void setCurrentColor(Color color) async {
+    State state = (super.key as GlobalKey).currentState;
+    if (state == null)
+      return;
+
+    (state as ColorPickerButtonState).setCurrentColor(color);
+  }
+
+  Color getCurrentColor(){
+    State state = (super.key as GlobalKey).currentState;
+    if (state == null)
+      return null;
+
+    return (state as ColorPickerButtonState).pickedColor;
+  }
 }
 
 class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerProviderStateMixin {
@@ -24,6 +50,8 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
 
   Color pickedColor;
   Color currentColor;
+
+  List<Function(Color)> onConfirmedListeners;
 
   @override
   void initState(){
@@ -35,7 +63,15 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
     colorAnimation = ColorTween(begin: pickedColor, end: pickedColor).animate(colorFader);
     colorFader.forward();
 
+    onConfirmedListeners = [widget.onColorConfirmed];
+
+    print("Made color picker button state");
+
     super.initState();
+  }
+
+  void addListener(Function(Color) listener) async {
+    onConfirmedListeners.add(listener);
   }
 
   void pickColor() async {
@@ -44,7 +80,17 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
       pickedColor = currentColor;
       colorFader.forward(from: 0.0);
     });
-    widget.onColorConfirmed(pickedColor);
+
+    for (Function listener in onConfirmedListeners)
+      listener(pickedColor);
+  }
+
+  void setCurrentColor(Color color){
+    setState(() {
+      currentColor = color;
+      pickedColor = color;
+    });
+//    pickColor();
   }
 
   @override
@@ -80,7 +126,7 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
           content: SingleChildScrollView(
             padding: EdgeInsets.all(0.0),
             child: ColorPicker(
-              pickerColor: widget.initialColor,
+              pickerColor: pickedColor,
               onColorChanged: (color) => setState(() => currentColor = color),
             ),
           ),
@@ -107,6 +153,8 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
   @override
   void dispose() {
     colorFader.dispose();
+
+    print("Disposed color picker button state");
 
     super.dispose();
   }
