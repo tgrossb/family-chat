@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:bodt_chat/widgetUtils/appendableListenable.dart';
 
 class ResettableTile extends StatefulWidget {
-  final Widget leading, title;
-  final AppendableListenable trailing;
+  final Widget leading, title, trailing;
   final Function onReset, onTap, onLongPress;
   final Duration duration;
   final bool initiallyResettable, canReset;
@@ -12,7 +10,6 @@ class ResettableTile extends StatefulWidget {
     @required this.onReset, @required this.canReset, Duration duration,
     this.onTap, this.onLongPress, this.initiallyResettable}):
       duration = duration ?? Duration(milliseconds: 1000),
-      assert(trailing is Widget),
       super(key: key ?? GlobalKey());
 
   @override
@@ -49,7 +46,7 @@ class ResettableTileState extends State<ResettableTile> with SingleTickerProvide
       children: <Widget>[
         ListTile(
           leading: widget.leading,
-          trailing: widget.trailing as Widget,
+          trailing: widget.trailing,
           title: widget.title,
           onTap: widget.onTap,
           onLongPress: widget.onLongPress,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:bodt_chat/widgetUtils/appendableListenable.dart';
 
-class ColorPickerButton extends StatefulWidget implements AppendableListenable {
+class ColorPickerButton extends StatefulWidget {
   final Color initialColor;
   final Color borderColor;
   final double borderWidth;
@@ -18,14 +17,6 @@ class ColorPickerButton extends StatefulWidget implements AppendableListenable {
 
   @override
   State<StatefulWidget> createState() => ColorPickerButtonState();
-
-  void addListener(Function onConfirmed) async {
-    State state = (super.key as GlobalKey).currentState;
-    if (state == null)
-      return;
-
-    (state as ColorPickerButtonState).addListener(onConfirmed);
-  }
 
   void setCurrentColor(Color color) async {
     State state = (super.key as GlobalKey).currentState;
@@ -65,8 +56,6 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
 
     onConfirmedListeners = [widget.onColorConfirmed];
 
-    print("Made color picker button state");
-
     super.initState();
   }
 
@@ -90,7 +79,6 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
       currentColor = color;
       pickedColor = color;
     });
-//    pickColor();
   }
 
   @override
@@ -153,8 +141,6 @@ class ColorPickerButtonState extends State<ColorPickerButton> with SingleTickerP
   @override
   void dispose() {
     colorFader.dispose();
-
-    print("Disposed color picker button state");
 
     super.dispose();
   }
