@@ -1,5 +1,5 @@
-## Bodt Chat
-This is a chat application designed for the Bodt family.  However, it has plans to become so much more.
+## Family Chat
+This is a simple chat application designed with a family user base in mind.  However, it has plans to become so much more with family tree integration and event coordination.
 
 
 ## Current Features
