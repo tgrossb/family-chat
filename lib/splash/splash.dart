@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:polygon_clipper/polygon_path_drawer.dart';
 import 'package:polygon_clipper/polygon_clipper.dart';
+import 'package:hermes/consts.dart';
+import 'package:hermes/splash/loginForm.dart';
 
 
 class Splash extends StatefulWidget {
@@ -25,111 +26,125 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     controller = AnimationController(vsync: this, duration: duration);
     pageSlider = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: controller, curve: Curves.easeOutQuint));
-//    pageSlider = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn));
     controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: CustomPaint(
-        painter: BackgroundPainter(minPadding: 16),
-        child: Stack(
-          alignment: Alignment(0, 1),
-          children: <Widget>[
-            SlideTransition(
-              position: pageSlider,
-              child: buildBottomPage(context),
-            ),
+    print(Consts.PAGE);
+    print(Consts.WATER_MARK);
 
-            buildToken(context)
-          ],
-        ),
+    return Scaffold(
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: <Widget>[
+          CustomPaint(
+            painter: BackgroundPainter(minPadding: 16, color: Consts.BACKGROUND_PAT_25),
+            child: Container(),
+          ),
+
+          CustomMultiChildLayout(
+            delegate: LayoutDelegate(),
+            children: <Widget>[
+              LayoutId(
+                  id: _LayoutParts.token,
+                  child: buildToken(context)
+              ),
+
+              LayoutId(
+                id: _LayoutParts.bottomPage,
+                child: SlideTransition(
+                  position: pageSlider,
+                  child: buildBottomPage(context),
+                ),
+              ),
+            ],
+          )
+        ],
+      )
+    );
+  }
+
+  // Constructs the bottom page layout.
+  // This includes the shape of the page itself, the login form, and the watermark
+  Widget buildBottomPage(BuildContext context) {
+    return ClipPath(
+      clipper: PageClipper(hexW: 180),
+      child: Container(
+          decoration: BoxDecoration(
+            color: Consts.PAGE,
+            image: DecorationImage(
+                image: AssetImage("assets/images/brainWrapped.png"),
+                fit: BoxFit.contain,
+                repeat: ImageRepeat.repeatY,
+                colorFilter: ColorFilter.mode(Consts.WATER_MARK, BlendMode.srcIn),
+                alignment: Alignment.topCenter
+            ),
+          ),
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              Wrap(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(left: 16, right: 16, top: 106, bottom: 16),
+                    child: LoginForm(),
+                  ),
+                ],
+              ),
+            ],
+          )
       ),
     );
   }
 
-  Widget buildBottomPage(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
+  // Constructs the token.
+  // This includes the HERMES text, the hexagon, the pan flute icon, and the background
+  // blocker box that encapsulates it all.
+  Widget buildToken(BuildContext context){
     return Stack(
-      alignment: Alignment(0, 1),
+      alignment: Alignment.bottomCenter,
       children: <Widget>[
         SizedBox(
-          height: height/2,
+          width: 180,
+          height: 220,
           child: Container(
-            child: Container(
-              color: Color.fromRGBO(255, 255, 255, 0.1),
-            ),
-
-            color: Color.fromRGBO(32, 17, 27, 1.0),
+            color: Consts.DARK_PURPLE,
           ),
         ),
-/*
-        Center(
+
+        Padding(
+          padding: EdgeInsets.only(bottom: 20),
           child: SizedBox(
-            width: 180,
-            height: 180,
+            width: 160,
+            height: 160,
             child: ClipPolygon(
               sides: 6,
               borderRadius: 5,
               child: Container(
-                color: Color.fromRGBO(32, 17, 27, 1.0),
+                color: Consts.GREEN,
               ),
             ),
           ),
         ),
-*/
-      ],
-    );
-  }
 
-  Widget buildToken(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      verticalDirection: VerticalDirection.up,
-      children: <Widget>[
-        Stack(
-          alignment: Alignment(0, 0),
-          children: <Widget>[
-            SizedBox(
-              width: 180,
-              height: 180,
-              child: ClipPolygon(
-                sides: 6,
-                borderRadius: 5,
-                child: Container(
-                  color: Color.fromRGBO(32, 17, 27, 1.0),
-                ),
-              ),
-            ),
-
-            SizedBox(
-              width: 160,
-              height: 160,
-              child: ClipPolygon(
-                sides: 6,
-                borderRadius: 5,
-                child: Container(
-                  color: Color.fromRGBO(133, 139, 98, 1.0),
-                ),
-              ),
-            ),
-
-            CustomPaint(
-              painter: PanPainter(),
-            )
-          ],
+        Padding(
+          padding: EdgeInsets.only(bottom: 100),
+          child: CustomPaint(
+            painter: PanPainter(),
+          ),
         ),
 
         Padding(
-          padding: EdgeInsets.only(bottom: 1),
-          child: Text("HERMES", style: TextStyle(
-              color: Color.fromRGBO(133, 129, 98, 1.0),
-              fontFamily: 'Rubik',
-              fontWeight: FontWeight.bold,
-              fontSize: 30
-          )),
+          padding: EdgeInsets.only(bottom: 180),
+          child: Container(
+            child: Text("HERMES", style: TextStyle(
+                color: Consts.GREEN,
+                fontFamily: 'Rubik',
+                fontWeight: FontWeight.bold,
+                fontSize: 30
+            )),
+          ),
         )
       ],
     );
@@ -142,9 +157,50 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   }
 }
 
+// This custom layout delegate handles the bottom page and token layout.
+// It is set up to lay out the bottom page and then always place the token
+// such that the middle of its hexagon is aligned with the top edge of the page.
+// In other words: a godsend
+class LayoutDelegate extends MultiChildLayoutDelegate {
+  @override
+  void performLayout(Size size){
+    Size bottomPageSize = Size.zero;
+    Offset bottomPagePos = Offset.zero;
+
+    if (hasChild(_LayoutParts.bottomPage)){
+      bottomPageSize = layoutChild(_LayoutParts.bottomPage, BoxConstraints.loose(size));
+
+      bottomPagePos = size - bottomPageSize;
+      positionChild(_LayoutParts.bottomPage, bottomPagePos);
+    }
+
+    if (hasChild(_LayoutParts.token)){
+      Size tokenSize = layoutChild(_LayoutParts.token, BoxConstraints());
+      double dx = bottomPagePos.dx + size.width/2 - tokenSize.width/2;
+      double dy = bottomPagePos.dy - (tokenSize.height-100);
+      positionChild(_LayoutParts.token, Offset(dx, dy));
+    }
+  }
+
+  @override
+  bool shouldRelayout(MultiChildLayoutDelegate oldDelegate) {
+    return false;
+  }
+}
+
+// This enum ensures that the ids for the bottom page and token are different
+// so they can be laid out by the delegate
+enum _LayoutParts {
+  bottomPage,
+  token
+}
+
+// Paints the background color and the x pattern going across it.
+// @TODO: I'm pretty sure the logic for figuring out the number of xs is wrong
 class BackgroundPainter extends CustomPainter {
-  final int minPadding;
-  BackgroundPainter({this.minPadding});
+  int minPadding;
+  Color color;
+  BackgroundPainter({@required this.minPadding, @required this.color});
 
   @override
   void paint(Canvas canvas, Size size){
@@ -152,7 +208,7 @@ class BackgroundPainter extends CustomPainter {
     final width = size.width;
     Path background = Path();
     background.addRect(Rect.fromLTWH(0, 0, width, height));
-    canvas.drawPath(background, Paint()..color = Color.fromRGBO(32, 17, 27, 1.0));
+    canvas.drawPath(background, Paint()..color = Consts.DARK_PURPLE);
 
 
     Path cross = Path();
@@ -174,7 +230,7 @@ class BackgroundPainter extends CustomPainter {
         canvas.save();
         canvas.translate(wPadding + 12.5 + 50*c, hPadding + 12.5 + 50*r);
         canvas.rotate(pi/4);
-        canvas.drawPath(cross, Paint()..color = Color.fromRGBO(150, 140, 131, 0.25));
+        canvas.drawPath(cross, Paint()..color = color);
         canvas.restore();
       }
     }
@@ -186,6 +242,44 @@ class BackgroundPainter extends CustomPainter {
   }
 }
 
+// This builds the clip path for the bottom page.
+// It is a rectangle with half of a hexagon indenting the top.
+// This handles all of the math for finding those intersection points.
+class PageClipper extends CustomClipper<Path> {
+  double hexW;
+  PageClipper({@required this.hexW});
+
+  @override
+  Path getClip(Size size){
+    double r = sqrt(3.0) * (hexW/4);
+    double s = sqrt((hexW*hexW)/4 - r*r);
+    Offset p1 = size.topCenter(Offset.zero).translate(-r, 0);
+    Offset p2 = size.topCenter(Offset.zero).translate(-r, s);
+    Offset p3 = size.topCenter(Offset.zero).translate(0, hexW/2);
+    Offset p4 = size.topCenter(Offset.zero).translate(r, s);
+    Offset p5 = size.topCenter(Offset.zero).translate(r, 0);
+
+    Path path = Path();
+    path.addPolygon([
+      size.topLeft(Offset.zero),
+      p1, p2, p3, p4, p5,
+      size.topRight(Offset.zero),
+      size.bottomRight(Offset.zero),
+      size.bottomLeft(Offset.zero)
+    ], true);
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper oldDelegate) {
+    return false;
+  }
+}
+
+// This paints the pan flute icon.
+// This will probably be replaced with just an icon image once the icon changes
+// to a lyre, as it will probably be too complicated to draw easily with canvas methods.
 class PanPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size){
