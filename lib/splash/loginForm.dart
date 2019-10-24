@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:hermes/consts.dart';
 import 'package:hermes/widgets/spinnerButton.dart';
+import 'dart:async';
 
 class LoginForm extends StatefulWidget {
   LoginForm({Key key}): super(key: key);
@@ -21,6 +22,7 @@ class LoginForm extends StatefulWidget {
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final focus = FocusNode();
+  final StreamController<int> tapInitiator = StreamController();
 
   String _email, _password;
   bool _autovalidate = false;
@@ -66,7 +68,9 @@ class LoginFormState extends State<LoginForm> {
             style: TextStyle(color: Consts.TEXT_GRAY),
             decoration: InputDecoration(labelText: "Password"),
             textInputAction: TextInputAction.done,
-            onFieldSubmitted: (value) => onLoginPressed(),
+            onFieldSubmitted: (value){
+              tapInitiator.add(1);
+            },
             keyboardType: TextInputType.text,
             obscureText: true,
             validator: (value){
@@ -99,9 +103,15 @@ class LoginFormState extends State<LoginForm> {
             backgroundColor: Consts.GREEN,
             morphDuration: Duration(seconds: 1),
             fadeTextDuration: Duration(milliseconds: 250),
-            onClick: onLoginPressed,
+            shouldAnimate: shouldAnimate,
+            onClick: (valid){
+              if (valid){
+                login(_email, _password);
+              }
+            },
             padding: EdgeInsets.symmetric(horizontal: 64, vertical: 16),
             endPadding: EdgeInsets.symmetric(horizontal: 16),
+            tapInitiator: tapInitiator.stream,
           ),
 
           FlatButton(
@@ -124,18 +134,26 @@ class LoginFormState extends State<LoginForm> {
     );
   }
 
-  void onLoginPressed(){
-    if (_formKey.currentState.validate()) {
+  // Validates the form
+  bool shouldAnimate(){
+    if (_formKey.currentState.validate()){
       _formKey.currentState.save();
-      // Try the actual login
-      login(_email, _password);
-    } else
-      setState(() {
-        _autovalidate = true;
-      });
+      return true;
+    }
+
+    setState(() {
+      _autovalidate = true;
+    });
+    return false;
   }
 
   void login(String email, String password){
     print("Successful login for $email with password '$password'");
+  }
+
+  @override
+  void dispose() {
+    tapInitiator.close();
+    super.dispose();
   }
 }
