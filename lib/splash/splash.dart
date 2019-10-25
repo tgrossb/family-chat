@@ -39,7 +39,7 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           CustomPaint(
-            painter: BackgroundPainter(minPadding: 16, color: Consts.BACKGROUND_PAT_25),
+            painter: BackgroundPainter(color: Consts.BACKGROUND_PAT_25),
             child: Container(),
           ),
 
@@ -195,12 +195,10 @@ enum _LayoutParts {
   token
 }
 
-// Paints the background color and the x pattern going across it.
-// @TODO: I'm pretty sure the logic for figuring out the number of xs is wrong
+// Paints the background color and the cross pattern going across it.
 class BackgroundPainter extends CustomPainter {
-  int minPadding;
   Color color;
-  BackgroundPainter({@required this.minPadding, @required this.color});
+  BackgroundPainter({@required this.color});
 
   @override
   void paint(Canvas canvas, Size size){
@@ -210,30 +208,40 @@ class BackgroundPainter extends CustomPainter {
     background.addRect(Rect.fromLTWH(0, 0, width, height));
     canvas.drawPath(background, Paint()..color = Consts.DARK_PURPLE);
 
-
     Path cross = Path();
     Radius rad = Radius.circular(1);
     cross.addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(-12.5, -1, 10, 2), rad));
     cross.addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(-1, 2.5, 2, 10), rad));
     cross.addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(2.5, -1, 10, 2), rad));
     cross.addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(-1, -12.5, 2, 10), rad));
-    
-    // Calculate the number we can get with at least minPadding on each side and 50px between
-    int maxC = 0, maxR = 0;
-    while ((maxC+2)*25 < width-2*minPadding) maxC++;
-    while ((maxR+2)*25 < height-2*minPadding) maxR++;
 
-    double wPadding = (width - (maxC+1)*25)/2;
-    double hPadding = (height - (maxR+1)*25)/2;
-    for (int r=0; r<maxR; r++){
-      for (int c=0; c<maxC; c++){
-        canvas.save();
-        canvas.translate(wPadding + 12.5 + 50*c, hPadding + 12.5 + 50*r);
-        canvas.rotate(pi/4);
-        canvas.drawPath(cross, Paint()..color = color);
-        canvas.restore();
-      }
+    double y = height/2+50;
+    drawRow(height/2, width, 25, 50, cross, canvas);
+    while (y - 12.5 < height) {
+      drawRow(height-y, width, 25, 50, cross, canvas);
+      drawRow(y, width, 25, 50, cross, canvas);
+      y += 50;
     }
+  }
+
+  void drawRow(double y, double rowWidth, double crossWidth, double padding, Path cross, Canvas canvas){
+    double x = rowWidth/2 + padding;
+    drawCross(rowWidth/2, y, cross, canvas);
+    while (x - crossWidth/2 < rowWidth){
+      drawCross(rowWidth-x, y, cross, canvas);
+      drawCross(x, y, cross, canvas);
+      x += padding;
+    }
+  }
+
+  // Handles all of the saving, translating, rotating, and restoring
+  // Pass the center of the cross
+  void drawCross(double x, double y, Path cross, Canvas canvas){
+    canvas.save();
+    canvas.translate(x, y);
+    canvas.rotate(pi/4);
+    canvas.drawPath(cross, Paint()..color = color);
+    canvas.restore();
   }
 
   @override

@@ -67,7 +67,7 @@ class SpinnerButtonState extends State<SpinnerButton> with SingleTickerProviderS
     totalHeight = textHeight + padding.top + padding.bottom;
     totalWidth = textWidth + padding.left + padding.right;
 
-    // Morph down to a square through the width
+    // Morph down to a square plus the end padding on the horizontal (defaults to the same as normal padding - which would make a square)
     widthMorph = Tween(begin: totalWidth, end: totalHeight+endPadding.left+endPadding.right).animate(
         CurvedAnimation(parent: controller.view, curve: Curves.easeOutQuint));
 
@@ -108,7 +108,7 @@ class SpinnerButtonState extends State<SpinnerButton> with SingleTickerProviderS
           Padding(
             padding: padding,
             child: Center(
-              child: fadeText.value > 0.1 ? Text(
+              child: fadeText.value > 0.01 ? Text(
                 widget.text.data,
                 style: widget.text.style.copyWith(color: textColor),
                 textAlign: TextAlign.center,
