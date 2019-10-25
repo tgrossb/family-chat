@@ -21,12 +21,15 @@ class LoginForm extends StatefulWidget {
 
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-  final focus = FocusNode();
+  final passwordFocus = FocusNode();
+  final passwordController = TextEditingController();
   final StreamController<int> tapInitiator = StreamController();
 
   String _email, _password;
   bool _autovalidate = false;
   RegExp emailRegex;
+
+  bool _loggingIn = false;
 
   LoginFormState(){
     Pattern emailPattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -42,6 +45,7 @@ class LoginFormState extends State<LoginForm> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           TextFormField(
+            enabled: !_loggingIn,
             style: TextStyle(color: Consts.TEXT_GRAY),
             decoration: InputDecoration(labelText: "Email"),
             textInputAction: TextInputAction.next,
@@ -57,14 +61,16 @@ class LoginFormState extends State<LoginForm> {
               _email = value;
             },
             onFieldSubmitted: (value){
-              FocusScope.of(context).requestFocus(focus);
+              FocusScope.of(context).requestFocus(passwordFocus);
             },
           ),
 
           SizedBox(height: 16),
 
           TextFormField(
-            focusNode: focus,
+            enabled: !_loggingIn,
+            focusNode: passwordFocus,
+            controller: passwordController,
             style: TextStyle(color: Consts.TEXT_GRAY),
             decoration: InputDecoration(labelText: "Password"),
             textInputAction: TextInputAction.done,
@@ -86,7 +92,7 @@ class LoginFormState extends State<LoginForm> {
           Align(
             alignment: Alignment.centerRight,
             child: FlatButton(
-              onPressed: (){
+              onPressed: _loggingIn ? null : (){
                 print("FORGOT PASSWORD!!!! Lol thats rough");
               },
               child: Text("Forgot password",
@@ -104,18 +110,14 @@ class LoginFormState extends State<LoginForm> {
             morphDuration: Duration(seconds: 1),
             fadeTextDuration: Duration(milliseconds: 250),
             shouldAnimate: shouldAnimate,
-            onClick: (valid){
-              if (valid){
-                login(_email, _password);
-              }
-            },
+            onClick: attemptLogin,
             padding: EdgeInsets.symmetric(horizontal: 64, vertical: 16),
             endPadding: EdgeInsets.symmetric(horizontal: 16),
             tapInitiator: tapInitiator.stream,
           ),
 
           FlatButton(
-            onPressed: (){
+            onPressed: _loggingIn ? null : (){
               print("Bro just already be signed up");
             },
             child: RichText(
@@ -147,8 +149,33 @@ class LoginFormState extends State<LoginForm> {
     return false;
   }
 
-  void login(String email, String password){
-    print("Successful login for $email with password '$password'");
+  // The entry point for logging in from the button
+  Future<bool> attemptLogin(bool valid) async {
+    if (valid) {
+      setState((){
+        _loggingIn = true;
+      });
+
+      bool success = await login(_email, _password);
+      print("Login for user '$_email' with password '$_password' was ${success ? "successful" : "unsuccessful"}");
+
+      if (!success) {
+        setState(() {
+          _loggingIn = false;
+        });
+
+        FocusScope.of(context).requestFocus(passwordFocus);
+        passwordController.clear();
+      }
+
+      return success;
+    }
+    return false;
+  }
+  
+  Future<bool> login(String email, String password) async {
+    await Future.delayed(Duration(seconds: 5));
+    return email == "tgrossb87@gmail.com" && password == "password";
   }
 
   @override

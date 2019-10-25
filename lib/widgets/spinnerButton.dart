@@ -15,6 +15,10 @@
  * A stream can also be given to programmatically 'tap' the button.  To initiate a tap,
  * bring the stream high (set it to 1).
  *
+ * If the onClick animation returns false, this indicates a failure.
+ * In this case, the animation will be run in reverse to re-enable the button.
+ * Otherwise, it is assumed that the button will be properly replaced.
+ *
  * Written by: Theo Grossberndt
  */
 
@@ -84,7 +88,9 @@ class SpinnerButtonState extends State<SpinnerButton> with SingleTickerProviderS
     bool animate = widget.shouldAnimate();
     if (animate)
       controller.forward();
-    widget.onClick(animate);
+    bool success = await widget.onClick(animate);
+    if (!success)
+      controller.reverse();
   }
 
   Widget buildButton(BuildContext context, Widget child){
