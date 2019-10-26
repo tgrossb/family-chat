@@ -4,7 +4,6 @@ import 'package:polygon_clipper/polygon_clipper.dart';
 import 'package:hermes/consts.dart';
 import 'package:hermes/splash/loginForm.dart';
 
-
 class Splash extends StatefulWidget {
   Splash({Key key}) : super(key: key);
 
@@ -36,7 +35,7 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       body: Stack(
-        alignment: Alignment.bottomCenter,
+        alignment: Alignment.center,
         children: <Widget>[
           CustomPaint(
             painter: BackgroundPainter(color: Consts.BACKGROUND_PAT_25),

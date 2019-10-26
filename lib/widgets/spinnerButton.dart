@@ -17,14 +17,18 @@
  *
  * If the onClick animation returns false, this indicates a failure.
  * In this case, the animation will be run in reverse to re-enable the button.
- * Otherwise, it is assumed that the button will be properly replaced.
+ *
+ * Otherwise, the button's parent should handle the future of this button.
  *
  * Written by: Theo Grossberndt
  */
 
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class SpinnerButton extends StatefulWidget {
+  static const int TRIGGER_TAP = 1;
+
   final Text text;
   final Widget spinner;
   final Color backgroundColor;
@@ -77,7 +81,7 @@ class SpinnerButtonState extends State<SpinnerButton> with SingleTickerProviderS
 
     if (widget.tapInitiator != null)
       widget.tapInitiator.listen((data){
-        if (data == 1 && controller.status != AnimationStatus.forward)
+        if (data == SpinnerButton.TRIGGER_TAP && controller.status != AnimationStatus.forward)
           click();
       });
 
@@ -113,16 +117,25 @@ class SpinnerButtonState extends State<SpinnerButton> with SingleTickerProviderS
 
           Padding(
             padding: padding,
-            child: Center(
-              child: fadeText.value > 0.01 ? Text(
-                widget.text.data,
-                style: widget.text.style.copyWith(color: textColor),
-                textAlign: TextAlign.center,
-              ) : SizedBox(
-                width: textHeight,
-                height: textHeight,
-                child: widget.spinner,
-              ),
+            child: IndexedStack(
+              index: fadeText.value > 0.01 ? 0 : 1,
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    widget.text.data,
+                    style: widget.text.style.copyWith(color: textColor),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                Center(
+                  child: SizedBox(
+                    width: textHeight,
+                    height: textHeight,
+                    child: widget.spinner,
+                  ),
+                )
+              ],
             ),
           ),
 

@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:hermes/consts.dart';
 import 'package:hermes/widgets/spinnerButton.dart';
+import 'package:hermes/widgets/checkProgressIndicator.dart';
 import 'dart:async';
 
 class LoginForm extends StatefulWidget {
@@ -24,6 +25,7 @@ class LoginFormState extends State<LoginForm> {
   final passwordFocus = FocusNode();
   final passwordController = TextEditingController();
   final StreamController<int> tapInitiator = StreamController();
+  final StreamController<int> progressFinisher = StreamController();
 
   String _email, _password;
   bool _autovalidate = false;
@@ -103,8 +105,10 @@ class LoginFormState extends State<LoginForm> {
 
           SpinnerButton(
             text: Text("LOG IN", style: TextStyle(fontSize: 24, fontFamily: 'Rubik', color: Colors.white)),
-            spinner: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Consts.BLUE),
+            spinner: CheckProgressIndicator(
+              color: Consts.BLUE,
+              strokeWidth: 2,
+              finish: progressFinisher.stream,
             ),
             backgroundColor: Consts.GREEN,
             morphDuration: Duration(seconds: 1),
@@ -138,14 +142,15 @@ class LoginFormState extends State<LoginForm> {
 
   // Validates the form
   bool shouldAnimate(){
+    setState(() {
+      _autovalidate = true;
+    });
+
     if (_formKey.currentState.validate()){
       _formKey.currentState.save();
       return true;
     }
 
-    setState(() {
-      _autovalidate = true;
-    });
     return false;
   }
 
@@ -166,7 +171,8 @@ class LoginFormState extends State<LoginForm> {
 
         FocusScope.of(context).requestFocus(passwordFocus);
         passwordController.clear();
-      }
+      } else
+        progressFinisher.add(1);
 
       return success;
     }
@@ -174,13 +180,14 @@ class LoginFormState extends State<LoginForm> {
   }
   
   Future<bool> login(String email, String password) async {
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(Duration(seconds: 2));
     return email == "tgrossb87@gmail.com" && password == "password";
   }
 
   @override
   void dispose() {
     tapInitiator.close();
+    progressFinisher.close();
     super.dispose();
   }
 }
