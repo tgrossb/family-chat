@@ -37,7 +37,7 @@ class CheckProgressIndicatorState extends State<CheckProgressIndicator> with Sin
     // TODO: implement initState
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: widget.duration ?? Duration(seconds: 1));
+    _controller = AnimationController(vsync: this, duration: widget.duration ?? Duration(milliseconds: 750));
 
     _controller.addStatusListener((status){
       if (status == AnimationStatus.completed && !toCheck) {
@@ -140,7 +140,6 @@ class ProgressPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ProgressPainter oldDelegate) {
-//    return animation.value != oldDelegate.animation.value;
-    return true;
+    return animation.value < 1;
   }
 }
