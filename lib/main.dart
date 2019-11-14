@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hermes/splash/splash.dart';
 import 'package:hermes/consts.dart';
+import 'package:hermes/authentication.dart';
 
 void main() => runApp(Hermes());
 
@@ -42,7 +43,7 @@ class Hermes extends StatelessWidget {
         textSelectionColor: Consts.BLUE,
         textSelectionHandleColor: Consts.BLUE
       ),
-      home: Splash(),
+      home: Splash(auth: Auth()),
     );
   }
 }

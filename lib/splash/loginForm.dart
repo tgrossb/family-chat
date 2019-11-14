@@ -9,12 +9,93 @@
 
 import 'package:flutter/material.dart';
 import 'package:hermes/consts.dart';
+import 'package:hermes/splash/form.dart';
 import 'package:hermes/widgets/spinnerButton.dart';
 import 'package:hermes/widgets/checkProgressIndicator.dart';
+import 'package:hermes/authentication.dart';
+import 'package:hermes/user.dart';
+import 'package:hermes/splash/signUpForm.dart';
 import 'dart:async';
 
+class LoginForm extends AutoAdvanceForm {
+  final Auth auth;
+
+  LoginForm({Key key, @required this.auth}):
+      super(key: key, formType: FormType.LOGIN_FORM, entries: <FormEntry>[
+        FormInput(
+          name: "Email",
+          keyboardType: TextInputType.emailAddress,
+          validator: AutoAdvanceForm.emailValidator
+        ),
+
+        FormDecor(id: 0),
+
+        FormInput(
+          name: "Password",
+          obscure: true,
+          validator: (value){
+            if (value.isEmpty())
+              return "Please enter your password";
+            return null;
+          }
+        ),
+
+        FormDecor(id: 1),
+
+        FormSubmitButton(
+          buttonText: "LOG IN"
+        ),
+
+        FormDecor(id: 2)
+      ], actuator: (values) async {
+        User user = await auth.signIn(values[0], values[1]);
+        if (user.isValid()){
+          return true;
+        }
+
+        return false;
+      }, inputCount: 2);
+
+  Widget buildDecor(BuildContext context, int id){
+    if (id == 0)
+      return SizedBox(height: 16);
+    if (id == 1)
+      return Align(
+        alignment: Alignment.centerRight,
+        child: FlatButton(
+          onPressed: (){
+            print("FORGOT PASSWORD!!!! Lol thats rough");
+          },
+          child: Text("Forgot password",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Consts.BLUE)),
+          padding: EdgeInsets.only(),
+        ),
+      );
+    if (id == 2)
+      return FlatButton(
+        onPressed: (){
+          print("Going to sign up");
+        },
+        child: RichText(
+          text: TextSpan(
+              style: TextStyle(color: Consts.BLUE),
+              children: <TextSpan>[
+                new TextSpan(text: "Don't have an account yet? "),
+                new TextSpan(text: "Sign Up!", style: TextStyle(fontWeight: FontWeight.bold))
+              ]
+          ),
+        ),
+        padding: EdgeInsets.only(),
+      );
+  }
+}
+/*
 class LoginForm extends StatefulWidget {
-  LoginForm({Key key}): super(key: key);
+  final Auth auth;
+  final Duration _slideDuration;
+  LoginForm({Key key, @required this.auth, Duration slideDuration}):
+        _slideDuration = slideDuration ?? Duration(seconds: 1),
+        super(key: key);
 
   @override
   State<LoginForm> createState() => LoginFormState();
@@ -39,7 +120,7 @@ class LoginFormState extends State<LoginForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Form(
       key: _formKey,
       autovalidate: _autovalidate,
@@ -56,7 +137,7 @@ class LoginFormState extends State<LoginForm> {
               if (value.isEmpty)
                 return "Please enter your email";
               if (!emailRegex.hasMatch(value))
-                return "Please enter a valid email";
+                return "Hmm that doesn't look like an email";
               return null;
             },
             onSaved: (value){
@@ -122,7 +203,9 @@ class LoginFormState extends State<LoginForm> {
 
           FlatButton(
             onPressed: _loggingIn ? null : (){
-              print("Bro just already be signed up");
+              setState(() {
+                _currentForm = SignUpForm(auth: widget.auth);
+              });
             },
             child: RichText(
               text: TextSpan(
@@ -180,8 +263,12 @@ class LoginFormState extends State<LoginForm> {
   }
   
   Future<bool> login(String email, String password) async {
-    await Future.delayed(Duration(seconds: 2));
-    return email == "tgrossb87@gmail.com" && password == "password";
+    User user = await widget.auth.signIn(email, password);
+    if (user.isValid()){
+      return true;
+    }
+
+    return false;
   }
 
   @override
@@ -191,3 +278,4 @@ class LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 }
+ */

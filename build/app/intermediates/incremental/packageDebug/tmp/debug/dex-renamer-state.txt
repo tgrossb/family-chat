@@ -1,4 +1,4 @@
-#Fri Oct 25 22:13:14 EDT 2019
+#Thu Nov 14 00:31:02 EST 2019
 base.0=/home/theo/Android/AndroidStudioProjects/hermes/build/app/intermediates/transforms/dexMerger/debug/0
 path.0=classes.dex
 renamed.0=classes.dex

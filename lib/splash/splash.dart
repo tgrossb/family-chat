@@ -1,11 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:hermes/splash/signUpForm.dart';
 import 'dart:math';
 import 'package:polygon_clipper/polygon_clipper.dart';
 import 'package:hermes/consts.dart';
 import 'package:hermes/splash/loginForm.dart';
+import 'package:hermes/splash/signUpForm.dart';
+import 'package:hermes/splash/form.dart';
+import 'package:hermes/authentication.dart';
 
 class Splash extends StatefulWidget {
-  Splash({Key key}) : super(key: key);
+  final Auth auth;
+  Splash({Key key, @required this.auth}) : super(key: key);
 
   @override
   SplashState createState() => SplashState(duration: Duration(seconds: 1));
@@ -18,6 +25,8 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
   SplashState({this.duration});
 
+  AutoAdvanceForm currentForm;
+
   @override
   void initState() {
     super.initState();
@@ -26,6 +35,8 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     pageSlider = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero).animate(
         CurvedAnimation(parent: controller, curve: Curves.easeOutQuint));
     controller.forward();
+
+//    currentForm = LoginForm(auth: widget.auth);
   }
 
   @override
@@ -87,7 +98,14 @@ class SplashState extends State<Splash> with SingleTickerProviderStateMixin {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.only(left: 16, right: 16, top: 106, bottom: 16),
-                    child: LoginForm(),
+                    child: LoginForm(auth: widget.auth)
+//                    NotificationListener(
+//                      child: currentForm,
+//                      onNotification: (notification){
+//                        print("Changing");
+//                        return true;
+//                      },
+//                    ),
                   ),
                 ],
               ),
