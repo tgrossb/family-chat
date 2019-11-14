@@ -38,6 +38,13 @@ enum FormType {
   LOGIN_FORM, SIGNUP_FORM, OTHER
 }
 
+class FutureFormEntry {
+  FormEntryType type;
+  int id;
+
+  FutureFormEntry({@required this.type, this.id = -1});
+}
+
 enum FormEntryType {
   INPUT, DECOR, SUBMIT
 }
@@ -56,7 +63,7 @@ class FormInput extends FormEntry {
   FormInput({@required this.name,
     this.keyboardType = TextInputType.text,
     Function validator, this.obscure = false}):
-      this.validator = validator ?? ((value) => null),
+      this.validator = validator ?? null,
       super(type: FormEntryType.INPUT);
 }
 
@@ -68,35 +75,43 @@ class FormSubmitButton extends FormEntry {
 }
 
 class FormDecor extends FormEntry {
-  int id;
+  Widget widget;
 
-  FormDecor({@required this.id}):
+  FormDecor({@required this.widget}):
       super(type: FormEntryType.DECOR);
 }
 
-class AutoAdvanceForm extends StatefulWidget {
+abstract class AutoAdvanceForm extends StatefulWidget {
   final FormType formType;
-  final List<FormEntry> entries;
-  final Function actuator;
-  final Function _buildDecor;
-  final int inputCount;
-  AutoAdvanceForm({Key key, @required this.formType,
-    @required this.entries, @required this.actuator, Function buildDecor, @required this.inputCount}):
-//      inputCount = entries.where((element) => element.type == FormEntryType.INPUT).length,
-      this._buildDecor = buildDecor ?? ((context, id) => null),
-      super(key: key);
+  final List<FutureFormEntry> futureFormEntries;
+  final int _inputCount, _submitCount;
+
+  AutoAdvanceForm({Key key, @required this.formType, @required this.futureFormEntries}):
+        _inputCount = (futureFormEntries.where((el) => el.type == FormEntryType.INPUT)).length,
+        _submitCount = (futureFormEntries.where((el) => el.type == FormEntryType.SUBMIT)).length,
+        super(key: key){
+    assert(_submitCount == 1);
+
+    // If the FutureFormEntries don't have defined ids, give them positional ids
+    if (futureFormEntries.where((el) => el.id < 0).length > 0)
+      for (int c=0; c<futureFormEntries.length; c++)
+        futureFormEntries[c].id = c;
+  }
 
   @override
   State<AutoAdvanceForm> createState() => AutoAdvanceFormState();
 
   static RegExp emailRegex = RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$');
-  static emailValidator(String value){
+  static String emailValidator(String value){
     if (value.isEmpty)
       return "Please enter your email";
     if (!emailRegex.hasMatch(value))
       return "Hmm that doesn't look like an email";
     return null;
   }
+
+  FormEntry buildEntry(BuildContext context, int id);
+  Future<bool> actuate(List<String> values);
 }
 
 class AutoAdvanceFormState extends State<AutoAdvanceForm> {
@@ -116,20 +131,22 @@ class AutoAdvanceFormState extends State<AutoAdvanceForm> {
   void initState(){
     super.initState();
 
-    values = List(widget.inputCount);
-    advancementNodes = List(values.length-1);
-    for (int c=0; c<values.length; c++) {
+    values = List(widget._inputCount);
+    advancementNodes = List(widget._inputCount-1);
+
+    for (int c=0; c<widget._inputCount; c++){
       values[c] = "";
-      if (c != values.length-1)
-        advancementNodes[c] = FocusNode();
+
+      if (c > 0)
+        advancementNodes[c-1] = FocusNode();
     }
   }
 
-  Widget buildInput(FormInput inputParams, int c){
-    bool last = c == widget.inputCount - 1;
+  Widget buildInput(FormInput inputParams, int inputPos){
+    bool last = inputPos == widget._inputCount-1;
     return TextFormField(
       enabled: !_actuating,
-      focusNode: c > 0 ? advancementNodes[c] : null,
+      focusNode: inputPos > 0 ? advancementNodes[inputPos-1] : null,
       controller: last ? finalController : null,
       style: TextStyle(color: Consts.TEXT_GRAY),
       decoration: InputDecoration(labelText: inputParams.name),
@@ -137,13 +154,14 @@ class AutoAdvanceFormState extends State<AutoAdvanceForm> {
       keyboardType: inputParams.keyboardType,
       validator: inputParams.validator,
       onSaved: (value){
-        values[c] = value;
+        values[inputPos] = value;
       },
-      onFieldSubmitted: c < widget.entries.length-1 ? (value){
-        FocusScope.of(context).requestFocus(advancementNodes[c]);
-      } : (value){
+      onFieldSubmitted: last ? (value){
         tapInitiator.add(1);
+      } : (value){
+        FocusScope.of(context).requestFocus(advancementNodes[inputPos]);
       },
+      obscureText: inputParams.obscure,
     );
   }
 
@@ -171,14 +189,19 @@ class AutoAdvanceFormState extends State<AutoAdvanceForm> {
 
   @override
   Widget build(BuildContext context){
-    List<Widget> formChildren = List(widget.entries.length);
-    for (int c=0; c<formChildren.length; c++){
-      if (widget.entries[c].type == FormEntryType.INPUT)
-        formChildren.add(buildInput(widget.entries[c], c));
-      else if (widget.entries[c].type == FormEntryType.SUBMIT)
-        formChildren.add(buildSubmitButton(widget.entries[c]));
+    List<Widget> formChildren = List(widget.futureFormEntries.length);
+    int inputCounter = 0;
+    for (int c=0; c<widget.futureFormEntries.length; c++){
+      FormEntry entry = widget.buildEntry(context, widget.futureFormEntries[c].id);
+      assert(entry.type == widget.futureFormEntries[c].type);
+
+      if (entry.type == FormEntryType.INPUT) {
+        formChildren[c] = buildInput(entry, inputCounter);
+        inputCounter++;
+      } else if (entry.type == FormEntryType.SUBMIT)
+        formChildren[c] = buildSubmitButton(entry);
       else
-        formChildren.add(widget._buildDecor(context, (widget.entries[c] as FormDecor).id));
+        formChildren[c] = (entry as FormDecor).widget;
     }
 
     return Form(
@@ -212,14 +235,15 @@ class AutoAdvanceFormState extends State<AutoAdvanceForm> {
         _actuating = true;
       });
 
-      bool success = await widget.actuator(values);
+      bool success = await widget.actuate(values);
 
       if (!success) {
         setState(() {
           _actuating = false;
         });
 
-        FocusScope.of(context).requestFocus(advancementNodes[advancementNodes.length-1]);
+//        FocusScope.of(context).requestFocus(advancementNodes[advancementNodes.length-1]);
+        FocusScope.of(_formKey.currentContext).requestFocus(advancementNodes[0]);
         finalController.clear();
       } else
         progressFinisher.add(1);

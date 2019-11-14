@@ -21,72 +21,84 @@ class LoginForm extends AutoAdvanceForm {
   final Auth auth;
 
   LoginForm({Key key, @required this.auth}):
-      super(key: key, formType: FormType.LOGIN_FORM, entries: <FormEntry>[
-        FormInput(
-          name: "Email",
-          keyboardType: TextInputType.emailAddress,
-          validator: AutoAdvanceForm.emailValidator
-        ),
+      super(key: key, formType: FormType.LOGIN_FORM, futureFormEntries: <FutureFormEntry>[
+        FutureFormEntry(type: FormEntryType.INPUT),
+        FutureFormEntry(type: FormEntryType.DECOR),
+        FutureFormEntry(type: FormEntryType.INPUT),
+        FutureFormEntry(type: FormEntryType.DECOR),
+        FutureFormEntry(type: FormEntryType.SUBMIT),
+        FutureFormEntry(type: FormEntryType.DECOR)
+      ]);
 
-        FormDecor(id: 0),
-
-        FormInput(
-          name: "Password",
-          obscure: true,
-          validator: (value){
-            if (value.isEmpty())
-              return "Please enter your password";
-            return null;
-          }
-        ),
-
-        FormDecor(id: 1),
-
-        FormSubmitButton(
-          buttonText: "LOG IN"
-        ),
-
-        FormDecor(id: 2)
-      ], actuator: (values) async {
-        User user = await auth.signIn(values[0], values[1]);
-        if (user.isValid()){
-          return true;
-        }
-
-        return false;
-      }, inputCount: 2);
-
-  Widget buildDecor(BuildContext context, int id){
-    if (id == 0)
-      return SizedBox(height: 16);
-    if (id == 1)
-      return Align(
-        alignment: Alignment.centerRight,
-        child: FlatButton(
-          onPressed: (){
-            print("FORGOT PASSWORD!!!! Lol thats rough");
-          },
-          child: Text("Forgot password",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Consts.BLUE)),
-          padding: EdgeInsets.only(),
-        ),
-      );
-    if (id == 2)
-      return FlatButton(
-        onPressed: (){
-          print("Going to sign up");
-        },
-        child: RichText(
-          text: TextSpan(
-              style: TextStyle(color: Consts.BLUE),
-              children: <TextSpan>[
-                new TextSpan(text: "Don't have an account yet? "),
-                new TextSpan(text: "Sign Up!", style: TextStyle(fontWeight: FontWeight.bold))
-              ]
+  @override
+  FormEntry buildEntry(BuildContext context, int pos){
+    return <FormEntry>[
+          FormInput(
+              name: "Email",
+              keyboardType: TextInputType.emailAddress,
+              validator: AutoAdvanceForm.emailValidator
           ),
-        ),
-        padding: EdgeInsets.only(),
-      );
+
+          FormDecor(
+            widget: SizedBox(height: 16)
+          ),
+
+          FormInput(
+              name: "Password",
+              obscure: true,
+              validator: (value) {
+                if (value.isEmpty)
+                  return "Please enter your password";
+                return null;
+              }
+          ),
+
+          FormDecor(
+            widget: Align(
+              alignment: Alignment.centerRight,
+              child: FlatButton(
+                onPressed: (){
+                  print("FORGOT PASSWORD!!!! Lol thats rough");
+                },
+                child: Text("Forgot password",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Consts.BLUE)),
+                padding: EdgeInsets.only(),
+              ),
+            )
+          ),
+
+          FormSubmitButton(
+              buttonText: "LOG IN"
+          ),
+
+          FormDecor(
+            widget: FlatButton(
+              onPressed: (){
+                print("Going to sign up");
+              },
+              child: RichText(
+                text: TextSpan(
+                    style: TextStyle(color: Consts.BLUE),
+                    children: <TextSpan>[
+                      new TextSpan(text: "Don't have an account yet? "),
+                      new TextSpan(text: "Sign Up!", style: TextStyle(fontWeight: FontWeight.bold))
+                    ]
+                ),
+              ),
+              padding: EdgeInsets.only(),
+            )
+          )
+        ][pos];
+  }
+
+  @override
+  Future<bool> actuate(List<String> values) async {
+    User user = await auth.signIn(values[0], values[1]);
+    if (user.isValid()) {
+      return true;
+    }
+
+    return false;
   }
 }
 /*
